@@ -20,8 +20,7 @@ const CONTACT_LINKS = [
   { label: "linked in", href: "https://www.linkedin.com/in/ericnguyen342/" },
 ];
 
-const openInNewTab = (href: string) =>
-  href.startsWith("http") || (href.startsWith("/") && href.includes("."));
+const openInNewTab = (href: string) => href.startsWith("http");
 
 export default function Home() {
   const pathname = usePathname();
