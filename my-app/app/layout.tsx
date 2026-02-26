@@ -15,11 +15,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eric Nguyen",
+  title: {
+    default: "Eric Nguyen",
+    template: "%s | Eric Nguyen",
+  },
+  description:
+    "Building modern web stuff. Sometimes it works the first time.",
+  openGraph: {
+    images: [
+      {
+        url: "/3nvyxScreenshoot.png",
+        width: 1200,
+        height: 630,
+        alt: "Eric Nguyen's Website",
+      },
+    ],
+  },
   icons: {
     icon: "/favicon.ico",
   },
-  description: "Personal portfolio and landing page",
 };
 
 export default function RootLayout({
