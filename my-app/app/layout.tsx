@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Eric Nguyen",
+  icons: {
+    icon: "/favicon.ico",
+  },
   description: "Personal portfolio and landing page",
 };
 
