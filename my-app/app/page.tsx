@@ -1,13 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+const PHOTO_HEADSHOT = "/Eric_Nguyen_Headshot%201.png";
+const PHOTO_DRAWING = "/Headshot_Drawing.png";
+
 const NAV_LINKS = [
   { label: "eric nguyen", href: "/" },
-  { label: "projects", href: "#projects" },
-  { label: "work", href: "#work" },
+  { label: "projects", href: "/projects" },
+  { label: "work", href: "/work" },
 ];
 
 const CONTACT_LINKS = [
@@ -21,6 +25,11 @@ const openInNewTab = (href: string) =>
 
 export default function Home() {
   const pathname = usePathname();
+  const [photoSrc, setPhotoSrc] = useState(PHOTO_HEADSHOT);
+
+  const isDrawing = photoSrc === PHOTO_DRAWING;
+  const togglePhoto = () =>
+    setPhotoSrc(isDrawing ? PHOTO_HEADSHOT : PHOTO_DRAWING);
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans antialiased">
@@ -67,16 +76,21 @@ export default function Home() {
             {/* Right column: photo box + links row, vertically centered */}
             <div className="flex min-h-full flex-col items-center justify-center">
               <div className="flex flex-col items-center gap-6">
-                <div className="relative h-64 w-64 shrink-0 overflow-hidden rounded-sm bg-zinc-200 sm:h-80 sm:w-80 md:h-[24rem] md:w-[24rem]">
+                <button
+                  type="button"
+                  onClick={togglePhoto}
+                  className="relative h-64 w-64 shrink-0 cursor-pointer overflow-hidden rounded-sm bg-zinc-200 sm:h-80 sm:w-80 md:h-[24rem] md:w-[24rem] focus:outline-none"
+                  aria-label={isDrawing ? "Show photo" : "Show drawing"}
+                >
                   <Image
-                    src="/Eric_Nguyen_Headshot%201.png"
-                    alt="Eric Nguyen"
+                    src={photoSrc}
+                    alt={isDrawing ? "Eric Nguyen (drawing)" : "Eric Nguyen"}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-opacity duration-200"
                     sizes="(max-width: 640px) 16rem, (max-width: 768px) 20rem, 24rem"
                     priority
                   />
-                </div>
+                </button>
                 <div className="flex flex-wrap items-center justify-center gap-8 text-sm font-normal leading-none text-zinc-800 md:gap-16">
                   {CONTACT_LINKS.map((item) => (
                     <Link
