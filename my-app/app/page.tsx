@@ -33,12 +33,12 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="px-6 pt-28 pb-20 md:px-12 md:pt-36 md:pb-24">
-        <section className="mx-auto max-w-5xl">
+      <main className="min-h-screen w-full bg-black md:pt-48">
+        <section className="bg-white mx-auto px-12 max-w-7xl">
           <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:items-start">
             {/* Left column: about + heading + paragraph */}
             <div className="space-y-5">
-              <p className="text-sm font-normal uppercase tracking-wide text-zinc-500">
+              <p className="text-sm font-normal tracking-wide text-black">
                 about
               </p>
               <h1 className="text-5xl font-bold leading-[1.1] tracking-tight text-zinc-900 sm:text-6xl md:text-7xl">
