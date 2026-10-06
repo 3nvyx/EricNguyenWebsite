@@ -1,73 +1,36 @@
-# Eric Nguyen — Personal Site
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Personal portfolio and landing page built with Next.js.
+## Getting Started
 
-## Preview
-
-<!-- Add a screenshot of your landing page here for a clearer README on GitHub:
-  1. Take a screenshot of the landing page (e.g. http://localhost:3000)
-  2. Save it in the repo (e.g. docs/landing.png or .github/landing.png)
-  3. Replace the line below with: ![Landing page](docs/landing.png)
--->
-*Screenshot coming soon — run the app locally or add an image to this section.*
-
-## Tech stack
-
-- **Next.js 16** (App Router)
-- **React 19**
-- **Tailwind CSS 4**
-- **TypeScript**
-- **IBM Plex Sans Condensed** (Google Fonts via `next/font`)
-
-## What’s included
-
-- **Home:** About section, headshot (click to toggle photo/drawing), resume / email / LinkedIn links
-- **Nav:** eric nguyen · projects · work (active page is bold, hover underline)
-- **Projects & Work:** Placeholder “Work in progress” pages at `/projects` and `/work`
-- **Responsive:** Layout and typography tuned for mobile and desktop
-
-## Getting started
-
-The app lives in the `my-app` directory:
+First, run the development server:
 
 ```bash
-cd my-app
-npm install
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Other commands
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-- `npm run build` — production build
-- `npm run start` — run production server
-- `npm run lint` — run ESLint
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Project structure
+## Learn More
 
-```
-EricNguyenWebsite/
-├── README.md           ← you are here
-└── my-app/
-    ├── app/
-    │   ├── layout.tsx
-    │   ├── page.tsx    ← home
-    │   ├── projects/page.tsx
-    │   └── work/page.tsx
-    ├── public/         ← images, resume PDF
-    └── package.json
-```
+To learn more about Next.js, take a look at the following resources:
 
-## Adding a screenshot to this README
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-1. Run the app and open the landing page in your browser.
-2. Take a screenshot (e.g. full page or hero section).
-3. Save it in the repo, e.g. `docs/landing.png` or `.github/landing.png`.
-4. In this README, replace the *Screenshot coming soon* line with:
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-   ```markdown
-   ![Landing page](docs/landing.png)
-   ```
+## Deploy on Vercel
 
-Commit and push; the image will show on GitHub.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
