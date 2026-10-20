@@ -13,7 +13,7 @@
   --color-mute: var(--mute);
   --color-faint: var(--faint);
   --font-sans: var(--font-inter-tight);
-  --font-display: var(--font-josefin);
+  --font-display: var(--font-unbounded);
 }
 
 html {
@@ -25,6 +25,41 @@ body {
   color: var(--ink);
   font-family: var(--font-inter-tight), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Brushed metal type: dark gradient in the glyphs, SVG specular bevel, pointer-lit reflection.
+   In the components layer so Tailwind utilities on the element (md:fixed etc.) still win. */
+@layer components {
+  .chrome-name {
+    position: relative;
+    display: inline-block;
+    width: fit-content;
+    filter: url(#chrome-bevel);
+  }
+
+  .chrome-base,
+  .chrome-light {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .chrome-base {
+    background-image: linear-gradient(
+      180deg,
+      #6b6b68 0%,
+      #3a3a38 42%,
+      #262625 52%,
+      #4f4f4c 68%,
+      #8a8a86 100%
+    );
+  }
+
+  .chrome-light {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
 }
 
 ::selection {

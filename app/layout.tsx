@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { Josefin_Sans, Inter_Tight } from "next/font/google";
+import { Unbounded, Inter_Tight } from "next/font/google";
 import "./globals.css";
 
-const josefin = Josefin_Sans({
-  variable: "--font-josefin",
+const unbounded = Unbounded({
+  variable: "--font-unbounded",
   subsets: ["latin"],
-  weight: ["100"],
+  weight: ["500", "700"],
 });
 
 const interTight = Inter_Tight({
@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${josefin.variable} ${interTight.variable}`}>
+      <body className={`${unbounded.variable} ${interTight.variable}`}>
         {children}
         <Analytics />
       </body>

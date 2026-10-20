@@ -8,6 +8,11 @@ import { SlapSplash } from "@/components/slap-splash";
 export function MediaSlot({ project }: { project: Project }) {
   const [missing, setMissing] = useState(false);
 
+  // A server-rendered <img> can fail before React attaches onError, so also check when it mounts.
+  const checkLoaded = (el: HTMLImageElement | null) => {
+    if (el && el.complete && el.naturalWidth === 0) setMissing(true);
+  };
+
   if (project.slug === "slap") {
     return (
       <div className="h-full w-full bg-ink p-[3%]">
@@ -27,6 +32,7 @@ export function MediaSlot({ project }: { project: Project }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={checkLoaded}
       src={project.media}
       alt={project.line}
       onError={() => setMissing(true)}
