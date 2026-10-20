@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "motion/react";
+import { motion, useMotionTemplate, useMotionValue, useSpring } from "motion/react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -11,27 +11,7 @@ import { cn } from "@/lib/utils";
  */
 export function ChromeName({ className }: { className?: string }) {
   const ref = useRef<HTMLHeadingElement>(null);
-  const x = useMotionValue(-400);
-  const y = useMotionValue(-400);
-  const sx = useSpring(x, { stiffness: 220, damping: 28, mass: 0.4 });
-  const sy = useSpring(y, { stiffness: 220, damping: 28, mass: 0.4 });
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const onMove = (e: PointerEvent) => {
-      const r = ref.current?.getBoundingClientRect();
-      if (!r) return;
-      x.set(e.clientX - r.left);
-      y.set(e.clientY - r.top);
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
-  }, [x, y]);
-
-  // The reflection: a diagonal band of light that slides along the word with the pointer,
-  // like a brushed-metal highlight. It fades out as the pointer moves vertically away.
-  const band = useMotionTemplate`linear-gradient(112deg, transparent calc(${sx}px - 70px), rgba(255,255,255,0.78) ${sx}px, transparent calc(${sx}px + 70px))`;
-  const fade = useTransform(sy, [-260, -40, 60, 280], [0, 1, 1, 0]);
+  const { band, fade } = usePointerLight(ref);
 
   return (
     <motion.h1
@@ -67,4 +47,47 @@ export function ChromeName({ className }: { className?: string }) {
       </svg>
     </motion.h1>
   );
+}
+
+// The shine is full strength with the pointer on the letters and gone FAR px outside them, so
+// it doesn't catch from the email line just below.
+const NEAR = 0;
+const FAR = 10;
+// The line box is taller than the glyphs; ignore this share of its height at top and bottom.
+const TRIM = 0.18;
+
+/**
+ * A diagonal band of light that follows the pointer across `ref`. It only shows while the
+ * pointer is on the element, with a short fade just outside its edges.
+ */
+function usePointerLight(ref: React.RefObject<HTMLElement | null>) {
+  const x = useMotionValue(-400);
+  const near = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 220, damping: 28, mass: 0.4 });
+  const fade = useSpring(near, { stiffness: 180, damping: 30 });
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const onMove = (e: PointerEvent) => {
+      const r = ref.current?.getBoundingClientRect();
+      if (!r) return;
+      x.set(e.clientX - r.left);
+      const dx = Math.max(r.left - e.clientX, 0, e.clientX - r.right);
+      const trim = r.height * TRIM;
+      const dy = Math.max(r.top + trim - e.clientY, 0, e.clientY - (r.bottom - trim));
+      const d = Math.hypot(dx, dy);
+      near.set(Math.min(1, Math.max(0, (FAR - d) / (FAR - NEAR))));
+    };
+    const onLeave = () => near.set(0);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onLeave);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      document.documentElement.removeEventListener("pointerleave", onLeave);
+    };
+  }, [ref, x, near]);
+
+  // A brushed-metal highlight that slides along the metal with the pointer.
+  const band = useMotionTemplate`linear-gradient(112deg, transparent calc(${sx}px - 22px), rgba(255,255,255,0.85) ${sx}px, transparent calc(${sx}px + 22px))`;
+  return { band, fade };
 }

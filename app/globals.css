@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --bone: #f3f1ec;
+  --bone: #f4f3f0;
   --ink: #111111;
   --mute: #777777;
-  --faint: #bdbab3;
+  --faint: #bcbbb7;
+  /* One face for all text. To use TWK Everett: add an @font-face for "Everett" with the
+     licensed woff2 in public/fonts, then put "Everett" first here. */
+  --font-text: var(--font-instrument);
 }
 
 @theme inline {
@@ -12,7 +15,7 @@
   --color-ink: var(--ink);
   --color-mute: var(--mute);
   --color-faint: var(--faint);
-  --font-sans: var(--font-inter-tight);
+  --font-sans: var(--font-text);
   --font-display: var(--font-unbounded);
 }
 
@@ -23,7 +26,7 @@ html {
 body {
   background: var(--bone);
   color: var(--ink);
-  font-family: var(--font-inter-tight), system-ui, sans-serif;
+  font-family: var(--font-text), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -59,6 +62,49 @@ body {
     position: absolute;
     inset: 0;
     pointer-events: none;
+  }
+}
+
+/* Type and spacing scale copied from the Rakuten Fashion Week Tokyo brand pages, measured at
+   1440px wide. --u is one design pixel: it scales with the viewport like theirs, but is floored
+   and capped so text stays readable on small screens and doesn't balloon on large ones. */
+:root {
+  --u: clamp(0.85px, calc(100vw / 1440), 1.25px);
+}
+
+@layer components {
+  .fw {
+    letter-spacing: 0.2px;
+  }
+  .fw-name {
+    font-size: calc(27 * var(--u));
+    line-height: 1.5;
+  }
+  .fw-nav {
+    font-size: calc(15.75 * var(--u));
+    line-height: calc(29 * var(--u));
+  }
+  .fw-nav-off {
+    color: rgb(132 139 144 / 0.5);
+  }
+  .fw-small {
+    font-size: calc(12 * var(--u));
+    line-height: 1.5;
+  }
+  .fw-label {
+    font-size: calc(12 * var(--u));
+    line-height: 1.5;
+    padding-bottom: calc(2.25 * var(--u));
+    border-bottom: 0.5px solid var(--ink);
+    margin-bottom: calc(27 * var(--u));
+  }
+  .fw-title {
+    font-size: calc(19.5 * var(--u));
+    line-height: 1.5;
+  }
+  .fw-text {
+    font-size: calc(15.75 * var(--u));
+    line-height: 2.1;
   }
 }
 

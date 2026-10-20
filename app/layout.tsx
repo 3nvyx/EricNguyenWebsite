@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { Unbounded, Inter_Tight } from "next/font/google";
+import { Unbounded, Instrument_Sans } from "next/font/google";
+import { Sidebar } from "@/components/sidebar";
 import "./globals.css";
 
 const unbounded = Unbounded({
   variable: "--font-unbounded",
   subsets: ["latin"],
-  weight: ["500", "700"],
+  weight: ["500"],
 });
 
-const interTight = Inter_Tight({
-  variable: "--font-inter-tight",
+// Stand-in for TWK Everett until there's a web license; swap it in globals.css (--font-text).
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument",
   subsets: ["latin"],
   weight: ["400"],
 });
@@ -42,8 +44,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${unbounded.variable} ${interTight.variable}`}>
+    <html lang="en" className={`${unbounded.variable} ${instrumentSans.variable}`}>
+      <body className="fw">
+        <Sidebar />
         {children}
         <Analytics />
       </body>

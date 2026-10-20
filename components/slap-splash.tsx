@@ -9,7 +9,7 @@ import {
 } from "@/lib/slap-splash";
 
 const INK = [17, 17, 17, 255];
-const BONE = [243, 241, 236, 255];
+const BONE = [244, 243, 240, 255];
 
 /** Decode the "#" art into ImageData once per module. */
 let decoded: ImageData[] | null = null;
