@@ -22,7 +22,8 @@ const SOCIAL = [
  */
 export function Footer() {
   return (
-    <footer className="fw bg-ink text-bone">
+    // Selection is ink-on-bone site-wide (globals.css), which vanishes on this ink bar; flip it here.
+    <footer className="fw bg-ink text-bone selection:bg-bone selection:text-ink">
       <div className="grid gap-8 px-5 py-8 md:grid-cols-[calc(36.5vw-45*var(--u))_minmax(0,1fr)] md:gap-0 md:px-[calc(45*var(--u))] md:py-[calc(26.25*var(--u))]">
         <div className="self-start">
           <Link href="/" className="font-display fw-small text-[calc(15*var(--u))] tracking-tight">

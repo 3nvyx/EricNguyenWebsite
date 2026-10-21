@@ -108,7 +108,10 @@ body {
   }
 }
 
-::selection {
-  background: var(--ink);
-  color: var(--bone);
+/* In the base layer so selection: utilities can override it (the footer flips it on its ink bar). */
+@layer base {
+  ::selection {
+    background: var(--ink);
+    color: var(--bone);
+  }
 }
