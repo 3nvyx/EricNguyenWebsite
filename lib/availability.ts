@@ -49,6 +49,14 @@ export const CLASS_SCHEDULE: Array<[number, string, string]> = [
   [5, "13:00", "17:00"],
 ];
 
+/**
+ * Whole days with no coffee chats, Pacific, inclusive (YYYY-MM-DD). For things the calendar
+ * marks "free" (like a hackathon) or that aren't on it at all.
+ */
+export const BLOCKED_DAYS: Array<{ from: string; to: string; label: string }> = [
+  { from: "2026-10-23", to: "2026-10-25", label: "CalHacks" },
+];
+
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const partsFormat = new Intl.DateTimeFormat("en-US", {
@@ -118,6 +126,21 @@ export function classBusy(days: ZonedDate[]): Interval[] {
     }
   }
   return busy;
+}
+
+function ymd(s: string): [number, number, number] {
+  const [y, m, d] = s.split("-").map(Number);
+  return [y, m, d];
+}
+
+/** Busy intervals covering every blocked day, midnight to midnight Pacific. */
+export function blockedBusy(): Interval[] {
+  return BLOCKED_DAYS.map(({ from, to }) => {
+    const [fy, fm, fd] = ymd(from);
+    const [ty, tm, td] = ymd(to);
+    // End at noon on the last day plus a bit over half a day, so it reaches the next midnight.
+    return { start: zoned(fy, fm, fd, 0, 0), end: zoned(ty, tm, td, 12, 0) + 13 * 3600e3 };
+  });
 }
 
 /** Open slots over the given days, skipping anything that overlaps (plus buffer) a busy interval. */

@@ -84,7 +84,11 @@ export function ProjectDetail({ project }: { project: Project }) {
             <dd className="fw-text mt-[calc(4*var(--u))]">
               {project.href ? (
                 <a href={project.href} target="_blank" rel="noopener noreferrer" className={hoverLink}>
-                  {project.href.includes("github.com") ? "GitHub" : "Live site"}
+                  {project.href.includes("github.com")
+                    ? "GitHub"
+                    : project.href.includes("youtube.com")
+                      ? "Recap video"
+                      : "Live site"}
                   {arrow}
                 </a>
               ) : (

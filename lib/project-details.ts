@@ -177,6 +177,46 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     ],
   },
 
+  hackcc: {
+    facts: [
+      { label: "Type", values: ["Project management", "Lead organizer"] },
+      { label: "Team", values: ["Me (lead)", "6 departments across colleges"] },
+      { label: "Duration", values: ["30 hours", "[Month] 2024"] },
+      { label: "Recognition", values: ["OCC Event of the Year 2025"] },
+    ],
+    statement: "[One line on why HackCC needed to exist: what community college students were missing.]",
+    body: [
+      { h: "Overview" },
+      "HackCC 2024 was a 30-hour hackathon for community college students, run by a team drawn from several colleges. I led it as lead organizer, directing six departments that handled sponsorship, the venue, catering, mentors and overnight accommodations for 100+ attendees.",
+      { h: "Running it" },
+      "[How the six departments split the work, and the hardest call you made as lead.]",
+      { h: "How it went" },
+      "Across HackCC and Spookathon we raised over $21,000 in sponsorship, and the two events together won OCC's Event of the Year at Honors Night 2025. [Attendance, projects and winners for HackCC itself.]",
+      { h: "Reflections" },
+      "[What you carried into Spookathon and OCC Hacks.]",
+    ],
+  },
+
+  spookathon: {
+    facts: [
+      { label: "Type", values: ["Project management", "Lead organizer"] },
+      { label: "Team", values: ["Me (lead)", "6 departments across colleges"] },
+      { label: "Duration", values: ["30 hours", "[Month] 2025"] },
+      { label: "Recognition", values: ["OCC Event of the Year 2025"] },
+    ],
+    statement: "[One line on what Spookathon set out to do differently from HackCC.]",
+    body: [
+      { h: "Overview" },
+      "Spookathon 2025 was a 30-hour hackathon that followed HackCC, run by the same cross-college team. I led it as lead organizer: sponsorship, the venue, catering, mentors and overnight accommodations for 100+ attendees.",
+      { h: "Running it" },
+      "[What changed from HackCC: the theme, the format, the team.]",
+      { h: "How it went" },
+      "Across HackCC and Spookathon we raised over $21,000 in sponsorship, and the two events together won OCC's Event of the Year at Honors Night 2025. [Attendance, projects and winners for Spookathon itself.]",
+      { h: "Reflections" },
+      "[What you'd tell the next lead organizer.]",
+    ],
+  },
+
   "q-industries": {
     facts: [
       { label: "Type", values: ["Client work", "at Plethora"] },

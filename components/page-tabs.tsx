@@ -16,7 +16,7 @@ export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
     <nav aria-label="Pages">
       <ul className={cn("fw-nav flex gap-6", layout === "stack" && "md:flex-col md:gap-0", layout === "row" && "md:gap-[calc(27*var(--u))]")}>
         {PAGES.map((it, i) => (
-          <li key={it.href}>
+          <li key={it.href} className={cn("self-start", it.more && "group relative")}>
             <Link
               href={it.href}
               aria-current={i === active ? "page" : undefined}
@@ -24,6 +24,23 @@ export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
             >
               {it.label}
             </Link>
+            {it.more && (
+              // Revealed on hover: to the right in the sidebar, underneath in the top bar. The
+              // padding bridges the gap so the pointer can travel from the tab to the link.
+              <Link
+                href={it.more.href}
+                className={cn(
+                  "fw-small pointer-events-none absolute whitespace-nowrap text-mute opacity-0 transition-opacity duration-200",
+                  "group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+                  "hover:text-ink hover:underline underline-offset-4",
+                  layout === "stack"
+                    ? "top-1/2 left-full -translate-y-1/2 pl-[calc(14*var(--u))]"
+                    : "top-full right-0 pt-[calc(6*var(--u))]",
+                )}
+              >
+                {it.more.label}
+              </Link>
+            )}
           </li>
         ))}
       </ul>

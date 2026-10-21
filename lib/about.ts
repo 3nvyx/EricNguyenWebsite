@@ -14,8 +14,8 @@ export type AboutSection = { label: string; entries: AboutEntry[]; compact?: boo
 // DRAFT: first-person intro shown above the sections. Edit freely; [brackets] are for Eric to fill.
 export const ABOUT_INTRO: string[] = [
   "I'm Eric, a computer engineering student at Orange Coast College, transferring to UC Irvine in fall 2027.",
-  "Before school I spent three years in Ho Chi Minh City at Q Industries, working with distributors and suppliers across borders on pricing, shipping and partnerships. [One line on what that taught you.]",
-  "At OCC I founded Iota Xi, the first two-year honor society for computer science, and led the teams behind HackCC and Spookathon. I like work that crosses hardware and software; SLAP!, a small device that captions a lecture live, is the one I'm proudest of so far.",
+  "During COVID I spent three years in Ho Chi Minh City at Q Industries, a spare parts trader supplying private and state-owned factories. I started in sales support and moved into business development, bringing in equipment and engineering solutions from companies abroad for our customers, and helped grow sales 10%.",
+  "At OCC I founded Iota Xi, the first two-year honor society for computer science, and led the teams that organized three hackathons: HackCC 2024, Spookathon 2025 and OCC Hacks 2026. I like work that crosses hardware and software; SLAP!, a small device that captions a lecture live, is the one I'm proudest of so far.",
   "I'm looking for a summer 2027 internship in [embedded / product / software engineering]. Off the clock: espresso tonics, photography, tennis.",
 ];
 
@@ -25,15 +25,15 @@ export const ABOUT: AboutSection[] = [
     entries: [
       {
         when: "2024 – now",
+        title: "Operations Assistant & Automation Developer",
+        where: "Garrison Honors Center, OCC",
+        line: "An offline Python desktop app that checks eligibility for 17 honor societies, replacing manual review of 300+ applications a semester and writing results back to the registrar's 20-year-old Access database.",
+      },
+      {
+        when: "2024 – 2026",
         title: "Product & Solutions Engineer",
         where: "Plethora",
         line: "Client sites for Pickle Banh Mi Co. and Q Industries, and internal workflow tools for Chef Nourish, from gathering requirements to shipping.",
-      },
-      {
-        when: "2024 – now",
-        title: "Data & Operations Assistant",
-        where: "Garrison Honors Center, OCC",
-        line: "Records and outreach for 3,000+ students; JavaScript automation that cut manual processing about twelvefold.",
       },
       {
         when: "2025",
@@ -59,9 +59,9 @@ export const ABOUT: AboutSection[] = [
         line: "The first two-year honor society for computer science; career opportunities for 300+ students through Amazon, Sony, Kickstarter and NASA.",
       },
       {
-        when: "2024 – 2025",
+        when: "2024 – 2026",
         title: "Lead Organizer",
-        where: "HackCC 2024, Spookathon 2025",
+        where: "HackCC 2024, Spookathon 2025, OCC Hacks 2026",
         line: "Led a six-department team across colleges to run 30-hour hackathons for 100+ attendees; raised $21,000.",
         link: { label: "Recap video", href: "https://www.youtube.com/watch?v=vT81BYkjc8k" },
       },

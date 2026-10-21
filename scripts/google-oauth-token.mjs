@@ -68,5 +68,5 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log("Opening Google consent screen… (sign in as envn001@gmail.com)");
   console.log(consent.toString());
-  exec(`open "${consent}"`);
+  if (!process.env.NO_OPEN) exec(`open "${consent}"`);
 });

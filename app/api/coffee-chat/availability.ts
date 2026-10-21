@@ -1,10 +1,10 @@
-import { HORIZON_DAYS, classBusy, daysAhead, freeSlots, type Interval } from "@/lib/availability";
+import { HORIZON_DAYS, blockedBusy, classBusy, daysAhead, freeSlots, type Interval } from "@/lib/availability";
 import { busyIntervals, isConfigured } from "@/lib/google-calendar";
 
-/** Open coffee chat slots right now: class schedule plus live free/busy when configured. */
+/** Open coffee chat slots right now: class schedule, blocked days, plus live free/busy when configured. */
 export async function openSlots(now = Date.now()): Promise<{ slots: Interval[]; live: boolean }> {
   const days = daysAhead(now, HORIZON_DAYS);
-  let busy = classBusy(days);
+  let busy = classBusy(days).concat(blockedBusy());
   let live = false;
   if (isConfigured()) {
     try {

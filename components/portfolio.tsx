@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { PROJECTS } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
-import { PageTitle } from "@/components/page-title";
+import { PageTitle, PageTitleLink } from "@/components/page-title";
 import { cn, ease, hoverLink as hover, pageMain } from "@/lib/utils";
 
 const CORE = PROJECTS.slice(0, 3);
@@ -14,7 +14,11 @@ const MORE = PROJECTS.slice(3);
 export function Portfolio() {
   return (
     <main className={pageMain}>
-      <PageTitle>Projects</PageTitle>
+      <PageTitle>
+        <PageTitleLink href="/projects" dir="forward">
+          Projects
+        </PageTitleLink>
+      </PageTitle>
       <section id="work" className="flex scroll-mt-10 flex-col gap-[calc(45*var(--u))]">
         {CORE.map((p, i) => (
           <motion.article

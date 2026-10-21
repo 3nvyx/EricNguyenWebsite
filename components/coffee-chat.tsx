@@ -11,9 +11,9 @@ const PANEL_WIDTH = 340;
 const PANEL_GAP = 8;
 const VIEWPORT_MARGIN = 16;
 /** Open upward when there's less than this below the button and more room above. */
-const PANEL_HEIGHT_HINT = 420;
+const PANEL_HEIGHT_HINT = 460;
 
-type Placement = { left: number; width: number; top?: number; bottom?: number };
+type Placement = { left: number; width: number; maxHeight: number; top?: number; bottom?: number };
 
 const subscribeNever = () => () => {};
 
@@ -38,10 +38,13 @@ export function CoffeeChat({ className, children }: { className?: string; childr
     const vh = window.innerHeight;
     const width = Math.min(PANEL_WIDTH, vw - VIEWPORT_MARGIN * 2);
     const left = Math.min(Math.max(r.left, VIEWPORT_MARGIN), vw - width - VIEWPORT_MARGIN);
-    const below = vh - r.bottom;
-    const above = r.top;
-    if (below >= PANEL_HEIGHT_HINT || below >= above) return { left, width, top: r.bottom + PANEL_GAP };
-    return { left, width, bottom: vh - r.top + PANEL_GAP };
+    // Room on either side of the button; the panel caps its height to that and scrolls inside.
+    const below = vh - r.bottom - PANEL_GAP - VIEWPORT_MARGIN;
+    const above = r.top - PANEL_GAP - VIEWPORT_MARGIN;
+    if (below >= PANEL_HEIGHT_HINT || below >= above) {
+      return { left, width, maxHeight: below, top: r.bottom + PANEL_GAP };
+    }
+    return { left, width, maxHeight: above, bottom: vh - r.top + PANEL_GAP };
   }, []);
 
   useLayoutEffect(() => {
@@ -121,7 +124,7 @@ export function CoffeeChat({ className, children }: { className?: string; childr
                 exit={{ opacity: 0, y: placement.top !== undefined ? -4 : 4, scale: 0.98 }}
                 transition={{ duration: 0.28, ease }}
                 style={placement}
-                className="fw fw-small fixed z-50 bg-bone p-[calc(16*var(--u))] text-ink shadow-[0_18px_48px_-16px_rgba(17,17,17,0.35)] ring-1 ring-ink/15"
+                className="fw fw-small fixed z-50 overflow-y-auto overscroll-contain bg-bone p-[calc(16*var(--u))] text-ink shadow-[0_18px_48px_-16px_rgba(17,17,17,0.35)] ring-1 ring-ink/15"
               >
                 <Picker onClose={close} />
               </motion.div>
@@ -388,7 +391,7 @@ function Picker({ onClose }: { onClose: () => void }) {
                         aria-pressed={c.key === day?.key}
                         aria-label={c.day ? c.day.label : undefined}
                         className={cn(
-                          "py-[calc(4*var(--u))] tabular-nums transition-colors duration-150",
+                          "py-[calc(3*var(--u))] tabular-nums transition-colors duration-150",
                           c.day ? "cursor-pointer border border-ink/25 hover:border-ink" : "text-faint",
                           c.key === day?.key && chipOn,
                         )}
@@ -403,7 +406,7 @@ function Picker({ onClose }: { onClose: () => void }) {
               <div
                 role="group"
                 aria-label={`Times on ${day?.label}`}
-                className="grid max-h-[calc(190*var(--u))] grid-cols-3 gap-[calc(6*var(--u))] overflow-y-auto pr-px"
+                className="grid grid-cols-3 gap-[calc(6*var(--u))]"
               >
                 {day?.slots.map((s) => (
                   <button
