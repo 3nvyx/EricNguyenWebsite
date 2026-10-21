@@ -113,7 +113,7 @@ export const PROJECTS: Project[] = [
     dates: "Apr 2026",
     tags: ["Security", "AI", "Real-time", "Hackathon"],
     stack: "Next.js / Three.js / Pusher",
-    media: "/media/nyx.png",
+    media: "/media/nyx.gif",
   },
   {
     slug: "condensed-cot",

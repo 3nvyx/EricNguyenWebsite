@@ -62,6 +62,8 @@ const damp = (from: number, to: number, rate: number, dt: number) => from + (to 
 export function NfcCard3D({ controls = false, className }: { controls?: boolean; className?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const labels = useRef<(HTMLLIElement | null)[]>([]);
+  const leaders = useRef<(SVGPathElement | null)[]>([]);
+  const bar = useRef<HTMLDivElement>(null);
   const api = useRef<{ flip: () => void; explode: (on: boolean) => void } | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(() => !webglAvailable());
@@ -228,7 +230,79 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
     });
     view.observe(el);
 
+    // Labels sit in a column beside the card, each tied to the middle of its layer's on-screen right
+    // edge by a leader line. They keep their spacing however the card is turned: face-on, the layers
+    // all project to one spot, and labels placed at their anchors would pile up on the art.
     const anchor = new THREE.Vector3();
+    const anchors = LAYERS.map(() => ({ x: 0, y: 0 }));
+    const callout = { placed: false, flipped: false, x: 0, ys: LAYERS.map(() => 0), slide: 0, slideTo: 0 };
+    const toScreen = (v: THREE.Vector3) => {
+      v.applyMatrix4(card.matrixWorld).project(camera);
+      return { x: ((v.x + 1) / 2) * width, y: ((1 - v.y) / 2) * height };
+    };
+    const placeLabels = (e: number, dt: number) => {
+      card.updateMatrixWorld();
+      const items = labels.current;
+      const labelW = Math.max(...items.map((li) => li?.offsetWidth ?? 0));
+      const gap = Math.max(...items.map((li) => li?.offsetHeight ?? 0)) + 6;
+      const top = 12;
+      const bottom = height - (bar.current?.offsetHeight ?? 0);
+
+      let left = width;
+      let right = 0;
+      LAYERS.forEach((l, i) => {
+        const z = l.step * SPREAD * e;
+        for (const sx of [-1, 1]) {
+          const mid = toScreen(anchor.set((sx * W) / 2, 0, z));
+          if (sx === -1 || mid.x > anchors[i].x) anchors[i] = mid;
+          for (const sy of [-1, 1]) {
+            const corner = toScreen(anchor.set((sx * W) / 2, (sy * H) / 2, z)).x;
+            left = Math.min(left, corner);
+            right = Math.max(right, corner);
+          }
+        }
+      });
+
+      // Keep the stack's order down the column (flipped when the back faces up), then push the
+      // labels apart, centred on their anchors and kept inside the box.
+      const tilt = anchors[0].y - anchors[LAYERS.length - 1].y;
+      if (Math.abs(tilt) > 8 || !callout.placed) callout.flipped = tilt > 0;
+      const order = LAYERS.map((_, i) => i);
+      if (callout.flipped) order.reverse();
+      const ys = order.map((i) => anchors[i].y);
+      for (let k = 1; k < ys.length; k++) ys[k] = Math.max(ys[k], ys[k - 1] + gap);
+      const centre = order.reduce((sum, i, k) => sum + anchors[i].y - ys[k], 0) / ys.length;
+      for (let k = 0; k < ys.length; k++) ys[k] += centre;
+      ys[ys.length - 1] = Math.min(ys[ys.length - 1], bottom - gap / 2);
+      for (let k = ys.length - 2; k >= 0; k--) ys[k] = Math.min(ys[k], ys[k + 1] - gap);
+      ys[0] = Math.max(ys[0], top + gap / 2);
+      for (let k = 1; k < ys.length; k++) ys[k] = Math.max(ys[k], ys[k - 1] + gap);
+
+      // Where the column doesn't fit beside the card (narrow screens), slide the card left to make room.
+      callout.slideTo = THREE.MathUtils.clamp(right + callout.slide + 28 + labelW + 12 - width, 0, left + callout.slide - 12);
+      const x = Math.min(right + 28, width - labelW - 12);
+      const rate = reduced || !callout.placed ? Infinity : 10;
+      callout.x = damp(callout.x, x, rate, dt);
+      order.forEach((i, k) => (callout.ys[i] = damp(callout.ys[i], ys[k], rate, dt)));
+      callout.placed = true;
+
+      const opacity = String(Math.max(0, e * 2 - 1));
+      LAYERS.forEach((_, i) => {
+        const li = items[i];
+        const line = leaders.current[i];
+        const { x: ax, y: ay } = anchors[i];
+        const y = callout.ys[i];
+        if (li) {
+          li.style.transform = `translate(${callout.x}px, ${y}px) translateY(-50%)`;
+          li.style.opacity = opacity;
+        }
+        if (line) {
+          line.setAttribute("d", `M${ax},${ay} L${callout.x - 12},${y} H${callout.x - 4}`);
+          line.style.opacity = opacity;
+        }
+      });
+    };
+
     let last = performance.now();
     const tick = (now: number) => {
       frame = 0;
@@ -268,20 +342,13 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
       const dist = Math.max((W * span) / 2 / Math.tan(fov) / camera.aspect, (H * span * 1.15) / 2 / Math.tan(fov));
       camera.position.set(0, 0, dist);
       camera.lookAt(0, 0, 0);
+      callout.slide = damp(callout.slide, e > 0.01 ? callout.slideTo : 0, reduced ? Infinity : 6, dt);
+      camera.setViewOffset(width, height, callout.slide, 0, width, height);
 
       renderer.render(scene, camera);
 
-      // Labels follow the middle of each layer's right edge.
-      card.updateMatrixWorld();
-      LAYERS.forEach((l, i) => {
-        const li = labels.current[i];
-        if (!li) return;
-        anchor.set(W / 2, 0, l.step * SPREAD * e).applyMatrix4(card.matrixWorld).project(camera);
-        const x = ((anchor.x + 1) / 2) * width;
-        const y = ((1 - anchor.y) / 2) * height;
-        li.style.transform = `translate(${x}px, ${y}px) translateY(-50%)`;
-        li.style.opacity = String(Math.max(0, e * 2 - 1));
-      });
+      if (e > 0.01) placeLabels(e, dt);
+      else callout.placed = false;
 
       if (visible) frame = requestAnimationFrame(tick);
     };
@@ -322,6 +389,20 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
       aria-label="3D model of Eric's NFC business card. Drag to turn it."
       className={cn("relative h-full w-full touch-pan-y select-none overflow-hidden bg-faint/75", "cursor-grab active:cursor-grabbing", className)}
     >
+      <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full text-ink/40">
+        {LAYERS.map((l, i) => (
+          <path
+            key={l.name}
+            ref={(n) => {
+              leaders.current[i] = n;
+            }}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1}
+            opacity={0}
+          />
+        ))}
+      </svg>
       <ul aria-hidden className="pointer-events-none absolute inset-0">
         {LAYERS.map((l, i) => (
           <li
@@ -329,17 +410,15 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
             ref={(n) => {
               labels.current[i] = n;
             }}
-            className="fw-small absolute top-0 left-0 flex items-center gap-2 whitespace-nowrap text-ink opacity-0"
+            className="fw-small absolute top-0 left-0 whitespace-nowrap text-ink opacity-0"
           >
-            <span className="h-px w-5 bg-ink/40" />
-            <span>
-              {l.label} <span className="text-mute">{l.note}</span>
-            </span>
+            {l.label} <span className="text-mute max-sm:hidden">{l.note}</span>
           </li>
         ))}
       </ul>
 
       <div
+        ref={bar}
         className={cn(
           "fw-small pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-[calc(14*var(--u))] text-mute transition-opacity duration-500",
           ready ? "opacity-100" : "opacity-0",

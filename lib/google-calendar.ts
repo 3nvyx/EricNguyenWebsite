@@ -95,7 +95,7 @@ type EventResponse = { htmlLink?: string; hangoutLink?: string };
  */
 export async function bookEvent(b: Booking): Promise<{ htmlLink?: string; meetLink?: string }> {
   const description = [
-    `Coffee chat booked from ericnguyen.dev by ${b.name} (${b.email}).`,
+    `Coffee chat booked from ericnguyenn.me by ${b.name} (${b.email}).`,
     b.note ? `\n${b.note}` : "",
     "\n30 minutes, video or in person around Irvine.",
   ].join("\n");

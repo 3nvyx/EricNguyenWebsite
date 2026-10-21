@@ -14,6 +14,8 @@ export type Block =
   | { h: string }
   | { list: string[] }
   | { figure: Figure }
+  /** A video with controls; `src` is the video, `poster` the still shown before it plays. */
+  | { video: Figure & { poster?: string } }
   /** Two figures side by side on desktop. */
   | { figures: [Figure, Figure] };
 

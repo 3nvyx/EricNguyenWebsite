@@ -55,6 +55,23 @@ export function Prose({ blocks, headings = "title" }: { blocks: Block[]; heading
             </div>
           );
         }
+        if ("video" in b) {
+          return (
+            <figure key={i} className="py-[calc(12*var(--u))]">
+              <video
+                src={b.video.src}
+                poster={b.video.poster}
+                controls
+                playsInline
+                preload="metadata"
+                aria-label={b.video.caption}
+                className="w-full bg-ink"
+                style={{ aspectRatio: b.video.aspect ?? "16 / 9" }}
+              />
+              <figcaption className="fw-small mt-[calc(8*var(--u))] text-mute">{b.video.caption}</figcaption>
+            </figure>
+          );
+        }
         return (
           <div key={i} className={cn("grid gap-[calc(18*var(--u))] py-[calc(12*var(--u))] md:grid-cols-2")}>
             <FigureView figure={b.figures[0]} />
