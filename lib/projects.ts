@@ -2,39 +2,58 @@ export type Project = {
   slug: string;
   title: string;
   line: string;
-  href: string;
-  /** Shown as "[year] stack" under the line. */
-  year: number;
+  /** Public link. Omitted for private work (client projects, private repos). */
+  href?: string;
+  /** When it was built, from the repo's commit history. Shown on the card's label line. */
+  dates: string;
+  /** Shown as hashtags under the title. */
+  tags: string[];
   stack: string;
   /** Path under /public. Missing files fall back to a placeholder. */
   media: string;
+  /** Shape of the card image, as a CSS aspect ratio; match it to the recording. Default 16 / 9. */
+  aspect?: string;
 };
 
+/** The first three are the featured rows; the rest are listed under MORE. */
 export const PROJECTS: Project[] = [
   {
     slug: "slap",
-    title: "Slap",
+    title: "SLAP!",
     line: "Live captions for any classroom",
     href: "https://github.com/3nvyx/slap",
-    year: 2026,
+    dates: "Oct 2026",
+    tags: ["Hardware", "Embedded", "Real-time", "AI"],
     stack: "ESP32 / Node / React",
     media: "/media/slap.gif",
   },
   {
+    slug: "chef-nourish",
+    title: "Chef Nourish",
+    line: "Meal production for a private chef kitchen, from client diets to delivery labels",
+    dates: "May – Sep 2026",
+    tags: ["Client work", "Full stack", "AI", "Operations"],
+    stack: "Next.js / Postgres / OpenAI",
+    media: "/media/chef-nourish.gif",
+    aspect: "4 / 3",
+  },
+  {
     slug: "honors",
-    title: "Honors",
-    line: "Eligibility for 17 honor societies, offline",
-    href: "https://occ-honor-societies-transcript-anal.vercel.app",
-    year: 2026,
+    title: "Honors Eligibility",
+    line: "Checks a transcript against 17 honor societies, fully offline",
+    dates: "Aug 2026 – now",
+    tags: ["Desktop app", "Data", "Automation"],
     stack: "Python / Access",
     media: "/media/honors.gif",
+    aspect: "16 / 10",
   },
   {
     slug: "sevis",
     title: "Sevis",
     line: "Where international students study, mapped",
     href: "https://github.com/3nvyx/SEVIS-data-maping-trends",
-    year: 2026,
+    dates: "Sep 2026",
+    tags: ["Data", "Visualization"],
     stack: "Python / Next.js",
     media: "/media/sevis.gif",
   },
@@ -43,7 +62,8 @@ export const PROJECTS: Project[] = [
     title: "Daisy",
     line: "Scene-based RGB lighting control",
     href: "https://github.com/3nvyx/daisy-light-control-system",
-    year: 2026,
+    dates: "Sep 2026",
+    tags: ["Lighting", "UI"],
     stack: "TypeScript / Next.js",
     media: "/media/daisy.gif",
   },
@@ -52,7 +72,8 @@ export const PROJECTS: Project[] = [
     title: "Carousel",
     line: "Cover-flow carousel component",
     href: "https://github.com/3nvyx/Interesting-Carousel",
-    year: 2025,
+    dates: "Nov 2025",
+    tags: ["UI", "Component"],
     stack: "TypeScript / React",
     media: "/media/carousel.gif",
   },

@@ -10,11 +10,11 @@ import { cn } from "@/lib/utils";
  * follows the pointer anywhere on the page, so the metal catches it as the mouse passes.
  */
 export function ChromeName({ className }: { className?: string }) {
-  const ref = useRef<HTMLHeadingElement>(null);
+  const ref = useRef<HTMLParagraphElement>(null);
   const { band, fade } = usePointerLight(ref);
 
   return (
-    <motion.h1
+    <motion.p
       ref={ref}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -45,7 +45,7 @@ export function ChromeName({ className }: { className?: string }) {
           </filter>
         </defs>
       </svg>
-    </motion.h1>
+    </motion.p>
   );
 }
 

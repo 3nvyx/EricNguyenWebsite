@@ -10,7 +10,7 @@ import { cn, ease, hoverLink } from "@/lib/utils";
  * "Have a coffee chat with me". Opens the Google Calendar booking page in a panel over the site;
  * without a booking page set up yet, it opens a pre-filled Calendar invite in a new tab.
  */
-export function CoffeeChat({ className }: { className?: string }) {
+export function CoffeeChat({ className, children }: { className?: string; children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function CoffeeChat({ className }: { className?: string }) {
     };
   }, [open]);
 
-  const label = (
+  const label = children ?? (
     <>
       Have a coffee chat with me
       <span className="ml-0.5 align-top text-[0.75em]">↗</span>

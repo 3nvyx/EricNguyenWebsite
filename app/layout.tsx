@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Unbounded, Instrument_Sans } from "next/font/google";
+import { Footer } from "@/components/footer";
 import { Sidebar } from "@/components/sidebar";
 import "./globals.css";
 
@@ -46,8 +47,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${unbounded.variable} ${instrumentSans.variable}`}>
       <body className="fw">
-        <Sidebar />
-        {children}
+        {/* Sidebar sticks while the page scrolls, then leaves with the content when the footer arrives. */}
+        <div className="md:grid md:grid-cols-[36.5vw_minmax(0,1fr)]">
+          <Sidebar />
+          {children}
+        </div>
+        <Footer />
         <Analytics />
       </body>
     </html>

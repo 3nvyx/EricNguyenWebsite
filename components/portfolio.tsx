@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { PROJECTS } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
+import { PageTitle } from "@/components/page-title";
 import { cn, ease, hoverLink as hover, pageMain } from "@/lib/utils";
 
 const CORE = PROJECTS.slice(0, 3);
@@ -12,6 +13,7 @@ const MORE = PROJECTS.slice(3);
 export function Portfolio() {
   return (
     <main className={pageMain}>
+      <PageTitle>Projects</PageTitle>
       <section id="work" className="flex scroll-mt-10 flex-col gap-[calc(45*var(--u))]">
         {CORE.map((p, i) => (
           <motion.article
@@ -20,23 +22,45 @@ export function Portfolio() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.15 + i * 0.1 }}
           >
-            <h2 className="fw-label uppercase">{p.title}</h2>
-            <div className="grid gap-5 md:grid-cols-[calc(279*var(--u))_minmax(0,1fr)] md:gap-[calc(27*var(--u))]">
-              <a
-                href={p.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block aspect-[2/1] w-full self-start overflow-hidden"
-                aria-label={`${p.title}: ${p.line}`}
-              >
-                <MediaSlot project={p} />
-              </a>
-              <div className="flex min-w-0 flex-col">
-                <a href={p.href} target="_blank" rel="noopener noreferrer" className={cn("fw-title self-start", hover)}>
-                  {p.title}
+            <h2 className="fw-label flex justify-between gap-6">
+              <span className="uppercase">{p.title}</span>
+              <span className="text-mute">{p.dates}</span>
+            </h2>
+            <div className="grid gap-5 md:grid-cols-[calc(400*var(--u))_minmax(0,1fr)] md:gap-[calc(27*var(--u))]">
+              {p.href ? (
+                <a
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full self-start overflow-hidden"
+                  style={{ aspectRatio: p.aspect ?? "16 / 9" }}
+                  aria-label={`${p.title}: ${p.line}`}
+                >
+                  <MediaSlot project={p} />
                 </a>
-                <div className="fw-text mt-[calc(45*var(--u))]">
-                  <p>[{p.year}] {p.stack}</p>
+              ) : (
+                <div className="w-full self-start overflow-hidden" style={{ aspectRatio: p.aspect ?? "16 / 9" }}>
+                  <MediaSlot project={p} />
+                </div>
+              )}
+              <div className="flex min-w-0 flex-col">
+                {p.href ? (
+                  <a href={p.href} target="_blank" rel="noopener noreferrer" className={cn("fw-title self-start", hover)}>
+                    {p.title}
+                  </a>
+                ) : (
+                  <p className="fw-title">{p.title}</p>
+                )}
+                <p className="fw-text mt-[calc(4*var(--u))] flex flex-wrap gap-x-[calc(12*var(--u))] text-mute">
+                  {p.tags.map((t) => (
+                    <span key={t}>#{t}</span>
+                  ))}
+                </p>
+                <div className="fw-text mt-[calc(36*var(--u))]">
+                  <p>
+                    {p.stack}
+                    {!p.href && <span className="text-mute"> [Private]</span>}
+                  </p>
                   <p className="mt-[calc(16*var(--u))]">{p.line}</p>
                 </div>
               </div>
@@ -58,7 +82,7 @@ export function Portfolio() {
                     {p.title}
                   </a>
                   <span className="text-mute">
-                    [{p.year}] {p.line}
+                    [{p.dates}] {p.line}
                   </span>
                 </li>
               ))}
