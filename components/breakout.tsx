@@ -22,20 +22,18 @@ const BALL_R = 6;
 const SPEED_START = 430;
 const SPEED_MAX = 780;
 const MAX_BALLS = 12;
-const LIVES = 3;
-const MAX_LIVES = 5;
 const DROP_W = 46;
 const DROP_H = 16;
 
-type Power = "split" | "wide" | "short" | "life";
+type Power = "split" | "wide" | "short";
 type Block = { x: number; y: number; hp: number; tough: boolean; power?: Power };
 type Ball = { x: number; y: number; vx: number; vy: number };
 type Drop = { x: number; y: number; power: Power };
 type Pop = { x: number; y: number; text: string; t: number };
-type Phase = "ready" | "serve" | "playing" | "over";
+type Phase = "ready" | "playing" | "over";
 export type Result = { run: number; score: number; durationMs: number };
 
-const DROP_LABEL: Record<Power, string> = { split: "SPLIT", wide: "WIDE", short: "SHORT", life: "+1" };
+const DROP_LABEL: Record<Power, string> = { split: "SPLIT", wide: "WIDE", short: "SHORT" };
 
 const BEST_KEY = "breakout-best";
 
@@ -61,7 +59,7 @@ function onBestChange(cb: () => void) {
 
 function pickPower(): Power {
   const r = Math.random();
-  return r < 0.38 ? "split" : r < 0.68 ? "wide" : r < 0.95 ? "short" : "life";
+  return r < 0.4 ? "split" : r < 0.72 ? "wide" : "short";
 }
 
 /** A row with a few holes. Tough (two-hit) blocks get more common the longer the run goes. */
@@ -101,7 +99,6 @@ function freshState() {
     /** Seconds with the ball in play. The wall, speed and tough blocks all scale with it. */
     elapsed: 0,
     startedAt: 0,
-    lives: LIVES,
     combo: 0,
     score: 0,
   };
@@ -118,15 +115,14 @@ function steepen(b: Ball, speed: number) {
 
 /**
  * Breakout where the wall advances: blocks creep down and new rows keep arriving from the top.
- * Three lives; losing the ball or letting the wall reach the line costs one. Some blocks take two
- * hits, some carry a power-up to catch (SPLIT, WIDE, +1) or dodge (SHORT, worth bonus points if
+ * One life: the game ends when the last ball drops or the wall reaches the line. Some blocks take
+ * two hits, some carry a power-up to catch (SPLIT, WIDE) or dodge (SHORT, worth bonus points if
  * you're brave). Breaking blocks without touching the paddle builds a score multiplier.
  */
 export function Breakout() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<Phase>("ready");
   const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(LIVES);
   const [mult, setMult] = useState(1);
   const [result, setResult] = useState<Result | null>(null);
   const best = useSyncExternalStore(onBestChange, readBest, () => 0);
@@ -183,7 +179,6 @@ export function Breakout() {
       if (phaseRef.current === "over") {
         state.current = freshState();
         setScore(0);
-        setLives(LIVES);
         setMult(1);
         setResult(null);
       }
@@ -207,24 +202,6 @@ export function Breakout() {
       if (s.score > readBest()) saveBest(s.score);
       runs.current += 1;
       setResult({ run: runs.current, score: s.score, durationMs: Math.round(performance.now() - s.startedAt) });
-    };
-
-    const loseLife = (wall: boolean) => {
-      const s = state.current;
-      s.lives -= 1;
-      setLives(s.lives);
-      s.combo = 0;
-      setMult(1);
-      s.drops = [];
-      s.paddleTarget = PADDLE.base;
-      s.sizeUntil = 0;
-      // If the wall got through, knock it back a few rows so the next life starts with room.
-      if (wall) s.blocks = s.blocks.filter((k) => k.y + BLOCK_H < PADDLE_Y - 5 * ROW_H);
-      s.balls = [];
-      if (s.lives <= 0) return end();
-      fx.lose();
-      serveBall();
-      setPlayPhase("serve");
     };
 
     const addScore = (n: number, x: number, y: number, label?: string) => {
@@ -258,16 +235,11 @@ export function Breakout() {
         s.sizeUntil = s.elapsed + 12;
         fx.good();
         addScore(25, cx, d.y, "WIDE");
-      } else if (d.power === "short") {
+      } else {
         s.paddleTarget = PADDLE.short;
         s.sizeUntil = s.elapsed + 10;
         fx.bad();
         addScore(75, cx, d.y, "+75 SHORT");
-      } else {
-        s.lives = Math.min(MAX_LIVES, s.lives + 1);
-        setLives(s.lives);
-        fx.good();
-        addScore(25, cx, d.y, "+1 LIFE");
       }
     };
 
@@ -313,7 +285,7 @@ export function Breakout() {
       s.pops = s.pops.filter((p) => p.t < 0.9);
 
       if (s.stuck) {
-        // Everything holds still until the serve, so a lost life never costs more than one.
+        // Everything holds still until the first launch.
         for (const b of s.balls) {
           b.x = s.paddleX + s.paddleW / 2;
           b.y = PADDLE_Y - BALL_R;
@@ -335,7 +307,7 @@ export function Breakout() {
         s.topY -= ROW_H;
         s.blocks.push(...makeRow(s.topY, s.elapsed));
       }
-      if (s.blocks.some((k) => k.y + BLOCK_H >= PADDLE_Y - 1)) return loseLife(true);
+      if (s.blocks.some((k) => k.y + BLOCK_H >= PADDLE_Y - 1)) return end();
 
       for (const d of s.drops) d.y += 150 * dt;
       s.drops = s.drops.filter((d) => {
@@ -415,7 +387,7 @@ export function Breakout() {
           }
         }
         s.balls = s.balls.filter((b) => b.y < H + BALL_R);
-        if (!s.balls.length) return loseLife(false);
+        if (!s.balls.length) return end();
       }
     };
 
@@ -425,7 +397,7 @@ export function Breakout() {
       ctx.setTransform(scale, 0, 0, scale, 0, 0);
       ctx.clearRect(0, 0, W, H);
 
-      // Danger line: the wall costs a life when it reaches it.
+      // Danger line: the game ends when the wall reaches it.
       ctx.fillStyle = faint;
       ctx.fillRect(0, PADDLE_Y - 1, W, 1);
 
@@ -512,29 +484,17 @@ export function Breakout() {
 
   const overlay =
     phase === "ready"
-      ? { title: "Breakout", line: "Click or press Space to launch" }
-      : phase === "serve"
-        ? { title: `${lives} ${lives === 1 ? "life" : "lives"} left`, line: "Click or press Space to serve" }
-        : phase === "over"
-          ? { title: "Game over", line: `${score} points · click to play again` }
-          : null;
+      ? { title: "Breakout", line: "Click to start" }
+      : phase === "over"
+        ? { title: "Game over", line: `${score} points · click to play again` }
+        : null;
 
   return (
     <div>
       <div className="fw-small mb-[calc(10*var(--u))] flex items-center justify-between gap-4 text-mute">
-        <span className="flex items-center gap-[calc(18*var(--u))]">
-          <span>
-            SCORE <span className="text-ink tabular-nums">{score}</span>
-            {mult > 1 && <span className="ml-1.5 text-ink">×{mult}</span>}
-          </span>
-          <span aria-label={`${lives} lives`} className="flex items-center gap-1">
-            {Array.from({ length: MAX_LIVES }, (_, i) => (
-              <span
-                key={i}
-                className={i < lives ? "size-[calc(7*var(--u))] rounded-full bg-ink" : "hidden"}
-              />
-            ))}
-          </span>
+        <span>
+          SCORE <span className="text-ink tabular-nums">{score}</span>
+          {mult > 1 && <span className="ml-1.5 text-ink">×{mult}</span>}
         </span>
         <span className="flex items-center gap-[calc(18*var(--u))]">
           <span>
@@ -556,7 +516,7 @@ export function Breakout() {
         <canvas
           ref={canvasRef}
           tabIndex={0}
-          aria-label="Breakout game. Move the paddle with the mouse or arrow keys; click or press Space to launch."
+          aria-label="Breakout game. Move the paddle with the mouse or arrow keys; click or press Space to start."
           className="block aspect-[4/3] w-full cursor-none touch-none outline-none"
         />
         {overlay && (
@@ -571,7 +531,7 @@ export function Breakout() {
       </div>
       <p className="fw-small mt-[calc(10*var(--u))] text-mute">
         Mouse, touch or ← → to move. Dark blocks take two hits; dotted ones drop a power-up. Catch
-        SPLIT, WIDE and +1; SHORT shrinks your bar but pays 75. Chain blocks without touching the
+        SPLIT and WIDE; SHORT shrinks your bar but pays 75. One life. Chain blocks without touching the
         bar for up to ×5.
       </p>
       <Leaderboard result={result} />

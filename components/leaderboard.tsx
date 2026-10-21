@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { NAME_MAX, cleanName, type BoardResponse, type Entry, type SubmitResponse } from "@/lib/leaderboard";
+import { useEffect, useRef, useState } from "react";
+import {
+  NAME_MAX,
+  PAGE_SIZE,
+  cleanName,
+  type BoardResponse,
+  type Entry,
+  type SubmitResponse,
+} from "@/lib/leaderboard";
 import type { Result } from "@/components/breakout";
 import { cn } from "@/lib/utils";
 
@@ -22,19 +29,52 @@ function saveName(name: string) {
 }
 
 /**
- * The top ten, plus an optional "save your score" field after each finished run. Hidden
+ * Every saved score, best first, plus an optional "save your score" field after each finished
+ * run. The list has no cap: it loads a page at a time as you scroll to its bottom. Hidden
  * entirely when the API isn't configured, so the game still works without a database.
  */
 export function Leaderboard({ result }: { result: Result | null }) {
   const [top, setTop] = useState<Entry[] | null>(null);
+  const [more, setMore] = useState(false);
   const [mine, setMine] = useState<number | null>(null);
+  const listRef = useRef<HTMLOListElement>(null);
+  const loading = useRef(false);
+
+  const load = async (offset: number) => {
+    if (loading.current) return;
+    loading.current = true;
+    try {
+      const res = await fetch(`/api/leaderboard?offset=${offset}&limit=${PAGE_SIZE}`);
+      const d = (await res.json()) as BoardResponse;
+      if (!d.ok) return;
+      // New saves can shift rows between pages; skip any we already have.
+      setTop((prev) => {
+        const have = new Set(prev?.map((e) => e.id));
+        return [...(offset ? (prev ?? []) : []), ...d.top.filter((e) => !offset || !have.has(e.id))];
+      });
+      setMore(d.more);
+    } catch {
+      // Leave the board as it is; the next scroll tries again.
+    } finally {
+      loading.current = false;
+    }
+  };
 
   useEffect(() => {
-    fetch("/api/leaderboard")
-      .then((r) => r.json() as Promise<BoardResponse>)
-      .then((d) => d.ok && setTop(d.top))
-      .catch(() => {});
+    void load(0);
   }, []);
+
+  const onScroll = (e: React.UIEvent<HTMLOListElement>) => {
+    const el = e.currentTarget;
+    if (more && top && el.scrollTop + el.clientHeight > el.scrollHeight - 120) void load(top.length);
+  };
+
+  // After saving, scroll the list (not the page) so your row is in view.
+  useEffect(() => {
+    const list = listRef.current;
+    const row = list?.querySelector<HTMLElement>("[data-mine]");
+    if (list && row) list.scrollTop = row.offsetTop - list.offsetTop - list.clientHeight / 2;
+  }, [mine, top]);
 
   if (!top) return null;
 
@@ -44,9 +84,10 @@ export function Leaderboard({ result }: { result: Result | null }) {
         <SaveScore
           key={result.run}
           result={result}
-          onSaved={(id, board) => {
+          onSaved={(id, board, hasMore) => {
             setMine(id);
             setTop(board);
+            setMore(hasMore);
           }}
         />
       )}
@@ -54,10 +95,16 @@ export function Leaderboard({ result }: { result: Result | null }) {
       {top.length === 0 ? (
         <p className="fw-text text-mute">No scores yet. Be the first.</p>
       ) : (
-        <ol className="flex flex-col">
+        // About twelve rows tall; everyone else scrolls inside it.
+        <ol
+          ref={listRef}
+          onScroll={onScroll}
+          className="flex max-h-[calc(400*var(--u))] flex-col overflow-y-auto overscroll-contain"
+        >
           {top.map((e, i) => (
             <li
               key={e.id}
+              data-mine={e.id === mine || undefined}
               className={cn(
                 "fw-text grid grid-cols-[calc(36*var(--u))_minmax(0,1fr)_auto] gap-[calc(12*var(--u))] py-[calc(4*var(--u))]",
                 e.id === mine ? "text-ink" : i > 2 && "text-mute",
@@ -77,7 +124,13 @@ export function Leaderboard({ result }: { result: Result | null }) {
   );
 }
 
-function SaveScore({ result, onSaved }: { result: Result; onSaved: (id: number, top: Entry[]) => void }) {
+function SaveScore({
+  result,
+  onSaved,
+}: {
+  result: Result;
+  onSaved: (id: number, top: Entry[], more: boolean) => void;
+}) {
   const [name, setName] = useState(readName);
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [message, setMessage] = useState("");
@@ -102,7 +155,7 @@ function SaveScore({ result, onSaved }: { result: Result; onSaved: (id: number, 
       saveName(clean);
       setStatus("saved");
       setMessage(`Saved. You're #${data.rank}.`);
-      onSaved(data.id, data.top);
+      onSaved(data.id, data.top, data.more);
     } catch {
       setStatus("idle");
       setMessage("Couldn't save that. Try again.");
