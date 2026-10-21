@@ -27,7 +27,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     body: [
       { h: "Overview" },
       "SLAP! is a hardware and software project Hibiki and I built in about 30 hours at OCC Hacks. It's a small device that sits near the lecturer, and you have to slap it to turn it on. Everyone in the class follows the same live captions on a shared web page, translated into Vietnamese or Japanese if they need it. Every lecture is saved and tied to the rest of the course, and turned into study material.",
-      { video: { src: "/media/slap/demo.mp4", poster: "/media/slap/demo-poster.jpg", caption: "Demoing SLAP! at OCC Hacks", aspect: "854 / 480" } },
+      { video: { src: "/media/slap/demo.mp4", poster: "/media/slap/demo-poster.jpg", caption: "Demoing SLAP! at OCC Hacks: captions, translation, then the device opened up" } },
       { h: "Context" },
       "In class I'd do my best to take notes, follow the lecture and pay full attention, and something would still slip through the cracks. Transcription tools like Granola and Wispr are made for work meetings, not for students; I'd check a lecture transcript once or twice and never again. And by then my study material was scattered across transcripts, GoodNotes, Canvas, paper handouts and PDFs, which made pulling it together a pain.",
       "Hibiki had the same problem, and as an international student, a language barrier on top of it.",
@@ -54,6 +54,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       "For something more interactive, you can pick a voice to explain a concept to you, generated with Fish Audio.",
       { h: "Reflections" },
       "Hardware is the risk. The MPU6050 didn't fit the ESP32, so it went on an Arduino, and I had to double the housing at the last minute to make room. We barely got it off the breadboard, soldered and into the case in time.",
+      { video: { src: "/media/slap/soldering.mp4", poster: "/media/slap/soldering-poster.jpg", caption: "Soldering it together, filmed on an Insta360" } },
       "Live captions need WebSockets held open and state in memory, so the API can't run on serverless hosting; it runs on a small server, with the web app optionally on Vercel.",
       "I learned plenty building it, and the show-and-tell with other attendees was the most fun I've had in a while.",
     ],
