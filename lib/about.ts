@@ -32,7 +32,7 @@ export const ABOUT: AboutSection[] = [
         when: "2024 – 2026",
         title: "Product & Solutions Engineer",
         where: "Plethora",
-        line: "A client site for Pickle Banh Mi Co. and internal workflow tools for Chef Nourish, from gathering requirements to shipping.",
+        line: "A software startup that pivoted several times. Along the way I built client work from requirements to launch, including the Q Industries website and the system Chef Nourish's kitchen runs on.",
       },
       {
         when: "2025",
