@@ -202,6 +202,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     body: [
       { h: "Overview" },
       "HackCC 2024 was a 30-hour hackathon for community college students, run by a team drawn from several colleges. I led it as lead organizer, directing six departments that handled sponsorship, the venue, catering, mentors and overnight accommodations for 100+ attendees.",
+      { youtube: { id: "vT81BYkjc8k", caption: "HackCC 2024, the recap" } },
       { h: "Running it" },
       "[How the six departments split the work, and the hardest call you made as lead.]",
       { h: "How it went" },

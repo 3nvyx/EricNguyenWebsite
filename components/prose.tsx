@@ -72,6 +72,22 @@ export function Prose({ blocks, headings = "title" }: { blocks: Block[]; heading
             </figure>
           );
         }
+        if ("youtube" in b) {
+          return (
+            <figure key={i} className="py-[calc(12*var(--u))]">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${b.youtube.id}?rel=0`}
+                title={b.youtube.caption}
+                loading="lazy"
+                allow="encrypted-media; picture-in-picture; fullscreen"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="aspect-video w-full bg-ink"
+              />
+              <figcaption className="fw-small mt-[calc(8*var(--u))] text-mute">{b.youtube.caption}</figcaption>
+            </figure>
+          );
+        }
         return (
           <div key={i} className={cn("grid gap-[calc(18*var(--u))] py-[calc(12*var(--u))] md:grid-cols-2")}>
             <FigureView figure={b.figures[0]} />

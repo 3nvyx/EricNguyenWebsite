@@ -55,7 +55,7 @@ function webglAvailable() {
 const damp = (from: number, to: number, rate: number, dt: number) => from + (to - from) * (1 - Math.exp(-rate * dt));
 
 /**
- * Eric's NFC business card as a live 3D model. Drag to turn it; let go and it settles on a face.
+ * Eric's NFC business card as a live 3D model. Drag to turn it any way; let go and it stays there.
  * With `controls`, a click flips it and a button pulls the print layers apart to show the tag
  * sealed inside. Without, clicks fall through (the card is a link on the projects list).
  */
@@ -101,8 +101,8 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const s = {
-      rotY: -0.9, rotX: 0.35, velY: 0, velX: 0, face: 0, settling: false,
-      hoverX: 0, hoverY: 0, explode: 0, explodeTo: 0,
+      rotY: -0.9, rotX: 0.35, velY: 0, velX: 0, face: 0, free: false, flip: 0,
+      hoverX: 0, hoverY: 0, leanX: 0, leanY: 0, explode: 0, explodeTo: 0,
       dragging: false, dragged: false, lastX: 0, lastY: 0, lastT: 0, downX: 0, downY: 0,
     };
 
@@ -144,12 +144,22 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
     resize.observe(el);
     fit();
 
-    // Input: drag to spin with momentum; hover leans the card toward the pointer.
+    // Until it's first dragged, the card holds a display pose (swaying, tipping back when exploded).
+    // After that it's free and stays wherever it's left. Either way, whichever face is toward you
+    // leans a little toward the pointer, on top of the card's own angle. Turning is
+    // orbit-style: across spins the card about its own upright axis, so it turns over front to back
+    // whatever its tilt; up and down tilts it toward or away from you, stopping at edge-on so the
+    // card never ends up upside down with the controls reversed.
+    const TILT = Math.PI / 2;
+    const spin = (ax: number, ay: number) => {
+      s.rotY += ay;
+      s.rotX = THREE.MathUtils.clamp(s.rotX + ax, -TILT, TILT);
+    };
+
     const down = (e: PointerEvent) => {
       if ((e.target as HTMLElement).closest("button")) return;
       s.dragging = true;
       s.dragged = false;
-      s.settling = false;
       s.lastX = s.downX = e.clientX;
       s.lastY = s.downY = e.clientY;
       s.lastT = performance.now();
@@ -162,6 +172,7 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
       if (!s.dragging) return;
       if (!s.dragged && Math.hypot(e.clientX - s.downX, e.clientY - s.downY) > 4) {
         s.dragged = true;
+        s.free = true;
         el.setPointerCapture(e.pointerId);
       }
       if (!s.dragged) return;
@@ -169,8 +180,7 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
       const dt = Math.max((now - s.lastT) / 1000, 1 / 240);
       const dy = ((e.clientX - s.lastX) / width) * Math.PI * 1.6;
       const dx = ((e.clientY - s.lastY) / height) * Math.PI * 0.8;
-      s.rotY += dy;
-      s.rotX = THREE.MathUtils.clamp(s.rotX + dx, -0.7, 0.7);
+      spin(dx, dy);
       s.velY = damp(s.velY, dy / dt, 20, dt);
       s.velX = damp(s.velX, dx / dt, 20, dt);
       s.lastX = e.clientX;
@@ -181,7 +191,6 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
       if (!s.dragging) return;
       s.dragging = false;
       if (performance.now() - s.lastT > 80) s.velY = s.velX = 0; // held still before letting go
-      s.settling = true;
       if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId);
     };
     const leave = () => {
@@ -212,9 +221,9 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
 
     api.current = {
       flip: () => {
-        s.settling = false;
-        s.velY = 0;
-        s.face += Math.PI;
+        s.velY = s.velX = 0;
+        if (s.free) s.flip += Math.PI;
+        else s.face += Math.PI;
       },
       explode: (on) => {
         s.explodeTo = on ? 1 : 0;
@@ -313,26 +322,32 @@ export function NfcCard3D({ controls = false, className }: { controls?: boolean;
       s.explode = reduced ? s.explodeTo : damp(s.explode, s.explodeTo, 5, dt);
       const e = s.explode;
 
-      if (!s.dragging) {
-        if (s.settling) {
-          // Coast on the throw, then land on whichever face is nearest.
-          s.rotY += s.velY * dt;
-          s.velY *= Math.exp(-2.5 * dt);
-          if (Math.abs(s.velY) < 1.2) {
-            s.face = Math.round(s.rotY / Math.PI) * Math.PI;
-            s.settling = false;
-          }
-        } else {
-          // Exploded, it turns and tips back so the layers stack down the screen.
-          const sway = reduced ? 0 : Math.sin(t * 0.6) * 0.18;
-          const toY = s.face + (-0.3 + sway) * (1 - e) - 0.55 * e + s.hoverX * 0.25;
-          s.rotY = damp(s.rotY, toY, 4, dt);
+      if (s.free) {
+        if (!s.dragging) {
+          // Coast on the throw, then stay put.
+          spin(s.velX * dt, s.velY * dt);
+          if (Math.abs(s.rotX) === TILT) s.velX = 0;
+          const drag = Math.exp(-2.5 * dt);
+          s.velX *= drag;
+          s.velY *= drag;
         }
-        s.velX *= Math.exp(-6 * dt);
-        const toX = (0.25 + (reduced ? 0 : Math.sin(t * 0.45) * 0.06)) * (1 - e) - 0.85 * e + s.hoverY * 0.15;
-        s.rotX = damp(s.rotX + s.velX * dt, toX, 3, dt);
+        if (s.flip) {
+          const step = reduced || Math.abs(s.flip) < 1e-3 ? s.flip : s.flip * (1 - Math.exp(-6 * dt));
+          spin(0, step);
+          s.flip -= step;
+        }
+      } else {
+        // Exploded, it turns and tips back so the layers stack down the screen.
+        const sway = reduced ? 0 : Math.sin(t * 0.6) * 0.18;
+        const toY = s.face + (-0.3 + sway) * (1 - e) - 0.55 * e;
+        const toX = (0.25 + (reduced ? 0 : Math.sin(t * 0.45) * 0.06)) * (1 - e) - 0.85 * e;
+        s.rotY = damp(s.rotY, toY, 4, dt);
+        s.rotX = damp(s.rotX, toX, 3, dt);
       }
-      card.rotation.set(s.rotX, s.rotY, 0);
+      // Added to the angles, the lean tips whichever face is toward you toward the pointer.
+      s.leanY = damp(s.leanY, s.dragging ? 0 : s.hoverX * 0.25, 4, dt);
+      s.leanX = damp(s.leanX, s.dragging ? 0 : s.hoverY * 0.15, 4, dt);
+      card.rotation.set(s.rotX + s.leanX, s.rotY + s.leanY, 0);
 
       for (const p of parts) p.obj.position.z = p.base + p.step * SPREAD * e;
 

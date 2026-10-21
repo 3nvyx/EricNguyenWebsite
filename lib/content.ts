@@ -16,6 +16,8 @@ export type Block =
   | { figure: Figure }
   /** A video with controls; `src` is the video, `poster` the still shown before it plays. */
   | { video: Figure & { poster?: string } }
+  /** A YouTube video, embedded by its id (the `v=` part of the watch URL). */
+  | { youtube: { id: string; caption: string } }
   /** Two figures side by side on desktop. */
   | { figures: [Figure, Figure] };
 
