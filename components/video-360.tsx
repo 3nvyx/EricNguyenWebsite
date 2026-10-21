@@ -66,7 +66,7 @@ function mount(
   vid.addEventListener("playing", onFrame);
   vid.addEventListener("seeked", onFrame);
 
-  // The middle of the video faces you at the start.
+  // The middle of the video faces you at the start. A larger lon turns the view left.
   const START = 270;
   const s = {
     lon: START, lat: 0, velLon: 0, velLat: 0, stickX: 0, stickY: 0, recentering: false,
@@ -116,7 +116,7 @@ function mount(
     const now = performance.now();
     const dt = Math.max((now - s.lastT) / 1000, 1 / 240);
     const k = camera.fov / height; // degrees per pixel, so the scene stays under the pointer
-    const dLon = -(e.clientX - s.lastX) * k;
+    const dLon = (e.clientX - s.lastX) * k;
     const dLat = (e.clientY - s.lastY) * k;
     look(dLon, dLat);
     s.velLon = damp(s.velLon, dLon / dt, 20, dt);
@@ -139,7 +139,7 @@ function mount(
   };
   const key = (e: KeyboardEvent) => {
     if (isControl(e)) return;
-    const turn: Record<string, [number, number]> = { ArrowLeft: [-15, 0], ArrowRight: [15, 0], ArrowUp: [0, 10], ArrowDown: [0, -10] };
+    const turn: Record<string, [number, number]> = { ArrowLeft: [15, 0], ArrowRight: [-15, 0], ArrowUp: [0, 10], ArrowDown: [0, -10] };
     if (turn[e.key]) {
       look(...turn[e.key]);
       onLook();
@@ -175,7 +175,7 @@ function mount(
     // The ball: pushed further, it turns faster, gently near the middle for fine aiming.
     if (s.stickX || s.stickY) {
       const curve = (v: number) => Math.sign(v) * Math.abs(v) ** 1.6;
-      look(curve(s.stickX) * 140 * dt, -curve(s.stickY) * 90 * dt);
+      look(-curve(s.stickX) * 140 * dt, -curve(s.stickY) * 90 * dt);
     }
     if (s.recentering) {
       const toLon = s.lon + ((((START - s.lon) % 360) + 540) % 360) - 180; // the short way round
@@ -196,7 +196,7 @@ function mount(
       camera.lookAt(target.setFromSphericalCoords(1, phi, theta));
       renderer.render(scene, camera);
       const needle = ui.needle();
-      if (needle) needle.style.transform = `rotate(${s.lon - START}deg)`;
+      if (needle) needle.style.transform = `rotate(${START - s.lon}deg)`;
     }
     if (visible) frame = requestAnimationFrame(tick);
   };
