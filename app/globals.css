@@ -1,26 +1,117 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bone: #f4f3f0;
+  --ink: #111111;
+  --mute: #777777;
+  --faint: #bcbbb7;
+  /* One face for all text. To use TWK Everett: add an @font-face for "Everett" with the
+     licensed woff2 in public/fonts, then put "Everett" first here. */
+  --font-text: var(--font-instrument);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-ibm-plex-sans-condensed);
-  --font-mono: var(--font-geist-mono);
+  --color-bone: var(--bone);
+  --color-ink: var(--ink);
+  --color-mute: var(--mute);
+  --color-faint: var(--faint);
+  --font-sans: var(--font-text);
+  --font-display: var(--font-unbounded);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bone);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-ibm-plex-sans-condensed), sans-serif;
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--font-text), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Brushed metal type: dark gradient in the glyphs, SVG specular bevel, pointer-lit reflection.
+   In the components layer so Tailwind utilities on the element (md:fixed etc.) still win. */
+@layer components {
+  .chrome-name {
+    position: relative;
+    display: inline-block;
+    width: fit-content;
+    filter: url(#chrome-bevel);
+  }
+
+  .chrome-base,
+  .chrome-light {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .chrome-base {
+    background-image: linear-gradient(
+      180deg,
+      #6b6b68 0%,
+      #3a3a38 42%,
+      #262625 52%,
+      #4f4f4c 68%,
+      #8a8a86 100%
+    );
+  }
+
+  .chrome-light {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+}
+
+/* Type and spacing scale copied from the Rakuten Fashion Week Tokyo brand pages, measured at
+   1440px wide. --u is one design pixel: it scales with the viewport like theirs, but is floored
+   and capped so text stays readable on small screens and doesn't balloon on large ones. */
+:root {
+  --u: clamp(0.85px, calc(100vw / 1440), 1.25px);
+}
+
+@layer components {
+  .fw {
+    letter-spacing: 0.2px;
+  }
+  .fw-name {
+    font-size: calc(27 * var(--u));
+    line-height: 1.5;
+  }
+  .fw-nav {
+    font-size: calc(15.75 * var(--u));
+    line-height: calc(29 * var(--u));
+  }
+  .fw-nav-off {
+    color: rgb(132 139 144 / 0.5);
+  }
+  .fw-small {
+    font-size: calc(12 * var(--u));
+    line-height: 1.5;
+  }
+  .fw-label {
+    font-size: calc(12 * var(--u));
+    line-height: 1.5;
+    padding-bottom: calc(2.25 * var(--u));
+    border-bottom: 0.5px solid var(--ink);
+    margin-bottom: calc(27 * var(--u));
+  }
+  .fw-title {
+    font-size: calc(19.5 * var(--u));
+    line-height: 1.5;
+  }
+  .fw-text {
+    font-size: calc(15.75 * var(--u));
+    line-height: 2.1;
+  }
+}
+
+/* In the base layer so selection: utilities can override it (the footer flips it on its ink bar). */
+@layer base {
+  ::selection {
+    background: var(--ink);
+    color: var(--bone);
+  }
 }
