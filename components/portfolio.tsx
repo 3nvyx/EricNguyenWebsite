@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "motion/react";
 import { PROJECTS } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
@@ -27,30 +28,18 @@ export function Portfolio() {
               <span className="text-mute">{p.dates}</span>
             </h2>
             <div className="grid gap-5 md:grid-cols-[calc(400*var(--u))_minmax(0,1fr)] md:gap-[calc(27*var(--u))]">
-              {p.href ? (
-                <a
-                  href={p.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full self-start overflow-hidden"
-                  style={{ aspectRatio: p.aspect ?? "16 / 9" }}
-                  aria-label={`${p.title}: ${p.line}`}
-                >
-                  <MediaSlot project={p} />
-                </a>
-              ) : (
-                <div className="w-full self-start overflow-hidden" style={{ aspectRatio: p.aspect ?? "16 / 9" }}>
-                  <MediaSlot project={p} />
-                </div>
-              )}
+              <Link
+                href={`/projects/${p.slug}`}
+                className="block w-full self-start overflow-hidden"
+                style={{ aspectRatio: p.aspect ?? "16 / 9" }}
+                aria-label={`${p.title}: ${p.line}`}
+              >
+                <MediaSlot project={p} />
+              </Link>
               <div className="flex min-w-0 flex-col">
-                {p.href ? (
-                  <a href={p.href} target="_blank" rel="noopener noreferrer" className={cn("fw-title self-start", hover)}>
-                    {p.title}
-                  </a>
-                ) : (
-                  <p className="fw-title">{p.title}</p>
-                )}
+                <Link href={`/projects/${p.slug}`} className={cn("fw-title self-start", hover)}>
+                  {p.title}
+                </Link>
                 <p className="fw-text mt-[calc(4*var(--u))] flex flex-wrap gap-x-[calc(12*var(--u))] text-mute">
                   {p.tags.map((t) => (
                     <span key={t}>#{t}</span>
@@ -74,13 +63,18 @@ export function Portfolio() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.45 }}
           >
-            <h2 className="fw-label">MORE</h2>
+            <h2 className="fw-label flex justify-between gap-6">
+              <span>MORE</span>
+              <Link href="/projects" className={hover}>
+                SEE ALL PROJECTS →
+              </Link>
+            </h2>
             <ul className="fw-text">
               {MORE.map((p) => (
                 <li key={p.slug} className="flex flex-wrap gap-x-[calc(27*var(--u))]">
-                  <a href={p.href} target="_blank" rel="noopener noreferrer" className={hover}>
+                  <Link href={`/projects/${p.slug}`} className={hover}>
                     {p.title}
-                  </a>
+                  </Link>
                   <span className="text-mute">
                     [{p.dates}] {p.line}
                   </span>

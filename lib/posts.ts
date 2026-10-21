@@ -1,7 +1,7 @@
 // Blog posts, newest first. Each one gets a page at /blogs/<slug>.
-// A post's body is a list of blocks: plain strings are paragraphs, { h } is a subheading.
+// A post's body uses the shared content blocks (lib/content.ts).
 
-export type Block = string | { h: string };
+import type { Block } from "@/lib/content";
 
 export type Post = {
   slug: string;

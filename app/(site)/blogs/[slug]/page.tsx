@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { POSTS, postDate } from "@/lib/posts";
-import { cn, hoverLink, pageMain } from "@/lib/utils";
+import { hoverLink, pageMain } from "@/lib/utils";
+import { Prose } from "@/components/prose";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -35,16 +36,8 @@ export default async function PostPage({ params }: Props) {
       <article className="max-w-[calc(640*var(--u))]">
         <h1 className="fw-name">{post.title}</h1>
         <p className="fw-text mt-[calc(10*var(--u))] text-mute">{post.summary}</p>
-        <div className="fw-text mt-[calc(36*var(--u))] space-y-[calc(16*var(--u))]">
-          {post.body.map((b, i) =>
-            typeof b === "string" ? (
-              <p key={i}>{b}</p>
-            ) : (
-              <h3 key={i} className={cn("fw-title pt-[calc(20*var(--u))]")}>
-                {b.h}
-              </h3>
-            ),
-          )}
+        <div className="mt-[calc(36*var(--u))]">
+          <Prose blocks={post.body} />
         </div>
       </article>
     </main>

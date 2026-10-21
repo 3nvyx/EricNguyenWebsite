@@ -35,7 +35,7 @@ export function Footer() {
           <nav aria-label="Footer" className="fw-small flex gap-[calc(27*var(--u))]">
             <ul className="flex flex-col">
               <li><Link href="/about" className={link}>ABOUT</Link></li>
-              <li><Link href="/" className={link}>PROJECTS</Link></li>
+              <li><Link href="/projects" className={link}>PROJECTS</Link></li>
               <li><Link href="/blogs" className={link}>BLOGS</Link></li>
             </ul>
             <ul className="flex flex-col">

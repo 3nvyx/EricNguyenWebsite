@@ -38,6 +38,15 @@ export const PROJECTS: Project[] = [
     aspect: "4 / 3",
   },
   {
+    slug: "nfc-card",
+    title: "NFC Business Card",
+    line: "A printed business card with an NFC tag sealed inside",
+    dates: "Sep – Oct 2026",
+    tags: ["Hardware", "3D printing", "CAD"],
+    stack: "Python / manifold3d / Bambu Studio",
+    media: "/media/nfc-card/preview.png",
+  },
+  {
     slug: "honors",
     title: "Honors Eligibility",
     line: "Checks a transcript against 17 honor societies, fully offline",
@@ -48,34 +57,63 @@ export const PROJECTS: Project[] = [
     aspect: "16 / 10",
   },
   {
-    slug: "sevis",
-    title: "Sevis",
-    line: "Where international students study, mapped",
-    href: "https://github.com/3nvyx/SEVIS-data-maping-trends",
-    dates: "Sep 2026",
-    tags: ["Data", "Visualization"],
-    stack: "Python / Next.js",
-    media: "/media/sevis.gif",
+    slug: "occhacks",
+    title: "OCC Hacks",
+    line: "The site, sign-ups and organizer dashboard for a 200-hacker event",
+    href: "https://www.occhacks.com",
+    dates: "May – Oct 2026",
+    tags: ["Web", "Full stack", "Events"],
+    stack: "Next.js / Supabase / Tailwind",
+    media: "/media/occhacks/hero.png",
+    aspect: "16 / 10",
   },
   {
-    slug: "daisy",
-    title: "Daisy",
-    line: "Scene-based RGB lighting control",
-    href: "https://github.com/3nvyx/daisy-light-control-system",
-    dates: "Sep 2026",
-    tags: ["Lighting", "UI"],
-    stack: "TypeScript / Next.js",
-    media: "/media/daisy.gif",
+    slug: "q-industries",
+    title: "Q Industries",
+    line: "A Vietnamese-language site for an industrial engineering supplier",
+    dates: "Mar – May 2026",
+    tags: ["Web", "Client work", "Vietnamese"],
+    stack: "Next.js / Tailwind / Resend",
+    media: "/media/q-industries.png",
   },
   {
-    slug: "carousel",
-    title: "Carousel",
-    line: "Cover-flow carousel component",
-    href: "https://github.com/3nvyx/Interesting-Carousel",
-    dates: "Nov 2025",
-    tags: ["UI", "Component"],
-    stack: "TypeScript / React",
-    media: "/media/carousel.gif",
+    slug: "pickle-banh-mi",
+    title: "Pickle Banh Mi",
+    line: "A website design for a local banh mi shop, made to bring in orders",
+    dates: "Design only",
+    tags: ["UI design", "Client work", "Figma"],
+    stack: "Figma",
+    media: "/media/pickle-banh-mi/hero.jpg",
+  },
+  {
+    slug: "nyx",
+    title: "Nyx",
+    line: "A live dashboard for an autonomous bug-hunting agent",
+    href: "https://github.com/3nvyx/nyx",
+    dates: "Apr 2026",
+    tags: ["Security", "AI", "Real-time", "Hackathon"],
+    stack: "Next.js / Three.js / Pusher",
+    media: "/media/nyx.png",
+  },
+  {
+    slug: "condensed-cot",
+    title: "Condensing Chain-of-Thought",
+    line: "Research: a 7B model that reasons in fewer, sharper steps scores higher on the AIME",
+    dates: "Jan – Apr 2025",
+    tags: ["Research", "AI", "LLMs"],
+    stack: "LoRA / DeepSeek-R1 / Qwen2.5",
+    media: "/media/research/poster.jpg",
+    aspect: "4 / 3",
+  },
+  {
+    slug: "glow-box",
+    title: "Glow Box",
+    line: "A lamp of printed PLA and CNC-cut oak, with 768 light settings",
+    dates: "Jan 2026",
+    tags: ["Product design", "3D printing", "CNC", "Lighting"],
+    stack: "Bambu P1S / CNC / PLA / Oak",
+    media: "/media/glow-box/shelf.jpg",
+    aspect: "4 / 3",
   },
 ];
 
@@ -87,18 +125,3 @@ export const LINKS = [
 ];
 
 export const EMAIL = "envn001@gmail.com";
-
-/**
- * Coffee chat booking calendar: the Google Calendar appointment schedule's embed URL, shown in a
- * panel on the page. Get it from the schedule's Share → Website embed → Inline, and copy the
- * iframe's src (https://calendar.google.com/calendar/appointments/schedules/…?gv=true).
- * Empty until that exists; the link then falls back to COFFEE_CHAT_INVITE.
- */
-export const COFFEE_CHAT_EMBED = "";
-
-/** Fallback: a pre-filled Calendar invite with Eric as the guest. */
-export const COFFEE_CHAT_INVITE =
-  "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-  "&text=" + encodeURIComponent("Coffee chat with Eric Nguyen") +
-  "&details=" + encodeURIComponent("30 minutes, video or in person around Irvine.") +
-  "&add=" + encodeURIComponent("envn001@gmail.com");

@@ -1,18 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import dynamic from "next/dynamic";
 import type { Project } from "@/lib/projects";
 import { SlapSplash } from "@/components/slap-splash";
+import { MediaImage } from "@/components/media-image";
 
-/** One media slot. Slap shows the device's own switch-on animation; the rest show a gif or a placeholder. */
-export function MediaSlot({ project }: { project: Project }) {
-  const [missing, setMissing] = useState(false);
+// three.js only loads on pages that show the card.
+const NfcCard3D = dynamic(() => import("@/components/nfc-card-3d").then((m) => m.NfcCard3D), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-faint/75" />,
+});
 
-  // A server-rendered <img> can fail before React attaches onError, so also check when it mounts.
-  const checkLoaded = (el: HTMLImageElement | null) => {
-    if (el && el.complete && el.naturalWidth === 0) setMissing(true);
-  };
-
+/**
+ * A project's cover. SLAP! shows the device's own switch-on animation, the NFC card is a 3D model
+ * (with flip and layer controls when `controls`), and the rest show a gif or a placeholder.
+ */
+export function MediaSlot({ project, controls = false }: { project: Project; controls?: boolean }) {
   if (project.slug === "slap") {
     return (
       <div className="h-full w-full bg-ink p-[3%]">
@@ -21,22 +24,7 @@ export function MediaSlot({ project }: { project: Project }) {
     );
   }
 
-  if (missing) {
-    return (
-      <div className="flex h-full w-full items-center justify-center border border-dashed border-faint text-xs text-mute">
-        {project.slug} — gif
-      </div>
-    );
-  }
+  if (project.slug === "nfc-card") return <NfcCard3D controls={controls} />;
 
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      ref={checkLoaded}
-      src={project.media}
-      alt={project.line}
-      onError={() => setMissing(true)}
-      className="h-full w-full object-cover"
-    />
-  );
+  return <MediaImage src={project.media} alt={project.line} label={`${project.slug} — gif`} />;
 }
