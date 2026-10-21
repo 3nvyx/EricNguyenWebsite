@@ -39,8 +39,9 @@ export function CopyEmailIcon({ className, iconClassName }: { className?: string
       title={copied ? "Copied to clipboard" : EMAIL}
       className={className}
     >
+      {/* A solid badge, so its edges line up with the GitHub and LinkedIn marks beside it. */}
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={iconClassName}>
-        <path d={copied ? ICON.check : ICON.mail} />
+        <path fillRule="evenodd" d={copied ? ICON.checkBadge : ICON.mailBadge} />
       </svg>
       <span className="sr-only" aria-live="polite">
         {copied ? "Copied to clipboard" : ""}

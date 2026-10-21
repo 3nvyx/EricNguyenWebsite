@@ -8,4 +8,10 @@ export const ICON = {
   mail: "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z",
   copy: "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z",
   check: "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
+  // Solid 24x24 badges (fill-rule evenodd) so they line up edge to edge with the LinkedIn mark:
+  // a rounded square with an envelope, or a check, cut out of it.
+  mailBadge:
+    "M2 0h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zM5 7h14v10H5zM5 7l7 5.25L19 7v1.9l-7 5.25L5 8.9z",
+  checkBadge:
+    "M2 0h20a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zM6.5 12.2l1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4-7 7z",
 };
