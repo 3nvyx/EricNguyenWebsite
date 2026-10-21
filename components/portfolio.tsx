@@ -46,7 +46,7 @@ function FeaturedProject({ project: p, index: i }: { project: Project; index: nu
               <span key={t}>#{t}</span>
             ))}
           </p>
-          <div className="fw-text mt-[calc(36*var(--u))]">
+          <div className="fw-text mt-[calc(16*var(--u))] md:mt-[calc(36*var(--u))]">
             <p>
               {p.stack}
               {!p.href && <span className="text-mute"> [Private]</span>}
@@ -85,9 +85,10 @@ export function Portfolio() {
                 SEE ALL PROJECTS →
               </Link>
             </h2>
-            <ul className="fw-text">
+            {/* Phones stack each title over its line, with room between entries. */}
+            <ul className="fw-text space-y-[calc(14*var(--u))] md:space-y-0">
               {MORE.map((p) => (
-                <li key={p.slug} className="flex flex-wrap gap-x-[calc(27*var(--u))]">
+                <li key={p.slug} className="flex flex-col md:flex-row md:flex-wrap md:gap-x-[calc(27*var(--u))]">
                   <Link href={`/projects/${p.slug}`} className={hover}>
                     {p.title}
                   </Link>
