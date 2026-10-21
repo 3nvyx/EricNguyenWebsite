@@ -78,7 +78,7 @@ export const ABOUT: AboutSection[] = [
     compact: true,
     entries: [
       { when: "2025", title: "Sharon K. Donoff Student Leader of the Year" },
-      { when: "2025", title: "OCC Event of the Year, HackCC and Spookathon" },
+      { when: "2025", title: "OCC Event of the Year, HackCC" },
       { when: "2025", title: "Garrison Fellow" },
       { when: "2025", title: "Joseph R. Kroll Award" },
       { when: "2024 – 25", title: "PTK All-California Academic Honor Roll" },

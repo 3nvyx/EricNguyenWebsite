@@ -81,7 +81,7 @@ export const PROJECTS: Project[] = [
     slug: "spookathon",
     title: "Spookathon 2025",
     line: "The 30-hour follow-up to HackCC, for 100+ hackers",
-    href: "https://www.spookathon.org",
+    href: "https://www.youtube.com/watch?v=I9FVxneDnL4",
     dates: "2025",
     tags: ["Project management", "Leadership", "Events"],
     stack: "Project management / Sponsorship / Logistics",

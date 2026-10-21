@@ -108,9 +108,9 @@ export function Sidebar() {
         </div>
         <div className="fw-small mt-[calc(18*var(--u))] max-w-[calc(320*var(--u))] space-y-[calc(10*var(--u))] text-mute">
           <p>
-            I am an engineer making hardware and software that make slow, manual work
-            disappear.{" "}
-            <span className="text-ink underline underline-offset-4">Currently seeking a summer 2027 internship.</span>
+            I am a product engineer working in hardware and software. I work alongside
+            the people doing the job and make the slow, manual parts disappear.{" "}
+            <span className="text-ink underline underline-offset-4">I am currently seeking a summer 2027 internship.</span>
           </p>
           <p>Off the clock: espresso tonics, photography, tennis.</p>
           <p>

@@ -1,5 +1,6 @@
 import { sectionId, type Block, type Figure } from "@/lib/content";
 import { MediaImage } from "@/components/media-image";
+import { Video360 } from "@/components/video-360";
 import { cn } from "@/lib/utils";
 
 function FigureView({ figure }: { figure: Figure }) {
@@ -69,6 +70,16 @@ export function Prose({ blocks, headings = "title" }: { blocks: Block[]; heading
                 style={{ aspectRatio: b.video.aspect ?? "16 / 9" }}
               />
               <figcaption className="fw-small mt-[calc(8*var(--u))] text-mute">{b.video.caption}</figcaption>
+            </figure>
+          );
+        }
+        if ("video360" in b) {
+          return (
+            <figure key={i} className="py-[calc(12*var(--u))]">
+              <div className="aspect-video w-full">
+                <Video360 src={b.video360.src} poster={b.video360.poster} label={b.video360.caption} />
+              </div>
+              <figcaption className="fw-small mt-[calc(8*var(--u))] text-mute">{b.video360.caption}</figcaption>
             </figure>
           );
         }

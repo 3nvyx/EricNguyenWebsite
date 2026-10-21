@@ -36,7 +36,8 @@ export function Footer() {
             <ul className="flex flex-col">
               <li><Link href="/about" className={link}>ABOUT</Link></li>
               <li><Link href="/projects" className={link}>PROJECTS</Link></li>
-              <li><Link href="/blogs" className={link}>BLOGS</Link></li>
+              {/* <li><Link href="/blogs" className={link}>BLOGS</Link></li> */}
+              <li><Link href="/play" className={link}>PLAY</Link></li>
             </ul>
             <ul className="flex flex-col">
               <li><a href={RESUME.href} {...ext} className={link}>RESUME</a></li>

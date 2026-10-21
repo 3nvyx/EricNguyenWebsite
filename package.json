@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
     "@radix-ui/react-tooltip": "^1.4.1",
     "@vercel/analytics": "^1.6.1",
     "clsx": "^2.1.1",
