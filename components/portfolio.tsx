@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { PROJECTS } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
-import { cn, ease, hoverLink as hover } from "@/lib/utils";
+import { cn, ease, hoverLink as hover, pageMain } from "@/lib/utils";
 
 const CORE = PROJECTS.slice(0, 3);
 const MORE = PROJECTS.slice(3);
@@ -11,12 +11,7 @@ const MORE = PROJECTS.slice(3);
 // Measurements below are design pixels at 1440 wide, written as calc(N*var(--u)) (see globals.css).
 export function Portfolio() {
   return (
-    <main
-      className={cn(
-        "px-5 pt-12 pb-24",
-        "md:ml-[36.5vw] md:pt-[calc(64*var(--u))] md:pr-[calc(45*var(--u))] md:pb-[calc(120*var(--u))] md:pl-0",
-      )}
-    >
+    <main className={pageMain}>
       <section id="work" className="flex scroll-mt-10 flex-col gap-[calc(45*var(--u))]">
         {CORE.map((p, i) => (
           <motion.article

@@ -6,12 +6,13 @@ import { motion } from "motion/react";
 import { EMAIL, LINKS } from "@/lib/projects";
 import { CoffeeChat } from "@/components/coffee-chat";
 import { ChromeName } from "@/components/chrome-name";
-import { DialNav, type DialItem } from "@/components/dial-nav";
+import { PageTabs, type PageTab } from "@/components/page-tabs";
 import { cn, ease, hoverLink } from "@/lib/utils";
 
-const PAGES: DialItem[] = [
+const PAGES: PageTab[] = [
+  { label: "ABOUT", href: "/about" },
   { label: "PROJECTS", href: "/" },
-  { label: "RESUME", href: "/resume" },
+  { label: "BLOGS", href: "/blogs" },
 ];
 
 const [GITHUB, RESUME, , LINKEDIN] = LINKS;
@@ -32,7 +33,11 @@ const SOCIAL = [
 /** The left column, shared by every page. Fixed on desktop so only the right side scrolls. */
 export function Sidebar() {
   const pathname = usePathname();
-  const active = Math.max(0, PAGES.findIndex((p) => p.href === pathname));
+  // Projects is home; a blog post under /blogs/... still marks BLOGS as current.
+  const active = Math.max(
+    0,
+    PAGES.findIndex((p) => (p.href === "/" ? pathname === "/" : pathname.startsWith(p.href))),
+  );
 
   // Clicking the email copies it. "Copied to clipboard" holds until the pointer leaves the
   // email (or focus moves away), then it returns to the resting mail icon and address.
@@ -145,7 +150,7 @@ export function Sidebar() {
 
       {/* Middle left. */}
       <div className="mt-[calc(36*var(--u))] md:absolute md:top-1/2 md:right-0 md:left-0 md:mt-0 md:-translate-y-1/2">
-        <DialNav items={PAGES} active={active} />
+        <PageTabs items={PAGES} active={active} />
       </div>
     </motion.aside>
   );
