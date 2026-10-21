@@ -1,4 +1,4 @@
-// About page content, from the resumes (Feb 2026 and earlier), with the degree updated to computer engineering.
+// About page content, from the resumes (Feb 2026 and earlier).
 
 export type AboutEntry = {
   when: string;
@@ -11,12 +11,11 @@ export type AboutEntry = {
 /** compact: one-line rows (awards, skills) instead of the full title / where / line block. */
 export type AboutSection = { label: string; entries: AboutEntry[]; compact?: boolean };
 
-// DRAFT: first-person intro shown above the sections. Edit freely; [brackets] are for Eric to fill.
+// First-person intro shown above the sections: who Eric is, not the resume (that's below).
 export const ABOUT_INTRO: string[] = [
-  "I'm Eric, a computer engineering student at Orange Coast College, transferring to UC Irvine in fall 2027.",
-  "During COVID I spent three years in Ho Chi Minh City at Q Industries, a spare parts trader supplying private and state-owned factories. I started in sales support and moved into business development, bringing in equipment and engineering solutions from companies abroad for our customers, and helped grow sales 10%.",
-  "At OCC I founded Iota Xi, the first two-year honor society for computer science, and led the teams that organized three hackathons: HackCC 2024, Spookathon 2025 and OCC Hacks 2026. I like work that crosses hardware and software; SLAP!, a small device that captions a lecture live, is the one I'm proudest of so far.",
-  "I'm looking for a summer 2027 internship in [embedded / product / software engineering]. Off the clock: espresso tonics, photography, tennis.",
+  "I'm Eric. I make things people actually pick up and use, and that could mean anything.",
+  "I do my best work next to the people who'll use it. I sit with someone doing a job the slow way, find the part that hurts, and make it disappear, in code, in hardware, or both.",
+  "I also love getting people into a room together. I started Iota Xi, my college's computer science honor society, and I've led three hackathons since. The best part of building is who you build it with.",
 ];
 
 export const ABOUT: AboutSection[] = [
@@ -33,19 +32,13 @@ export const ABOUT: AboutSection[] = [
         when: "2024 – 2026",
         title: "Product & Solutions Engineer",
         where: "Plethora",
-        line: "Client sites for Pickle Banh Mi Co. and Q Industries, and internal workflow tools for Chef Nourish, from gathering requirements to shipping.",
+        line: "A client site for Pickle Banh Mi Co. and internal workflow tools for Chef Nourish, from gathering requirements to shipping.",
       },
       {
         when: "2025",
         title: "AI Research Fellow",
         where: "Giles T. Brown Research Symposium",
         line: "Condensed chain-of-thought: distilled DeepSeek-R1 reasoning through Qwen2.5-32B-Instruct to tune DeepSeek-R1-Distill-Qwen-7B. AIME 2024 pass@1 from 46.7% to 53.3%.",
-      },
-      {
-        when: "2020 – 2023",
-        title: "International Partnerships Coordinator",
-        where: "Q Industries, Ho Chi Minh City",
-        line: "Grew sales 10% by securing distributorships with international brands and tightening quotes and shipping.",
       },
     ],
   },
@@ -88,20 +81,11 @@ export const ABOUT: AboutSection[] = [
     label: "SKILLS",
     compact: true,
     entries: [
-      { when: "Programming", title: "Python, C++, Java, JavaScript / TypeScript, HTML / CSS" },
-      { when: "Tools", title: "Git, Node.js, React, Next.js, Tailwind, Figma" },
-      { when: "CAD and fabrication", title: "Rhino, SolidWorks, Fusion 360, Bambu Studio (3D printing)" },
-    ],
-  },
-  {
-    label: "EDUCATION",
-    entries: [
-      {
-        when: "2024 – 2027",
-        title: "Computer Engineering",
-        where: "Orange Coast College, Costa Mesa",
-        line: "Transferring to UC Irvine in fall 2027. GPA 3.72.",
-      },
+      { when: "Languages", title: "TypeScript, JavaScript, Python, C++, SQL, HTML / CSS" },
+      { when: "Frontend", title: "React, Next.js, React Router, Tailwind CSS, shadcn/ui" },
+      { when: "Backend and data", title: "Node.js, Hono, WebSockets, PostgreSQL, Supabase, Neon" },
+      { when: "Hardware and tools", title: "ESP32-S3, Arduino, Git, Docker, Vercel, PostHog" },
+      { when: "Design and fabrication", title: "Figma, Rhino, SolidWorks, Fusion 360, Bambu Studio (3D printing)" },
     ],
   },
 ];

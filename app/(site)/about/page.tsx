@@ -11,8 +11,17 @@ export default function AboutPage() {
     <main className={pageMain}>
       <PageTitle>About</PageTitle>
       <div className="flex flex-col gap-[calc(45*var(--u))]">
-        <section>
-          <div className="fw-text max-w-[calc(640*var(--u))] space-y-[calc(16*var(--u))]">
+        {/* The photo sits beside the intro as its own column, so no line wraps under it. Stacked on phones. */}
+        <section className="fw-text flex max-w-[calc(820*var(--u))] flex-col gap-[calc(20*var(--u))] md:flex-row md:gap-[calc(27*var(--u))]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/eric-portrait.jpg"
+            alt="Eric Nguyen"
+            width={800}
+            height={1201}
+            className="aspect-square w-[calc(160*var(--u))] min-w-28 shrink-0 object-cover object-[50%_28%] md:mt-[calc(8*var(--u))]"
+          />
+          <div className="space-y-[calc(16*var(--u))]">
             {ABOUT_INTRO.map((p) => (
               <p key={p}>{p}</p>
             ))}
