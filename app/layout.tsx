@@ -17,21 +17,34 @@ const instrumentSans = Instrument_Sans({
   weight: ["400"],
 });
 
+const SITE_URL = "https://ericnguyenn.me";
+const SITE_TITLE = "Eric Nguyen — Product Engineer";
+const SITE_DESCRIPTION =
+  "I make things people actually pick up and use. I sit with someone doing a job the slow way, find the part that hurts, and make it disappear, in code, in hardware, or both.";
+// Same portrait as the About page.
+const SITE_IMAGE = { url: "/eric-portrait.jpg", width: 800, height: 1201, alt: "Eric Nguyen" };
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Eric Nguyen",
+    default: SITE_TITLE,
     template: "%s | Eric Nguyen",
   },
-  description: "Eric Nguyen. Slap, Honors, Sevis, Daisy, Carousel.",
+  description: SITE_DESCRIPTION,
   openGraph: {
-    images: [
-      {
-        url: "/3nvyxScreenshoot.png",
-        width: 1200,
-        height: 630,
-        alt: "Eric Nguyen",
-      },
-    ],
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Eric Nguyen",
+    locale: "en_US",
+    type: "website",
+    images: [SITE_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [SITE_IMAGE],
   },
   icons: {
     icon: "/favicon.ico",
