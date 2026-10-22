@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { PROJECTS, type Project } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
 import { cardHover, useHoverPlay } from "@/components/project-card";
@@ -59,6 +59,24 @@ function FeaturedProject({ project: p, index: i }: { project: Project; index: nu
   );
 }
 
+/**
+ * The arrow after "See all projects". Once the link scrolls into view it hops forward twice,
+ * rests, and repeats, so the way onward is easy to spot. Still for reduced-motion users.
+ */
+function NudgeArrow() {
+  const still = useReducedMotion();
+  return (
+    <motion.span
+      aria-hidden
+      className="ml-[calc(8*var(--u))] inline-block"
+      whileInView={still ? undefined : { x: [0, 6, 0, 4, 0] }}
+      transition={{ duration: 0.9, ease: "easeOut", repeat: Infinity, repeatDelay: 1.4 }}
+    >
+      →
+    </motion.span>
+  );
+}
+
 // Measurements below are design pixels at 1440 wide, written as calc(N*var(--u)) (see globals.css).
 export function Portfolio() {
   return (
@@ -79,10 +97,10 @@ export function Portfolio() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.45 }}
           >
-            <h2 className="fw-label flex justify-between gap-6">
-              <span>MORE</span>
-              <Link href="/projects" className={hover}>
-                SEE ALL PROJECTS →
+            <h2 className="fw-label">
+              <Link href="/projects" className={cn("group inline-flex items-baseline", hover)}>
+                SEE ALL PROJECTS
+                <NudgeArrow />
               </Link>
             </h2>
             {/* Phones stack each title over its line, with room between entries. */}

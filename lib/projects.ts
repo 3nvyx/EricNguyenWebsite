@@ -141,7 +141,7 @@ export const LINKS = [
   { label: "GitHub", href: "https://github.com/3nvyx" },
   { label: "Resume", href: "/Eric_Nguyen_Resume.pdf" },
   { label: "Mail", href: "mailto:envn001@gmail.com" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/ericnguyen342/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/eric-nguyennn/" },
 ];
 
 export const EMAIL = "envn001@gmail.com";
