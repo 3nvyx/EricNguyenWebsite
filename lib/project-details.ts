@@ -125,6 +125,53 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     ],
   },
 
+  luyten: {
+    facts: [
+      { label: "Type", values: ["Hackathon project", "Cal Hacks"] },
+      { label: "Team", values: ["Me", "@bananatruck", "@lucamanh"] },
+      { label: "Duration", values: ["2 days", "Oct 2026"] },
+      { label: "Tools", values: ["TypeScript", "SvelteKit, Tailwind", "SpacetimeDB", "Claude Agent SDK", "Grok, Gemini", "Python uAgents"] },
+    ],
+    statement: "Ask a CFO whether an AI can post straight to the general ledger and the answer is no. So in Luyten it can't. It can only ask.",
+    body: [
+      { h: "Overview" },
+      "Luyten closes a startup's books every month with AI agents. The agents do the work a finance team spends about ten days on: matching bank lines to invoices, accruing late bills, rebuilding revenue schedules, revaluing foreign-currency balances. But none of them can touch the ledger. They file Proposals, another model attacks each one, an Advisor agent rules on it, and anything material waits for the CFO.",
+      { figure: { src: "/media/luyten/needs-your-ok.jpg", caption: "The CFO's Needs your OK queue: a $245,000 intercompany elimination with the Advisor's ruling", aspect: "16 / 10" } },
+      { h: "Context" },
+      "[Why you built it: where the idea came from and why finance.]",
+      { h: "Propose, critique, rule, confirm" },
+      { list: [
+        "Worker agents propose. A Bookkeeper, Revenue, Credit & Risk and Consolidation agent each file Proposals. A Proposal never moves a balance.",
+        "A Red Team on other vendors critiques. Grok attacks each Proposal first, then Gemini reads Grok's critique and adds only what it missed. Different models, different blind spots.",
+        "The Advisor rules. It approves, rejects or amends every Proposal and always writes down why. It never proposes, so it never grades its own work.",
+        "The CFO confirms anything material: $10,000 or more, or any amendment. Only the CFO locks the month.",
+      ] },
+      { figure: { src: "/media/luyten/debate-thread.jpg", caption: "A debate: Credit & Risk wants to block a vendor, the Red Team pushes back, the Advisor rules on a narrower block", aspect: "16 / 10" } },
+      { h: "The database is the gate" },
+      "A prompt that says \"be careful\" isn't a control. The ledger is a SpacetimeDB module, and every write checks who is calling. Each agent connects with its own identity, so a worker that ignores its instructions, or gets jailbroken, gets a refusal from the database. Money is stored as whole cents in 64-bit integers, and every conversion rounds the same way in the database and the accounting engine.",
+      { h: "What one close does" },
+      "The demo company has a US parent and a UK subsidiary, with problems planted in its books. Closing September produces about 50 Proposals:",
+      { list: [
+        "9 vendor payments matched to their bills; weak customer matches left for a person",
+        "A duplicate vendor payment caught and booked as money due back",
+        "A missing 12-month revenue schedule rebuilt for a $26,400 contract",
+        "Credit checks on every guarantor behind an open invoice; $48,000 fully reserved for one in bankruptcy",
+        "Two vendors blocked before their first payment: one owner is a synthetic identity, the other is deceased",
+        "A UK loan revalued at the closing rate, and $245,000 of intercompany balances eliminated",
+      ] },
+      { figures: [
+        { src: "/media/luyten/lock-the-month.jpg", caption: "Unmatched bank lines stay visible until the CFO accepts them with a reason", aspect: "16 / 10" },
+        { src: "/media/luyten/board-pack-consolidated.jpg", caption: "The consolidated Board Pack; every number drills down to its journal lines", aspect: "16 / 10" },
+      ] },
+      { h: "Testing it" },
+      "1,085 tests pass across the project, including 156 for the double-entry ledger engine, and CI runs every database gate against a real SpacetimeDB. The whole app also runs in the browser with no API keys, which is what the live demo is. A full live close on real models cost $4.92.",
+      { h: "My part" },
+      "[What you owned on the team of four.]",
+      { h: "Reflections" },
+      "Our first live close looked fine until we read the logs. The Advisor asked for the month's Proposals in one call, the answer was too big for the tool, and it ruled on none of them. A fallback quietly applied standard rulings instead. Paging the list ten at a time fixed it: the next run had no Proposal left unruled. A demo that works and an agent that actually did the work are two different things.",
+    ],
+  },
+
   honors: {
     facts: [
       { label: "Type", values: ["Tool for OCC's", "Garrison Honors Center"] },

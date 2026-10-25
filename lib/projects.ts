@@ -47,6 +47,17 @@ export const PROJECTS: Project[] = [
     media: "/media/nfc-card/preview.png",
   },
   {
+    slug: "luyten",
+    title: "Luyten",
+    line: "AI agents close a startup's books each month, and only the CFO says OK",
+    href: "https://3nvyx.github.io/luyten/",
+    dates: "Oct 2026",
+    tags: ["AI agents", "Fintech", "Full stack", "Hackathon"],
+    stack: "SvelteKit / SpacetimeDB / Claude Agent SDK",
+    media: "/media/luyten.gif",
+    aspect: "1740 / 1090",
+  },
+  {
     slug: "honors",
     title: "Honors Eligibility",
     line: "Checks a transcript against 17 honor societies, fully offline",
