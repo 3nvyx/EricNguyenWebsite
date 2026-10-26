@@ -36,7 +36,7 @@ export const PROJECTS: Project[] = [
     tags: ["AI agents", "Fintech", "Full stack", "Hackathon"],
     stack: "SvelteKit / SpacetimeDB / Claude Agent SDK",
     media: "/media/luyten.gif",
-    aspect: "1740 / 1090",
+    aspect: "16 / 10",
   },
   {
     slug: "chef-nourish",
