@@ -187,7 +187,9 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { list: [
         "A demo that works and an agent that did the work are two different things. Our first live close looked fine until we read the logs. The Advisor asked for the month's Proposals in one call, the answer was too big for the tool, and it ruled on none of them; a fallback quietly applied standard rulings instead. Paging the list ten at a time fixed it, and the next run left no Proposal unruled.",
         "Put the rules where the model can't skip them. A prompt can be ignored or jailbroken, so the approval gate lives in the database: a worker that tries to post gets refused, whatever its instructions say.",
-        "Give tool-using models time to think. Grok answered only 13 of 48 critiques in the live run, because each one could take up to six tool steps against a 30-second deadline. The rest fell back to scripted critiques, labelled as scripted, and the deadline is now 90 seconds.",      ] },
+        "Give tool-using models time to think. Grok answered only 13 of 48 critiques in the live run, because each one could take up to six tool steps against a 30-second deadline. The rest fell back to scripted critiques, labelled as scripted, and the deadline is now 90 seconds.",
+      ] },
+      { figure: { src: "/media/luyten/cal-hacks-swag.jpg", caption: "What we brought home from Cal Hacks", aspect: "4 / 3" } },
     ],
   },
 
