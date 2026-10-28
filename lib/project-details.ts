@@ -127,19 +127,22 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
 
   luyten: {
     facts: [
-      { label: "Type", values: ["Hackathon project", "Cal Hacks"] },
+      { label: "Type", values: ["Hackathon winner", "Cal Hacks, SpacetimeDB track"] },
       { label: "Team", values: ["Me", "@bananatruck", "@lucamanh"] },
-      { label: "Duration", values: ["2 days", "Oct 2026"] },
+      { label: "Duration", values: ["36 hours", "Oct 2026"] },
       { label: "Tools", values: ["TypeScript", "SvelteKit, Tailwind", "SpacetimeDB", "Claude Agent SDK", "Grok, Gemini", "Python uAgents"] },
     ],
     statement: "Ask a CFO whether an AI can post straight to the general ledger and the answer is no. So in Luyten it can't. It can only ask.",
     body: [
       { h: "Overview" },
       "Luyten closes a startup's books every month with AI agents. The agents do the work a finance team spends about ten days on: matching bank lines to invoices, accruing late bills, rebuilding revenue schedules, revaluing foreign-currency balances. But none of them can touch the ledger. They file Proposals, another model attacks each one, an Advisor agent rules on it, and anything material waits for the CFO.",
-      { figure: { src: "/media/luyten/needs-your-ok.jpg", caption: "The CFO's Needs your OK queue: a $245,000 intercompany elimination with the Advisor's ruling", aspect: "16 / 10" } },
+      { figure: { src: "/media/luyten/needs-your-ok.jpg", caption: "The CFO's Needs your OK queue: a $245,461.64 intercompany elimination with the Advisor's ruling", aspect: "16 / 10" } },
       { h: "Context" },
-      "[Why you built it: where the idea came from and why finance.]",
+      "Two weeks before Cal Hacks, the trend was reverse engineering everything. At Cal Hacks, most of the sponsors asked for the same thing: in 36 hours, pick a finance role, build the harness for agents to do it on their own, and get it to 95% accuracy.",
+      "We picked the month-end close. Every month a finance team has to close its books, and at a growing startup that still takes days. Each of those days is time not spent fundraising or networking. The tools don't grow with the company either: moving from one ERP to the next between seed, Series A and Series B is painful. Luyten is built for a startup going through that growth.",
       { h: "Propose, critique, rule, confirm" },
+      "The landing page draws the whole flow as one graph. Each chip is a piece of work moving along a wire. Bank lines, invoices, credit facts and group balances come in on the left. Each worker turns its input into a proposal, and every proposal goes to the Red Team. The critique goes to the Advisor, and its ruling either posts straight to the ledger, when it's under $10,000, or waits for the CFO to confirm.",
+      { figure: { src: "/media/luyten/agent-workflow.gif", caption: "The agent workflow from Luyten's landing page: data in, proposals, critiques, rulings, and the CFO's confirm", aspect: "1200 / 724" } },
       { list: [
         "Worker agents propose. A Bookkeeper, Revenue, Credit & Risk and Consolidation agent each file Proposals. A Proposal never moves a balance.",
         "A Red Team on other vendors critiques. Grok attacks each Proposal first, then Gemini reads Grok's critique and adds only what it missed. Different models, different blind spots.",
@@ -149,6 +152,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { figure: { src: "/media/luyten/debate-thread.jpg", caption: "A debate: Credit & Risk wants to block a vendor, the Red Team pushes back, the Advisor rules on a narrower block", aspect: "16 / 10" } },
       { h: "The database is the gate" },
       "A prompt that says \"be careful\" isn't a control. The ledger is a SpacetimeDB module, and every write checks who is calling. Each agent connects with its own identity, so a worker that ignores its instructions, or gets jailbroken, gets a refusal from the database. Money is stored as whole cents in 64-bit integers, and every conversion rounds the same way in the database and the accounting engine.",
+      "SpacetimeDB picked Luyten as one of its Cal Hacks track winners. The ledger and all of its rules live in one module that runs inside the database, so there was no separate backend to build or deploy, and the agents all work against the same live tables.",
       { h: "What one close does" },
       "The demo company has a US parent and a UK subsidiary, with problems planted in its books. Closing September produces about 50 Proposals:",
       { list: [
@@ -157,7 +161,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
         "A missing 12-month revenue schedule rebuilt for a $26,400 contract",
         "Credit checks on every guarantor behind an open invoice; $48,000 fully reserved for one in bankruptcy",
         "Two vendors blocked before their first payment: one owner is a synthetic identity, the other is deceased",
-        "A UK loan revalued at the closing rate, and $245,000 of intercompany balances eliminated",
+        "A UK loan revalued at the closing rate, and about $245,000 of intercompany balances eliminated",
       ] },
       { figures: [
         { src: "/media/luyten/lock-the-month.jpg", caption: "Unmatched bank lines stay visible until the CFO accepts them with a reason", aspect: "16 / 10" },
