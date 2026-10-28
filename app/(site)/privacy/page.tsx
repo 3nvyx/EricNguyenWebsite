@@ -10,7 +10,7 @@ export default function PrivacyPage() {
   return (
     <main className={pageMain}>
       <PageTitle>Privacy</PageTitle>
-      <div className="fw-text max-w-[calc(640*var(--u))] space-y-[calc(16*var(--u))]">
+      <div className="fw-text space-y-[calc(16*var(--u))]">
         <p>
           This site collects nothing unless you book a coffee chat. Booking asks for your name and
           email so I can send you a calendar invite. Those go into one event on my Google Calendar,

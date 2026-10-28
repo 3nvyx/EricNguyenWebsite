@@ -33,7 +33,7 @@ export default async function PostPage({ params }: Props) {
           {post.draft && " [Draft]"}
         </span>
       </h2>
-      <article className="max-w-[calc(640*var(--u))]">
+      <article>
         <h1 className="fw-name">{post.title}</h1>
         <p className="fw-text mt-[calc(10*var(--u))] text-mute">{post.summary}</p>
         <div className="mt-[calc(36*var(--u))]">
