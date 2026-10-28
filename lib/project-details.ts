@@ -130,7 +130,9 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { label: "Type", values: ["Hackathon winner", "Cal Hacks, SpacetimeDB track"] },
       { label: "Team", values: ["Me", "@bananatruck", "@lucamanh"] },
       { label: "Duration", values: ["36 hours", "Oct 2026"] },
-      { label: "Tools", values: ["TypeScript", "SvelteKit, Tailwind", "SpacetimeDB", "Claude Agent SDK", "Grok, Gemini", "Python uAgents"] },
+      { label: "Frontend", values: ["SvelteKit, Vite", "TypeScript", "Tailwind"] },
+      { label: "DB & ledger", values: ["SpacetimeDB"] },
+      { label: "Backend", values: ["Node.js, Python", "Claude Agent SDK", "Vercel AI SDK", "OpenAI, Grok, Gemini", "Fetch.ai, CRS", "Bright Data, Moss", "Apify, Capital One Nessie"] },
     ],
     statement: "Ask a CFO whether an AI can post straight to the general ledger and the answer is no. So in Luyten it can't. It can only ask.",
     body: [
