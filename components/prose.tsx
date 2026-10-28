@@ -55,6 +55,11 @@ export function Prose({ blocks, headings = "title" }: { blocks: Block[]; heading
           );
         }
         if ("video" in b) {
+          const aspect = b.video.aspect ?? "16 / 9";
+          // A portrait video sizes to the screen's height instead of the column's width, so it
+          // never runs taller than the window; it sits centred in the column.
+          const [w, h] = aspect.split("/").map(Number);
+          const portrait = h > w;
           return (
             <figure key={i} className="py-[calc(12*var(--u))]">
               <video
@@ -64,10 +69,10 @@ export function Prose({ blocks, headings = "title" }: { blocks: Block[]; heading
                 playsInline
                 preload="metadata"
                 aria-label={b.video.caption}
-                className="w-full bg-ink"
-                style={{ aspectRatio: b.video.aspect ?? "16 / 9" }}
+                className={cn("bg-ink", portrait ? "mx-auto block h-[80vh] max-w-full" : "w-full")}
+                style={{ aspectRatio: aspect }}
               />
-              <figcaption className="fw-small mt-[calc(8*var(--u))] text-mute">{b.video.caption}</figcaption>
+              <figcaption className={cn("fw-small mt-[calc(8*var(--u))] text-mute", portrait && "text-center")}>{b.video.caption}</figcaption>
             </figure>
           );
         }
