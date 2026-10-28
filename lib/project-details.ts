@@ -171,10 +171,13 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       ] },
       { h: "Testing it" },
       "1,085 tests pass across the project, including 156 for the double-entry ledger engine, and CI runs every database gate against a real SpacetimeDB. The whole app also runs in the browser with no API keys, which is what the live demo is. A full live close on real models cost $4.92.",
-      { h: "My part" },
-      "[What you owned on the team of four.]",
-      { h: "Reflections" },
-      "Our first live close looked fine until we read the logs. The Advisor asked for the month's Proposals in one call, the answer was too big for the tool, and it ruled on none of them. A fallback quietly applied standard rulings instead. Paging the list ten at a time fixed it: the next run had no Proposal left unruled. A demo that works and an agent that actually did the work are two different things.",
+      { h: "Lessons" },
+      { list: [
+        "A demo that works and an agent that did the work are two different things. Our first live close looked fine until we read the logs. The Advisor asked for the month's Proposals in one call, the answer was too big for the tool, and it ruled on none of them; a fallback quietly applied standard rulings instead. Paging the list ten at a time fixed it, and the next run left no Proposal unruled.",
+        "Put the rules where the model can't skip them. A prompt can be ignored or jailbroken, so the approval gate lives in the database: a worker that tries to post gets refused, whatever its instructions say.",
+        "Give tool-using models time to think. Grok answered only 13 of 48 critiques in the live run, because each one could take up to six tool steps against a 30-second deadline. The rest fell back to scripted critiques, labelled as scripted, and the deadline is now 90 seconds.",
+        "Build the no-keys demo first. Every outside service has a stand-in, so anyone can run the whole close in the browser without an API key. It's also what the live demo runs on.",
+      ] },
     ],
   },
 

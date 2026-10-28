@@ -16,7 +16,7 @@ function FigureView({ figure }: { figure: Figure }) {
 
 /**
  * Renders a content body. Headings are either section labels over a hairline (project pages)
- * or plain titles (blog posts). Text stays at a readable measure; figures use the full width.
+ * or plain titles (blog posts). Text and figures both use the full width of the column.
  */
 export function Prose({ blocks, headings = "title" }: { blocks: Block[]; headings?: "label" | "title" }) {
   return (
@@ -24,9 +24,7 @@ export function Prose({ blocks, headings = "title" }: { blocks: Block[]; heading
       {blocks.map((b, i) => {
         if (typeof b === "string") {
           return (
-            <p key={i} className="max-w-[calc(640*var(--u))]">
-              {b}
-            </p>
+            <p key={i}>{b}</p>
           );
         }
         if ("h" in b) {
@@ -42,7 +40,7 @@ export function Prose({ blocks, headings = "title" }: { blocks: Block[]; heading
         }
         if ("list" in b) {
           return (
-            <ul key={i} className="max-w-[calc(640*var(--u))] list-['–_'] space-y-[calc(6*var(--u))] pl-[calc(18*var(--u))]">
+            <ul key={i} className="list-['–_'] space-y-[calc(6*var(--u))] pl-[calc(18*var(--u))]">
               {b.list.map((item) => (
                 <li key={item}>{item}</li>
               ))}
