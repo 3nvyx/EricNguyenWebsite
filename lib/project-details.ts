@@ -155,6 +155,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { h: "The database is the gate" },
       "A prompt that says \"be careful\" isn't a control. The ledger is a SpacetimeDB module, and every write checks who is calling. Each agent connects with its own identity, so a worker that ignores its instructions, or gets jailbroken, gets a refusal from the database. Money is stored as whole cents in 64-bit integers, and every conversion rounds the same way in the database and the accounting engine.",
       "SpacetimeDB picked Luyten as one of its Cal Hacks track winners. The ledger and all of its rules live in one module that runs inside the database, so there was no separate backend to build or deploy, and the agents all work against the same live tables.",
+      { figure: { src: "/media/luyten/spacetimedb-team.jpg", caption: "Our team with the SpacetimeDB folks at Cal Hacks", aspect: "4 / 3" } },
       { h: "What one close does" },
       "The demo company has a US parent and a UK subsidiary, with problems planted in its books. Closing September produces about 50 Proposals:",
       { list: [
@@ -169,15 +170,21 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
         { src: "/media/luyten/lock-the-month.jpg", caption: "Unmatched bank lines stay visible until the CFO accepts them with a reason", aspect: "16 / 10" },
         { src: "/media/luyten/board-pack-consolidated.jpg", caption: "The consolidated Board Pack; every number drills down to its journal lines", aspect: "16 / 10" },
       ] },
+      { h: "How it's built" },
+      { list: [
+        "Frontend: a SvelteKit app for the CFO, with Svelte 5 and Tailwind, built on Vite. Every screen reads and acts through one data interface with two implementations: an in-browser stand-in for the demo, and a live SpacetimeDB connection. Every number drills down to its journal lines, then the Proposal, then the debate behind it.",
+        "Agents: five agents run on the Claude Agent SDK, each with a plain-English charter whose checkable lines map to eval scenarios. The Advisor runs on a larger model than the workers, and a bridge lets the same agents run on OpenAI. The Red Team calls Grok, then Gemini, through the Vercel AI SDK. Fetch.ai uAgents let anyone ask the Advisor questions from ASI:One.",
+        "Backend: the ledger is a SpacetimeDB module, with tables for the books, Proposals, approvals, agent messages and the audit trail, and the reducers that enforce the gate. The accounting itself is a separate double-entry engine with no I/O: matching, revenue schedules, accruals, FX, eliminations and consolidation, covered by 156 unit tests. A Node gateway runs the agents and starts each close.",
+        "Querying the data: the app subscribes to every table, so a new Proposal or ruling appears on screen the moment an agent writes it, with no polling. The agents query through tools instead: list_proposals pages through a month's Proposals ten at a time, search_policies searches the house accounting policies through Moss, and the credit tools pull bureau and identity data from CRS. The Advisor chat answers questions straight from the live books.",
+      ] },
       { h: "Testing it" },
       "1,085 tests pass across the project, including 156 for the double-entry ledger engine, and CI runs every database gate against a real SpacetimeDB. The whole app also runs in the browser with no API keys, which is what the live demo is. A full live close on real models cost $4.92.",
       { h: "Lessons" },
+      "Agents can be dumb. Really dumb. Most of what we learned came from catching them at it.",
       { list: [
         "A demo that works and an agent that did the work are two different things. Our first live close looked fine until we read the logs. The Advisor asked for the month's Proposals in one call, the answer was too big for the tool, and it ruled on none of them; a fallback quietly applied standard rulings instead. Paging the list ten at a time fixed it, and the next run left no Proposal unruled.",
         "Put the rules where the model can't skip them. A prompt can be ignored or jailbroken, so the approval gate lives in the database: a worker that tries to post gets refused, whatever its instructions say.",
-        "Give tool-using models time to think. Grok answered only 13 of 48 critiques in the live run, because each one could take up to six tool steps against a 30-second deadline. The rest fell back to scripted critiques, labelled as scripted, and the deadline is now 90 seconds.",
-        "Build the no-keys demo first. Every outside service has a stand-in, so anyone can run the whole close in the browser without an API key. It's also what the live demo runs on.",
-      ] },
+        "Give tool-using models time to think. Grok answered only 13 of 48 critiques in the live run, because each one could take up to six tool steps against a 30-second deadline. The rest fell back to scripted critiques, labelled as scripted, and the deadline is now 90 seconds.",      ] },
     ],
   },
 
