@@ -99,7 +99,7 @@ export function ProjectDetail({ project }: { project: Project }) {
         </dl>
 
         {detail?.statement && (
-          <p className="fw-name mt-[calc(45*var(--u))] max-w-[calc(640*var(--u))] text-balance leading-[1.35]">
+          <p className="fw-name mt-[calc(45*var(--u))] text-pretty leading-[1.35]">
             {detail.statement}
           </p>
         )}
