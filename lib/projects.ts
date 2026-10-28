@@ -31,13 +31,12 @@ export const PROJECTS: Project[] = [
   {
     slug: "nijello",
     title: "Nijello",
-    line: "A bot that bids for letters and spells words in a live arena, trained on millions of simulated matches",
+    line: "A Cal Hacks side project: a Scrabble auction bot trained by evolution on millions of simulated matches",
     href: "https://github.com/3nvyx/nijello-scabble-bot",
     dates: "Oct 2026",
-    tags: ["AI", "Game AI", "Simulation", "Hackathon"],
+    tags: ["AI", "Evolution", "Simulation", "Hackathon"],
     stack: "TypeScript / Node / SpacetimeDB",
-    media: "/media/nijello/live-match.jpg",
-    aspect: "4 / 3",
+    media: "/media/nijello/arena.jpg",
   },
   {
     slug: "slap",
