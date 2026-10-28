@@ -29,6 +29,17 @@ export const PROJECTS: Project[] = [
     aspect: "16 / 10",
   },
   {
+    slug: "nijello",
+    title: "Nijello",
+    line: "A bot that bids for letters and spells words in a live arena, trained on millions of simulated matches",
+    href: "https://github.com/3nvyx/nijello-scabble-bot",
+    dates: "Oct 2026",
+    tags: ["AI", "Game AI", "Simulation", "Hackathon"],
+    stack: "TypeScript / Node / SpacetimeDB",
+    media: "/media/nijello/live-match.jpg",
+    aspect: "4 / 3",
+  },
+  {
     slug: "slap",
     title: "SLAP!",
     line: "Live captions for any classroom",
