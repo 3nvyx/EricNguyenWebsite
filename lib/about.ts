@@ -20,6 +20,18 @@ export const ABOUT_INTRO: string[] = [
 
 export const ABOUT: AboutSection[] = [
   {
+    label: "SKILLS",
+    compact: true,
+    entries: [
+      { when: "Languages", title: "TypeScript, JavaScript, Python, C++, SQL, HTML / CSS" },
+      { when: "Frontend", title: "React, Next.js, SvelteKit, React Router, Vite, Tailwind CSS, shadcn/ui" },
+      { when: "Backend and data", title: "Node.js, Hono, WebSockets, PostgreSQL, SpacetimeDB, Supabase, Neon" },
+      { when: "AI and agents", title: "Claude Agent SDK, Vercel AI SDK, OpenAI, Fetch.ai uAgents, LoRA fine-tuning" },
+      { when: "Hardware and tools", title: "ESP32-S3, Arduino, Git, Docker, Vercel, PostHog" },
+      { when: "Design and fabrication", title: "Figma, Rhino, SolidWorks, Fusion 360, Bambu Studio (3D printing)" },
+    ],
+  },
+  {
     label: "EXPERIENCE",
     entries: [
       {
@@ -75,17 +87,6 @@ export const ABOUT: AboutSection[] = [
       { when: "2025", title: "Garrison Fellow" },
       { when: "2025", title: "Joseph R. Kroll Award" },
       { when: "2024 – 25", title: "PTK All-California Academic Honor Roll" },
-    ],
-  },
-  {
-    label: "SKILLS",
-    compact: true,
-    entries: [
-      { when: "Languages", title: "TypeScript, JavaScript, Python, C++, SQL, HTML / CSS" },
-      { when: "Frontend", title: "React, Next.js, React Router, Tailwind CSS, shadcn/ui" },
-      { when: "Backend and data", title: "Node.js, Hono, WebSockets, PostgreSQL, Supabase, Neon" },
-      { when: "Hardware and tools", title: "ESP32-S3, Arduino, Git, Docker, Vercel, PostHog" },
-      { when: "Design and fabrication", title: "Figma, Rhino, SolidWorks, Fusion 360, Bambu Studio (3D printing)" },
     ],
   },
 ];

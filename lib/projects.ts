@@ -20,7 +20,7 @@ export const PROJECTS: Project[] = [
   {
     slug: "luyten",
     title: "Cal Hacks Winner: Luyten – Autonomous Finance",
-    line: "Agentic finance for high-growth startups, so the books close while you build",
+    line: "Agentic finance for high-growth startups, so the books close while teams build",
     href: "https://3nvyx.github.io/luyten/",
     dates: "Oct 2026",
     tags: ["AI agents", "Fintech", "Full stack", "Hackathon"],
