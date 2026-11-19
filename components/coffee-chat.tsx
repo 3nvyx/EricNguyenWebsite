@@ -18,9 +18,13 @@ type Placement = { left: number; width: number; maxHeight: number; top?: number;
 const subscribeNever = () => () => {};
 
 /**
- * "Have a coffee chat with me". Opens a dropdown of open 30-minute slots over the next two
+ * "Coffee chat? ( ˘▽˘)っ♨". Opens a dropdown of open 30-minute slots over the next two
  * weeks (from /api/coffee-chat/slots); picking one and leaving a name and email books it
  * straight onto Eric's calendars and sends the invite.
+ *
+ * With a mouse it opens on hover and closes a moment after the pointer leaves both the link and
+ * the panel, unless it's pinned: by a click on the link, or a click or keypress inside it
+ * (picking a time, typing a name), so it never shuts mid-booking. Touch opens it with a tap.
  */
 export function CoffeeChat({ className, children }: { className?: string; children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -58,7 +62,34 @@ export function CoffeeChat({ className, children }: { className?: string; childr
     };
   }, [open, measure]);
 
+  // Hover: a pending close, and whether a click or focus has pinned the panel open.
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const pinned = useRef(false);
+  const HOVER_CLOSE_MS = 250;
+
+  const show = useCallback(() => {
+    clearTimeout(leaveTimer.current);
+    setPlacement(measure());
+    setOpen(true);
+  }, [measure]);
+  const hoverIn = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return;
+    clearTimeout(leaveTimer.current);
+    if (!open) show();
+  };
+  const hoverOut = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" || pinned.current) return;
+    clearTimeout(leaveTimer.current);
+    leaveTimer.current = setTimeout(() => {
+      if (pinned.current) return;
+      setOpen(false);
+    }, HOVER_CLOSE_MS);
+  };
+  useEffect(() => () => clearTimeout(leaveTimer.current), []);
+
   const close = useCallback(() => {
+    clearTimeout(leaveTimer.current);
+    pinned.current = false;
     setOpen(false);
     buttonRef.current?.focus();
   }, []);
@@ -69,6 +100,7 @@ export function CoffeeChat({ className, children }: { className?: string; childr
     const onDown = (e: PointerEvent) => {
       const t = e.target as Node;
       if (panelRef.current?.contains(t) || buttonRef.current?.contains(t)) return;
+      pinned.current = false;
       setOpen(false);
     };
     document.addEventListener("keydown", onKey);
@@ -79,17 +111,28 @@ export function CoffeeChat({ className, children }: { className?: string; childr
     };
   }, [open, close]);
 
-  const label = children ?? "Have a coffee chat with me";
+  const label = children ?? "Coffee chat? ( ˘▽˘)っ♨";
 
   return (
     <>
       <button
         ref={buttonRef}
         type="button"
+        // Open (from hover) and not yet pinned: the click pins it. Otherwise it toggles.
         onClick={() => {
-          if (!open) setPlacement(measure());
-          setOpen(!open);
+          if (open && !pinned.current) {
+            pinned.current = true;
+            return;
+          }
+          if (open) {
+            close();
+            return;
+          }
+          pinned.current = true;
+          show();
         }}
+        onPointerEnter={hoverIn}
+        onPointerLeave={hoverOut}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
@@ -124,6 +167,11 @@ export function CoffeeChat({ className, children }: { className?: string; childr
                 exit={{ opacity: 0, y: placement.top !== undefined ? -4 : 4, scale: 0.98 }}
                 transition={{ duration: 0.28, ease }}
                 style={placement}
+                onPointerEnter={hoverIn}
+                onPointerLeave={hoverOut}
+                // Pinned by a real click or keypress inside, not by the panel focusing itself on open.
+                onPointerDown={() => (pinned.current = true)}
+                onKeyDown={() => (pinned.current = true)}
                 className="fw fw-small fixed z-50 overflow-y-auto overscroll-contain bg-bone p-[calc(16*var(--u))] text-ink shadow-[0_18px_48px_-16px_rgba(17,17,17,0.35)] ring-1 ring-ink/15"
               >
                 <Picker onClose={close} />

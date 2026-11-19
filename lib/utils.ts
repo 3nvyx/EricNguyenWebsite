@@ -12,7 +12,7 @@ export const hoverLink =
 /** The right-hand column every page renders into, beside the sticky sidebar. */
 export const pageMain = cn(
   "px-5 pt-12 pb-24",
-  "md:pt-[calc(64*var(--u))] md:pr-0 md:pb-[calc(120*var(--u))] md:pl-0",
+  "md:pt-[calc(64*var(--u))] md:pr-[var(--edge)] md:pb-[calc(120*var(--u))] md:pl-0",
 );
 
 /** Shared easing for page motion. */

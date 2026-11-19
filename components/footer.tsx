@@ -4,6 +4,7 @@ import { ICON } from "@/lib/icons";
 import { CoffeeChat } from "@/components/coffee-chat";
 import { CopyEmailIcon } from "@/components/copy-email";
 import { LocalTime } from "@/components/local-time";
+import { cn } from "@/lib/utils";
 
 const [GITHUB, RESUME, , LINKEDIN] = LINKS;
 
@@ -16,15 +17,23 @@ const SOCIAL = [
 ];
 
 /**
- * Site footer, modelled on the Rakuten Fashion Week footer: a full-width ink bar, the name in
- * the left column, three stacked link columns starting at the main column, and social marks
- * plus copyright on the right. Measurements are design pixels at 1440 (see globals.css).
+ * Site footer, modelled on the Rakuten Fashion Week footer: a full-width ink bar with the name,
+ * three stacked link columns, and social marks plus copyright. It's the same on every page and
+ * lays itself out by the window's width: on wide screens three zones across (name left, links
+ * centred, marks right); at tablet width the name and the marks share the top row with the
+ * links beneath; on phones it stacks. Measurements are design pixels at 1440 (see globals.css).
  */
 export function Footer() {
   return (
     // Selection is ink-on-bone site-wide (globals.css), which vanishes on this ink bar; flip it here.
     <footer className="fw bg-ink text-bone selection:bg-bone selection:text-ink">
-      <div className="grid gap-8 px-5 py-8 md:mx-auto md:max-w-[var(--frame)] md:grid-cols-[var(--side-col)_minmax(0,1fr)] md:gap-0 md:px-[var(--edge)] md:py-[calc(26.25*var(--u))]">
+      <div
+        className={cn(
+          "grid gap-8 px-5 py-8",
+          "md:grid-cols-[1fr_auto] md:gap-x-[calc(45*var(--u))] md:gap-y-[calc(27*var(--u))] md:px-[var(--edge)] md:py-[calc(26.25*var(--u))]",
+          "lg:grid-cols-[1fr_auto_1fr] lg:gap-y-0",
+        )}
+      >
         <div className="self-start">
           <Link href="/" className="font-display fw-small text-[calc(15*var(--u))] tracking-tight">
             Eric Nguyen
@@ -32,8 +41,10 @@ export function Footer() {
           <LocalTime className="fw-small mt-[calc(6*var(--u))] opacity-70" />
         </div>
 
-        <div className="flex flex-col gap-8 md:flex-row md:justify-between md:gap-[calc(69*var(--u))]">
-          <nav aria-label="Footer" className="fw-small flex gap-[calc(27*var(--u))]">
+        <nav
+          aria-label="Footer"
+          className="fw-small flex gap-[calc(27*var(--u))] md:col-span-2 md:row-start-2 lg:col-span-1 lg:col-start-2 lg:row-start-1"
+        >
             <ul className="flex flex-col">
               <li><Link href="/about" className={link}>ABOUT</Link></li>
               <li><Link href="/projects" className={link}>PROJECTS</Link></li>
@@ -48,10 +59,10 @@ export function Footer() {
               <li><a href={GITHUB.href} {...ext} className={link}>GITHUB</a></li>
               <li><a href={LINKEDIN.href} {...ext} className={link}>LINKEDIN</a></li>
             </ul>
-          </nav>
+        </nav>
 
-          <div className="fw-small md:w-[calc(279*var(--u))]">
-            <ul className="flex items-center gap-[calc(11.25*var(--u))]">
+          <div className="fw-small md:col-start-2 md:row-start-1 md:justify-self-end md:text-right lg:col-start-3">
+            <ul className="flex items-center gap-[calc(11.25*var(--u))] md:justify-end">
               <li className="flex">
                 <CopyEmailIcon
                   className="flex cursor-pointer opacity-90 transition-opacity hover:opacity-100"
@@ -74,7 +85,6 @@ export function Footer() {
               Irvine, California
             </p>
           </div>
-        </div>
       </div>
     </footer>
   );
