@@ -121,6 +121,130 @@ body {
   }
 }
 
+/* The sidebar tabs' blob (components/arc-tabs.tsx): its outline drifts between a few lopsided
+   ovals, slowly, so it reads as something fluid rather than a shape. */
+@keyframes blob-drift {
+  0%   { border-radius: 46% 54% 52% 48% / 50% 44% 56% 50%; transform: scale(1) rotate(0deg); }
+  33%  { border-radius: 54% 46% 44% 56% / 44% 54% 46% 56%; transform: scale(1.03, 0.98) rotate(2deg); }
+  66%  { border-radius: 50% 50% 56% 44% / 56% 48% 52% 44%; transform: scale(0.98, 1.03) rotate(-2deg); }
+  100% { border-radius: 46% 54% 52% 48% / 50% 44% 56% 50%; transform: scale(1) rotate(0deg); }
+}
+.blob {
+  border-radius: 46% 54% 52% 48% / 50% 44% 56% 50%;
+  animation: blob-drift 14s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blob { animation: none; }
+}
+
+/* Page slides (components/slide-link.tsx). SlideLink sets html[data-slide] for one view
+   transition. Without data-slide, view transitions keep the browser's default cross-fade.
+
+   Home to the projects grid (`forward`) and back (`back`): the sidebar slides off to the left (or
+   back in), the "Projects" title glides sideways between its spot on home and the top bar's
+   corner (it's marked with morph() in lib/utils.ts; the names are on only during these slides),
+   and the old page goes soft and grey as the new one fades up over it. On the grid, the cards
+   then come in as blurred blocks that glide into order and sharpen (components/project-card.tsx). */
+html[data-slide="forward"] .vt-name,
+html[data-slide="back"] .vt-name {
+  view-transition-name: var(--vt-name);
+}
+html[data-slide="forward"]::view-transition-group(*),
+html[data-slide="forward"]::view-transition-old(*),
+html[data-slide="forward"]::view-transition-new(*),
+html[data-slide="back"]::view-transition-group(*),
+html[data-slide="back"]::view-transition-old(*),
+html[data-slide="back"]::view-transition-new(*) {
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* The old page only softens; it stays opaque under the arriving one, so nothing shows through. */
+@keyframes page-dissolve { to { filter: blur(14px) grayscale(1); } }
+@keyframes page-arrive { from { opacity: 0; } }
+html[data-slide="forward"]::view-transition-old(root),
+html[data-slide="back"]::view-transition-old(root) {
+  animation-name: page-dissolve;
+  mix-blend-mode: normal;
+}
+html[data-slide="forward"]::view-transition-new(root),
+html[data-slide="back"]::view-transition-new(root) {
+  animation-name: page-arrive;
+  mix-blend-mode: normal;
+}
+
+@keyframes sidebar-away { to { transform: translateX(-35%); opacity: 0; } }
+@keyframes sidebar-return { from { transform: translateX(-35%); opacity: 0; } }
+html[data-slide="forward"]::view-transition-old(sidebar) { animation-name: sidebar-away; }
+html[data-slide="back"]::view-transition-new(sidebar) { animation-name: sidebar-return; }
+
+/* Tab switches beside the sidebar (`up` / `down`): only .page-slot moves, like scrolling one long
+   page. The next page is joined to the edge of the screen and both travel together by one
+   screen height on the same curve, so nothing fades and there is never a gap. Each page is
+   clipped to the screen it shows, so a tall page's content below the fold can't bleed into the
+   other. The root (sidebar, footer) swaps without animating. The name is set only during these
+   slides, so it doesn't swallow the morph names during `forward` / `back`.
+
+   SlideLink sets --slide-old-top / --slide-new-top: where the slot's top sat on screen before
+   and after the switch. The layer is placed at the new slot, so the old image is shifted back by
+   the difference, and each clip is the 0..100vh band of the screen in the image's own space. */
+@keyframes scroll-out-up { to { transform: translateY(-100vh); } }
+@keyframes scroll-in-up { from { transform: translateY(100vh); } }
+@keyframes scroll-out-down { to { transform: translateY(100vh); } }
+@keyframes scroll-in-down { from { transform: translateY(-100vh); } }
+
+html[data-slide="up"] .page-slot,
+html[data-slide="down"] .page-slot {
+  view-transition-name: page;
+}
+html[data-slide="up"]::view-transition-old(root),
+html[data-slide="up"]::view-transition-new(root),
+html[data-slide="down"]::view-transition-old(root),
+html[data-slide="down"]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-slide]::view-transition-group(page) {
+  animation: none;
+}
+html[data-slide]::view-transition-old(page),
+html[data-slide]::view-transition-new(page) {
+  /* One curve for both, so the pages stay joined: quick to start, long soft settle. */
+  animation-duration: 0.65s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  animation-fill-mode: both;
+  mix-blend-mode: normal;
+  /* Each image keeps its own size instead of being stretched to the other page's height. */
+  height: auto;
+}
+html[data-slide]::view-transition-old(page) {
+  --top: var(--slide-old-top, 0px);
+  translate: 0 calc(var(--slide-old-top, 0px) - var(--slide-new-top, 0px));
+  clip-path: polygon(
+    0 calc(-1 * var(--top)), 100% calc(-1 * var(--top)),
+    100% calc(100vh - var(--top)), 0 calc(100vh - var(--top))
+  );
+}
+html[data-slide]::view-transition-new(page) {
+  --top: var(--slide-new-top, 0px);
+  clip-path: polygon(
+    0 calc(-1 * var(--top)), 100% calc(-1 * var(--top)),
+    100% calc(100vh - var(--top)), 0 calc(100vh - var(--top))
+  );
+}
+html[data-slide="up"]::view-transition-old(page) { animation-name: scroll-out-up; }
+html[data-slide="up"]::view-transition-new(page) { animation-name: scroll-in-up; }
+html[data-slide="down"]::view-transition-old(page) { animation-name: scroll-out-down; }
+html[data-slide="down"]::view-transition-new(page) { animation-name: scroll-in-down; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-slide]::view-transition-group(*),
+  html[data-slide]::view-transition-old(*),
+  html[data-slide]::view-transition-new(*) {
+    animation: none;
+  }
+}
+
 /* In the base layer so selection: utilities can override it (the footer flips it on its ink bar). */
 @layer base {
   ::selection {

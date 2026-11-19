@@ -16,6 +16,7 @@ export const ABOUT_INTRO: string[] = [
   "I'm Eric. I make things people actually pick up and use, and that could mean anything.",
   "I do my best work next to the people who'll use it. I sit with someone doing a job the slow way, find the part that hurts, and make it disappear, in code, in hardware, or both.",
   "I also love getting people into a room together. I started Iota Xi, my college's computer science honor society, and I've led three hackathons since. The best part of building is who you build it with.",
+  "I am a product engineer working in hardware and software. I work alongside the people doing the job and make the slow, manual parts disappear. I am currently seeking a summer 2027 internship.",
 ];
 
 export const ABOUT: AboutSection[] = [

@@ -18,6 +18,16 @@ export type Project = {
 /** Newest first, by when each was started. The first three are the featured rows; the rest are listed under MORE. */
 export const PROJECTS: Project[] = [
   {
+    slug: "zap",
+    title: "ZAP!",
+    line: "An Immerse the Bay study tool for Meta Quest: say a topic, throw it into space, and step inside its world",
+    href: "https://zap-eosin.vercel.app",
+    dates: "Nov 2026",
+    tags: ["XR", "Meta Quest", "Voice AI", "Hackathon"],
+    stack: "Unity / C# / Python / World Labs",
+    media: "/media/zap.gif",
+  },
+  {
     slug: "luyten",
     title: "Cal Hacks Winner: Luyten – Autonomous Finance",
     line: "Agentic finance for high-growth startups, so the books close while teams build",

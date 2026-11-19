@@ -7,7 +7,11 @@ import { useCopyEmail } from "@/components/copy-email";
 import { ICON } from "@/lib/icons";
 import { ChromeName } from "@/components/chrome-name";
 import { PageTabs } from "@/components/page-tabs";
-import { cn, ease, hoverLink } from "@/lib/utils";
+import { useMountedInSlide } from "@/components/slide-link";
+import { ArcTabs } from "@/components/arc-tabs";
+import { cn, ease, hoverLink, morph } from "@/lib/utils";
+
+const sidebarMorph = morph("sidebar");
 
 const [GITHUB, RESUME, , LINKEDIN] = LINKS;
 const SOCIAL = [
@@ -29,19 +33,26 @@ export function Sidebar() {
   // Clicking the email copies it. "Copied to clipboard" holds until the pointer leaves the
   // email (or focus moves away), then it returns to the resting mail icon and address.
   const { copied, copy: copyEmail, reset: resetCopied } = useCopyEmail();
+  // Coming back from the projects grid, the sidebar slides in as part of the page: no fade too.
+  const inSlide = useMountedInSlide();
 
   return (
     <motion.aside
-      initial={{ opacity: 0 }}
+      initial={inSlide ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.9, ease }}
+      // morph: slides off to the left on the way to the projects grid, and back in coming home.
+      style={sidebarMorph.style}
       className={cn(
+        sidebarMorph.className,
         "flex flex-col px-5 pt-8",
         "md:sticky md:top-0 md:z-10 md:ml-[calc(45*var(--u))] md:h-dvh md:w-[calc(428*var(--u))] md:self-start md:justify-between md:px-0",
         "md:pt-[calc(64*var(--u))] md:pb-[calc(45*var(--u))]",
       )}
     >
-      <div>
+      {/* Above the tabs' blob, so on very short windows (where the blob can reach this high)
+          the name, links and coffee chat stay clickable. */}
+      <div className="relative z-10">
         <div className="flex flex-wrap items-center gap-x-[calc(24*var(--u))] gap-y-1">
           <ChromeName className="fw-name" />
           <ul className="flex translate-y-[calc(2*var(--u))] items-center gap-[calc(18*var(--u))]">
@@ -68,9 +79,9 @@ export function Sidebar() {
             href={RESUME.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-[#3a3a38] px-[calc(8*var(--u))] py-[calc(3*var(--u))] tracking-[0.04em] text-bone transition-colors duration-200 hover:bg-[#262625]"
+            className="bg-[#3a3a38] px-[calc(8*var(--u))] py-[calc(3*var(--u))] text-bone transition-colors duration-200 hover:bg-[#262625]"
           >
-            RESUME<span className="ml-0.5 align-top text-[0.75em]">↗</span>
+            Resume<span className="ml-0.5 align-top text-[0.75em]">↗</span>
           </a>
           <button
             type="button"
@@ -108,20 +119,17 @@ export function Sidebar() {
         </div>
         <div className="fw-small mt-[calc(18*var(--u))] max-w-[calc(320*var(--u))] space-y-[calc(10*var(--u))] text-mute">
           <p>
-            I am a product engineer working in hardware and software. I work alongside
-            the people doing the job and make the slow, manual parts disappear.{" "}
-            <span className="text-ink underline underline-offset-4">I am currently seeking a summer 2027 internship.</span>
-          </p>
-          <p>Off the clock: espresso tonics, photography, tennis.</p>
-          <p>
             <CoffeeChat className="text-ink" />
           </p>
         </div>
       </div>
 
-      {/* Middle left. */}
+      {/* Middle left: the tabs on an arc on desktop, a plain row on phones. */}
       <div className="mt-[calc(36*var(--u))] md:absolute md:top-1/2 md:right-0 md:left-0 md:mt-0 md:-translate-y-1/2">
-        <PageTabs />
+        <div className="md:hidden">
+          <PageTabs />
+        </div>
+        <ArcTabs className="hidden md:block" />
       </div>
     </motion.aside>
   );

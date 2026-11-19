@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Unbounded, Instrument_Sans } from "next/font/google";
 import { Footer } from "@/components/footer";
+import { SlideNavDone } from "@/components/slide-link";
 import "./globals.css";
 
 const unbounded = Unbounded({
@@ -61,6 +62,7 @@ export default function RootLayout({
       <body className="fw">
         {children}
         <Footer />
+        <SlideNavDone />
         <Analytics />
       </body>
     </html>

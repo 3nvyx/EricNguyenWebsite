@@ -6,6 +6,7 @@ import { PROJECTS, type Project } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
 import { cardHover, useHoverPlay } from "@/components/project-card";
 import { PageTitle, PageTitleLink } from "@/components/page-title";
+import { SlideLink, useMountedInSlide } from "@/components/slide-link";
 import { cn, ease, hoverLink as hover, pageMain } from "@/lib/utils";
 
 const CORE = PROJECTS.slice(0, 3);
@@ -14,12 +15,13 @@ const MORE = PROJECTS.slice(3);
 /** One featured row: cover beside the details. Like the projects page, its gif plays only on hover. */
 function FeaturedProject({ project: p, index: i }: { project: Project; index: number }) {
   const { ref, playing, handlers } = useHoverPlay<HTMLElement>();
+  const inSlide = useMountedInSlide();
 
   return (
     <motion.article
       ref={ref}
       {...handlers}
-      initial={{ opacity: 0, y: 10 }}
+      initial={inSlide ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease, delay: 0.15 + i * 0.1 }}
       className={cn("group", cardHover)}
@@ -79,10 +81,11 @@ function NudgeArrow() {
 
 // Measurements below are design pixels at 1440 wide, written as calc(N*var(--u)) (see globals.css).
 export function Portfolio() {
+  const inSlide = useMountedInSlide();
   return (
     <main className={pageMain}>
       <PageTitle>
-        <PageTitleLink href="/projects" dir="forward">
+        <PageTitleLink href="/projects" dir="forward" vtName="projects-title">
           Projects
         </PageTitleLink>
       </PageTitle>
@@ -93,15 +96,15 @@ export function Portfolio() {
 
         {MORE.length > 0 && (
           <motion.section
-            initial={{ opacity: 0, y: 10 }}
+            initial={inSlide ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease, delay: 0.45 }}
           >
             <h2 className="fw-label">
-              <Link href="/projects" className={cn("group inline-flex items-baseline", hover)}>
+              <SlideLink href="/projects" dir="forward" className={cn("group inline-flex items-baseline", hover)}>
                 SEE ALL PROJECTS
                 <NudgeArrow />
-              </Link>
+              </SlideLink>
             </h2>
             {/* Phones stack each title over its line, with room between entries. */}
             <ul className="fw-text space-y-[calc(14*var(--u))] md:space-y-0">

@@ -4,12 +4,12 @@
 export type Page = { label: string; href: string; more?: { label: string; href: string } };
 
 export const PAGES: Page[] = [
-  { label: "ABOUT", href: "/about" },
+  { label: "About", href: "/about" },
   // Home is the featured projects; the full grid is one hover away.
-  { label: "PROJECTS", href: "/", more: { label: "SEE MORE →", href: "/projects" } },
+  { label: "Projects", href: "/", more: { label: "See more →", href: "/projects" } },
   // Blogs are parked for now; the tab goes to the game instead.
   // { label: "BLOGS", href: "/blogs" },
-  { label: "PLAY", href: "/play" },
+  { label: "Play", href: "/play" },
 ];
 
 /** Which page a path belongs to: home and everything under /projects count as Projects. */

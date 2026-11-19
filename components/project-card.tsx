@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
 import { cn, hoverLink } from "@/lib/utils";
@@ -39,26 +40,95 @@ export function useHoverPlay<T extends HTMLElement>() {
   return { ref, playing: active || inView, handlers };
 }
 
-/** A card on the projects page. Its gif holds on a still and plays only while hovered. */
-export function ProjectCard({ project: p }: { project: Project }) {
+// Each card enters as a block in three beats: it fades in as a soft grey blur, a little out of
+// place (scattered off to the left, the way the page sweeps in); it glides into its slot in grid
+// order; and once its cover has loaded it sharpens into colour.
+const STAGGER = 0.045; // seconds between cards
+const MAX_STAGGERED = 12;
+const GLIDE = [0.32, 0.72, 0, 1] as const;
+
+/** Where card `i` starts before it glides into order. Fixed per card, so it never jitters. */
+function scatter(i: number) {
+  return {
+    opacity: 0,
+    x: `${-(18 + (i % 3) * 10)}%`,
+    y: `${(((i * 37) % 5) - 2) * 7}%`,
+    rotate: (((i * 53) % 7) - 3) * 1.1,
+    scale: 0.94,
+    filter: "blur(14px) grayscale(1)",
+  };
+}
+
+const SETTLED = { opacity: 1, x: "0%", y: "0%", rotate: 0, scale: 1, filter: "none" };
+
+/** Runs the three beats; returns what to pass to the card's motion.div. */
+function useBlockEntrance(index: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  const controls = useAnimationControls();
+  const still = useReducedMotion();
+
+  useEffect(() => {
+    // The server always renders the scattered start, so reduced motion settles it here rather
+    // than skipping `initial` (which would leave the server's hidden styles in place).
+    if (still) {
+      controls.set(SETTLED);
+      return;
+    }
+    const el = ref.current;
+    const img = el?.querySelector("img");
+    // The 3D card and the SLAP! splash have no image to wait for.
+    const loaded = new Promise<void>((done) => {
+      if (!img || img.complete) return done();
+      img.addEventListener("load", () => done(), { once: true });
+      img.addEventListener("error", () => done(), { once: true });
+    });
+    let live = true;
+    const delay = Math.min(index, MAX_STAGGERED) * STAGGER;
+    (async () => {
+      await controls.start({ opacity: 1, transition: { duration: 0.25, delay } });
+      if (!live) return;
+      await controls.start({ x: "0%", y: "0%", rotate: 0, scale: 1, transition: { duration: 0.7, ease: GLIDE } });
+      await loaded;
+      if (!live) return;
+      await controls.start({ filter: "blur(0px) grayscale(0)", transition: { duration: 0.5, ease: GLIDE } });
+      // Drop the filter entirely, so the card doesn't keep a filter layer for good.
+      if (live) controls.set({ filter: "none" });
+    })();
+    return () => {
+      live = false;
+      controls.stop();
+    };
+  }, [controls, index, still]);
+
+  return { ref, controls, initial: scatter(index) };
+}
+
+/**
+ * A card on the projects page. Its gif holds on a still and plays only while hovered. `index` is
+ * its place in the grid, for the order the cards glide in.
+ */
+export function ProjectCard({ project: p, index }: { project: Project; index: number }) {
   const { ref, playing, handlers } = useHoverPlay<HTMLAnchorElement>();
+  const { ref: blockRef, controls, initial } = useBlockEntrance(index);
 
   return (
-    <Link ref={ref} href={`/projects/${p.slug}`} {...handlers} className={cn("group block", cardHover)}>
-      <p className="fw-label flex justify-between gap-6">
-        <span className="uppercase">{p.title}</span>
-        <span className="text-mute">{p.dates}</span>
-      </p>
-      <div className="aspect-video w-full overflow-hidden">
-        <MediaSlot project={p} playing={playing} />
-      </div>
-      <p className={cn("fw-title mt-[calc(14*var(--u))] self-start", hoverLink, "group-hover:underline")}>
-        {p.title}
-      </p>
-      <p className="fw-text text-mute">
-        {p.tags.map((t) => `#${t}`).join("  ")}
-      </p>
-      <p className="fw-text mt-[calc(10*var(--u))]">{p.line}</p>
-    </Link>
+    <motion.div ref={blockRef} initial={initial} animate={controls}>
+      <Link ref={ref} href={`/projects/${p.slug}`} {...handlers} className={cn("group block", cardHover)}>
+        <p className="fw-label flex justify-between gap-6">
+          <span className="uppercase">{p.title}</span>
+          <span className="text-mute">{p.dates}</span>
+        </p>
+        <div className="aspect-video w-full overflow-hidden">
+          <MediaSlot project={p} playing={playing} />
+        </div>
+        <p className={cn("fw-title mt-[calc(14*var(--u))] self-start", hoverLink, "group-hover:underline")}>
+          {p.title}
+        </p>
+        <p className="fw-text text-mute">
+          {p.tags.map((t) => `#${t}`).join("  ")}
+        </p>
+        <p className="fw-text mt-[calc(10*var(--u))]">{p.line}</p>
+      </Link>
+    </motion.div>
   );
 }

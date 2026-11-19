@@ -125,6 +125,69 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     ],
   },
 
+  zap: {
+    facts: [
+      { label: "Type", values: ["Hackathon project", "Immerse the Bay 2026, Stanford XR", "Living Worlds track"] },
+      { label: "Team", values: ["Me", "@KevinNDoan", "@nadia827ny"] },
+      { label: "Duration", values: ["Nov 14 – 15, 2026"] },
+      { label: "Headset", values: ["Meta Quest 3 / 3S", "Unity 6, C#", "OpenXR", "XR Interaction Toolkit"] },
+      { label: "Relay", values: ["Python, FastAPI", "Faster Whisper", "GPT-6 Luna", "World Labs"] },
+      { label: "Design & pitch", values: ["Figma", "Next.js", "Three.js"] },
+    ],
+    statement: "Notes are flat. Learning isn't. What if every topic you studied was a place you could walk into?",
+    body: [
+      { h: "Overview" },
+      "ZAP! is a study tool for the Meta Quest 3 that Kevin, Nadia and I built at Immerse the Bay, Stanford XR's hackathon, for its Living Worlds track. You hold a button and say a topic, and an orb appears in your hand with a short note about it. You throw the orb to place it in the space around you, link it to related orbs, and build up a constellation of what you're learning. Throw an orb forward and you travel inside it, into a 3D world about that topic, where you can walk around, pick up learning objects and ask questions out loud.",
+      { video: { src: "/media/zap/headset-tour.mp4", poster: "/media/zap/headset-tour-poster.jpg", caption: "A tour recorded from the headset: the constellation, the Great Wall, its watchtower and the biology lab", aspect: "720 / 756" } },
+      { h: "Context" },
+      "Laptops and phones have plenty of tools for capturing and organizing ideas. VR has almost none, and the few that exist put a flat desktop inside a headset, which ignores what VR is good at: space, your hands and immersion. We wanted something closer to Notion or Obsidian, built for a headset, where your ideas surround you instead of sitting in a sidebar, and where you can step inside any one of them.",
+      "This was my first time building for XR, and most of us were new to Unity, C# and Quest development. Unity's simulator got us through a lot on the laptop, but anything about feel, like throwing an orb across a room, had to be tested on the Quest.",
+      { figures: [
+        { src: "/media/zap/building.jpg", caption: "Building between headset tests", aspect: "3 / 4" },
+        { src: "/media/zap/testing.jpg", caption: "Testing the constellation at our table", aspect: "3 / 4" },
+      ] },
+      { h: "How it works" },
+      { list: [
+        "Say it. Hold A and say a topic. An orb appears in your hand right away and pulses while you talk. When you let go, the laptop transcribes what you said and GPT-6 Luna writes the orb's note, using the topics of up to six parent orbs as context.",
+        "Throw it. Grip the orb and let go to place it. A gentle release leaves it floating where you dropped it. Hold both grips in empty space to pull or stretch the whole map.",
+        "Zap it. Point at one orb, hold the trigger, point at another and let go to link them. Do it again to cut the link.",
+        "Step inside. Throw an orb forward, or select it and press X, to travel into its world. Connected worlds show up as orbs beside you, so you can travel between them without going back.",
+      ] },
+      { figure: { src: "/media/zap/constellation.jpg", caption: "The constellation at home: three world orbs, with the Great Wall linked to its watchtower", aspect: "1 / 1" } },
+      { h: "The worlds" },
+      "Our first plan was live video. Orbis, a world model served through Reactor, streams video from a text prompt, and we tried wrapping it around the headset as a dome. It only covered one wall. Pushing it toward a panorama made it drift back into ordinary perspective video, and separate camera streams never agreed on a single space. You couldn't look around a place that held still.",
+      "So we switched to World Labs, which generates a world and exports it as a textured 3D mesh. That gave us real geometry with collision, so you can actually walk around inside it. The catch is time: a world took about five minutes to generate, and the high-quality mesh export took another 34 to 40 minutes. Credits were tight too. A world with its export cost about 5,000 credits, so we used one world for all of our testing and made extra accounts to afford three for the demo: the Great Wall from outside, a watchtower connected to it, and a DNA biology lab.",
+      { figures: [
+        { src: "/media/zap/great-wall.jpg", caption: "Outside on the Great Wall, with a question and its answer on a glass pane", aspect: "1 / 1" },
+        { src: "/media/zap/watchtower.jpg", caption: "Inside the connected watchtower", aspect: "1 / 1" },
+      ] },
+      "Inside a world, your voice changes what's in it. Hold the left trigger and ask a question, and the answer lands on a glass pane you can grab and move anywhere. Ask for a change, like \"create RNA and delete the DNA\", and both happen. The relay checks the whole request before it removes anything, and a world holds at most six learning objects. The objects are simple schematic models, and their notes say so: the ribosome we asked for came with a note saying its proportions are illustrative, not to scale.",
+      { figures: [
+        { src: "/media/zap/biology-lab.jpg", caption: "DNA and RNA models in the biology lab, with reading panes beside them", aspect: "1 / 1" },
+        { src: "/media/zap/ribosome.jpg", caption: "A ribosome, created by asking for one out loud", aspect: "1 / 1" },
+      ] },
+      "On demo morning we cut out the export. Instead of waiting for a mesh, the headset now renders World Labs' Gaussian splats directly, 500,000 of them per world, with the world's collision geometry underneath so you can still walk around. With that, we generated two brand-new worlds from spoken topics, a plant cell lab and a forest, and opened both on the Quest. Generation itself still takes about five minutes, so the judging demo stuck with the three worlds we had prepared.",
+      { h: "How it's built" },
+      { list: [
+        "Headset: Unity 6 with OpenXR and the XR Interaction Toolkit, built for the Quest 3 as an Android app. Each orb's topic, note, position and links are saved to a small JSON file on the headset, with a backup of the previous save, and the map is rebuilt from it on launch.",
+        "Relay: a Python FastAPI server on a laptop. The Quest sends voice recordings over the local network, Faster Whisper transcribes them on the laptop, and GPT-6 Luna writes notes, answers questions and plans object edits. It also fetches and caches the World Labs worlds. API keys stay on the laptop and never ship in the app.",
+        "Design: Nadia designed the look in Figma, from the stars, lines and notes to the frosted glass panes, the light sky and the yellow ZAP! logo, set in Bricolage Grotesque.",
+        "Pitch site: a Next.js and Three.js site we presented from, with the headset tour, a browser sketch of the constellation, and a one-page pamphlet that judges opened from a QR code. It works offline and saves as a PDF.",
+      ] },
+      { h: "Splitting the work" },
+      "Before anyone branched, we split the project into lanes and gave every file one owner. I took core: the constellation, voice, notes, the relay's speech and note routes, builds and merging. Kevin took worlds: everything inside an orb and the travel between them. Nadia took design: how orbs, lines, notes and text look. The three files that mixed everyone's work got pulled apart first, so nobody had to edit someone else's file.",
+      "I also ran a lot of my lane through AI coding agents, with one coordinating and the others taking small, scoped tasks. Each agent wrote a handoff note when it finished: where things stand, what was checked and what wasn't. By demo morning there were over 50 of them, and they made it possible to pick up any thread without rereading the code.",
+      { h: "Lessons" },
+      { list: [
+        "Test the core experience before building around it. We spent hours on live video before learning it couldn't give you a stable place to stand.",
+        "Generation time is the real product problem. Splats got rid of the half-hour export, but five minutes is still too long for \"say a topic and step inside.\" Faster, cheaper world generation is what would make ZAP! real.",
+        "Be honest about what the visuals are. The worlds are generated interpretations, not historical reconstructions, and the learning objects are illustrations, not simulations. We put that on the pamphlet instead of hoping nobody would ask.",
+        "Give every file one owner. It costs a little time at the start and saves the night before the demo.",
+      ] },
+      "Next on the list: generating new worlds while you wait, AI-suggested links between orbs, and study spaces you can share.",
+    ],
+  },
+
   luyten: {
     facts: [
       { label: "Type", values: ["Hackathon winner", "Cal Hacks, SpacetimeDB track"] },
