@@ -5,7 +5,9 @@ import Link from "next/link";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
-import { cn, hoverLink } from "@/lib/utils";
+import { useMountedInSlide } from "@/components/slide-link";
+import { isFeatured } from "@/lib/featured";
+import { cn, hoverLink, morph } from "@/lib/utils";
 
 /** The soft background a project card takes while hovered or focused. */
 export const cardHover = cn(
@@ -62,7 +64,7 @@ function scatter(i: number) {
 const SETTLED = { opacity: 1, x: "0%", y: "0%", rotate: 0, scale: 1, filter: "none" };
 
 /** Runs the three beats; returns what to pass to the card's motion.div. */
-function useBlockEntrance(index: number) {
+function useBlockEntrance(index: number, glides: boolean) {
   const ref = useRef<HTMLDivElement>(null);
   const controls = useAnimationControls();
   const still = useReducedMotion();
@@ -70,7 +72,9 @@ function useBlockEntrance(index: number) {
   useEffect(() => {
     // The server always renders the scattered start, so reduced motion settles it here rather
     // than skipping `initial` (which would leave the server's hidden styles in place).
-    if (still) {
+    // A featured card arriving from home: its cover glides here in the page transition, so it
+    // starts in place. (Only on a client navigation, so this can't differ from server HTML.)
+    if (still || glides) {
       controls.set(SETTLED);
       return;
     }
@@ -98,9 +102,9 @@ function useBlockEntrance(index: number) {
       live = false;
       controls.stop();
     };
-  }, [controls, index, still]);
+  }, [controls, index, still, glides]);
 
-  return { ref, controls, initial: scatter(index) };
+  return { ref, controls, initial: glides ? false : scatter(index) };
 }
 
 /**
@@ -109,7 +113,11 @@ function useBlockEntrance(index: number) {
  */
 export function ProjectCard({ project: p, index }: { project: Project; index: number }) {
   const { ref, playing, handlers } = useHoverPlay<HTMLAnchorElement>();
-  const { ref: blockRef, controls, initial } = useBlockEntrance(index);
+  const glides = useMountedInSlide() && isFeatured(p.slug);
+  const { ref: blockRef, controls, initial } = useBlockEntrance(index, glides);
+  // Only home's covers have a twin to glide from. Named, the others would be lifted out of their
+  // card for the transition and held where their entrance starts.
+  const cover = isFeatured(p.slug) ? morph(`project-${p.slug}`, "vt-card") : undefined;
 
   return (
     <motion.div ref={blockRef} initial={initial} animate={controls}>
@@ -118,7 +126,8 @@ export function ProjectCard({ project: p, index }: { project: Project; index: nu
           <span className="uppercase">{p.title}</span>
           <span className="text-mute">{p.dates}</span>
         </p>
-        <div className="aspect-video w-full overflow-hidden">
+        {/* morph: coming from home, a featured cover blurs, glides here and sharpens. */}
+        <div className={cn("aspect-video w-full overflow-hidden", cover?.className)} style={cover?.style}>
           <MediaSlot project={p} playing={playing} />
         </div>
         <p className={cn("fw-title mt-[calc(14*var(--u))] self-start", hoverLink, "group-hover:underline")}>

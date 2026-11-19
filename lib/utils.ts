@@ -23,7 +23,11 @@ export const ease = [0.22, 1, 0.36, 1] as const;
  * SlideLink transition: the element with the same name on the other page glides from one spot
  * to the other. Merge `className` with cn and pass `style`. globals.css turns the name on only
  * during those transitions, so it doesn't cut the element out of the vertical tab slides.
+ * `kind` is a view-transition-class, for styling a family of morphs ("vt-card": the covers).
  */
-export function morph(name: string) {
-  return { className: "vt-name", style: { "--vt-name": name } as React.CSSProperties };
+export function morph(name: string, kind?: string) {
+  return {
+    className: "vt-name",
+    style: { "--vt-name": name, ...(kind && { "--vt-class": kind }) } as React.CSSProperties,
+  };
 }

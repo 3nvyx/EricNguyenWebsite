@@ -4,42 +4,47 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { SlideLink, slideTo, type SlideDir } from "@/components/slide-link";
 import { PAGES, activePage } from "@/lib/pages";
-import { FluidBlob } from "@/components/fluid-blob";
-import { cn } from "@/lib/utils";
+// The blob behind the tabs is switched off for now; see the commented-out FluidBlob below.
+// import { FluidBlob } from "@/components/fluid-blob";
+import { cn, hoverLink } from "@/lib/utils";
 
 /*
- * The desktop sidebar's page tabs, set along an arc like the rim of a wheel just off the left
- * edge of the screen. The current page sits at the apex, a little larger; the others curve back
- * toward the edge, close together, smaller and fainter the further they are. The text stays
- * level: only its position and size follow the arc. The list has ends (About on top, Play at the
- * bottom); it doesn't loop.
+ * The desktop sidebar's page tabs (once set on an arc, hence the name). They hold still in a
+ * close column, About on top and Play at the bottom; the current one is larger, and the others
+ * smaller and fainter the further they are, and switching pages just grows one and shrinks the
+ * other. A short bar to their left, a solid track with a marker one page tall, shows how many
+ * pages there are and which one you're on; the marker slides as the page changes.
  *
- * Clicking a tab, or turning the mouse wheel over the tabs (one notch, one page), turns the arc
- * and slides the page beside it (SlideLink's `up` / `down`) on the same curve and timing, so the
- * wheel and the page move as one. Phones keep the plain tab row (PageTabs).
+ * Clicking a tab, or turning the mouse wheel over the tabs (one notch, one page), changes page
+ * and slides the page beside it (SlideLink's `up` / `down`); the tabs' sizes and the marker ease
+ * on the same curve and timing, so they move with the page. Phones keep the plain tab row
+ * (PageTabs).
  *
- * The tabs sit in a black blob that bulges out from the left edge of the screen, roughly half an
- * oval, with a jelly-like edge that drifts on its own, gives where the pointer crosses it, and
- * ripples when the page changes (components/fluid-blob.tsx). The tabs read light on it.
- * Over the blob or a tab the wheel turns the arc; anywhere else it scrolls the page.
+ * Over the tabs and the bar the wheel changes page; anywhere else it scrolls the page.
+ *
+ * (Switched off for now: a black jelly blob behind the tabs, bulging in from the screen's left
+ * edge, with the tabs in light on it; components/fluid-blob.tsx. To bring it back, uncomment it
+ * and its import, and put the tabs back on ON_BLOB's light colours.)
  */
 
 // Measurements are design pixels at 1440 wide (see --u in globals.css).
-const RADIUS = 150; // the wheel's radius
-const STEP = 0.27; // radians between neighbouring tabs: about 40px apart, 5px further left
+const ROW = 40; // from one tab to the next
 const GROW = 0.15; // the current tab's extra size
 const SHRINK = 0.1; // how much smaller each step away is
-const FADE = 0.2; // how much fainter each step away is (the only fade: tabs are full bone on the blob)
+const FADE = 0.2; // how much fainter each step away is
 const MIN_OPACITY = 0.6;
-// The blob: an oval centred on the screen's left edge, level with the apex, so about half of it
-// shows. The sidebar's content starts EDGE in from the screen's edge.
-const BLOB_X = 300; // half its width: how far it reaches into the screen
-const BLOB_Y = 190; // half its height, at most
-const BLOB_Y_MIN = 110; // ...and at least, to hold the tabs
-const TOP_BLOCK = 215; // the sidebar's name, links and coffee chat, from the top: the blob stays below
-const EDGE = 45;
+// The page bar, left of the tabs and centred on them: a track SEG tall per page.
+const BAR_X = -20; // from the tabs' left edge
+const BAR_SEG = 16;
+const BAR_W = 2;
+// The blob (switched off): an oval centred on the screen's left edge, level with the apex.
+// const BLOB_X = 300; // half its width: how far it reaches into the screen
+// const BLOB_Y = 190; // half its height, at most
+// const BLOB_Y_MIN = 110; // ...and at least, to hold the tabs
+// const TOP_BLOCK = 215; // the sidebar's top block, from the top: the blob stays below it
+// const EDGE = 45; // the sidebar's content starts this far in from the screen's edge
 
-// Same duration and curve as the page slides in globals.css, so the arc and the page move as one.
+// Same duration and curve as the page slides in globals.css, so the tabs move with the page.
 const DURATION = 650;
 const EASE = cubicBezier(0.32, 0.72, 0, 1);
 
@@ -54,7 +59,7 @@ export function ArcTabs({ className }: { className?: string }) {
   // A tab below the current one slides its page up from below.
   const dirTo = (i: number): SlideDir => (i > active ? "up" : "down");
 
-  // The wheel turns the arc one tab per notch. A trackpad sends a stream of small events for
+  // The wheel moves one page per notch. A trackpad sends a stream of small events for
   // one swipe, so after a step the wheel stays locked until the stream goes quiet and the turn
   // has had time to land. Steps count from the page last asked for, not the one showing, so a
   // slow page can't make a second notch ask for the same page again.
@@ -73,7 +78,7 @@ export function ArcTabs({ className }: { className?: string }) {
       if (e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
       // Firefox's mouse wheel counts in lines (deltaMode 1), about 3 a notch; others in pixels.
       const dy = e.deltaMode ? e.deltaY * 16 : e.deltaY;
-      // The rest of a swipe that just turned the arc is swallowed, even once it reaches an end.
+      // The rest of a swipe that just changed page is swallowed, even once it reaches an end.
       const turning = !settled || performance.now() < lockedUntil;
       const next = targetRef.current + (dy > 0 ? 1 : -1);
       // Past either end (with the swipe over), the wheel scrolls the page as usual.
@@ -97,15 +102,15 @@ export function ArcTabs({ className }: { className?: string }) {
   }, [router]);
 
   return (
-    // The nav itself takes no pointer events: only the blob and the tabs do, so the wheel turns the
-    // arc over them and scrolls the page everywhere else in the sidebar (their events reach the
+    // The nav takes no pointer events itself: only the bar and the tabs do, so the wheel changes
+    // page over them and scrolls the page everywhere else in the sidebar (their events reach the
     // nav's listener).
     <nav
       ref={navRef}
       aria-label="Pages"
       className={cn("fw-nav pointer-events-none relative h-[calc(200*var(--u))] w-[calc(290*var(--u))]", className)}
     >
-      <FluidBlob
+      {/* <FluidBlob
         pulse={active}
         className="pointer-events-auto absolute"
         style={{
@@ -116,15 +121,36 @@ export function ArcTabs({ className }: { className?: string }) {
           width: `calc(${2 * BLOB_X} * var(--u))`,
           height: "calc(2 * var(--blob-y))",
         }}
-      />
+      /> */}
+
+      {/* The page bar. Its padding widens the hover target past the hairline. */}
+      <div
+        aria-hidden
+        className="pointer-events-auto absolute px-[calc(6*var(--u))]"
+        style={{ left: `calc(${BAR_X - 6} * var(--u))`, top: `calc(50% - ${(N * BAR_SEG) / 2} * var(--u))` }}
+      >
+        <div
+          className="relative bg-faint"
+          style={{ width: `calc(${BAR_W} * var(--u))`, height: `calc(${N * BAR_SEG} * var(--u))` }}
+        >
+          {/* The marker: one page's share of the track, on the current page. */}
+          <span
+            className="absolute top-0 left-0 block h-[var(--seg)] w-full bg-ink"
+            style={{
+              ["--seg" as string]: `calc(${BAR_SEG} * var(--u))`,
+              transform: `translateY(calc(${pos * BAR_SEG} * var(--u)))`,
+            }}
+          />
+        </div>
+      </div>
       <ul className={LIST}>
         {PAGES.map((it, i) => (
-          <li key={it.href} className={cn(ITEM, it.more && "group")} style={place(i - pos)}>
+          <li key={it.href} className={cn(ITEM, it.more && "group")} style={place(i, i - pos)}>
             <SlideLink
               href={it.href}
               dir={dirTo(i)}
               aria-current={i === active ? "page" : undefined}
-              className={cn(ON_BLOB, "text-bone")}
+              className={cn(hoverLink, "duration-300", i === active ? "text-ink" : "fw-nav-off")}
             >
               {it.label}
             </SlideLink>
@@ -136,8 +162,7 @@ export function ArcTabs({ className }: { className?: string }) {
                 dir="forward"
                 className={cn(
                   MORE,
-                  ON_BLOB,
-                  "pointer-events-none text-bone/60 opacity-0 transition-[opacity,color] duration-200",
+                  "pointer-events-none text-mute opacity-0 transition-opacity duration-200 hover:text-ink hover:underline underline-offset-4",
                   "group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
                 )}
               >
@@ -154,25 +179,27 @@ export function ArcTabs({ className }: { className?: string }) {
 const LIST = "text-[length:calc(27*var(--u))] leading-[calc(40*var(--u))]";
 const ITEM = "pointer-events-auto absolute top-1/2 left-0 origin-left whitespace-nowrap";
 const MORE = "fw-small absolute top-1/2 left-full -translate-y-1/2 pl-[calc(14*var(--u))]";
-// Links on the blob: hoverLink's darken-on-hover would vanish on black, so they brighten instead.
-const ON_BLOB = "underline-offset-4 transition-colors duration-300 hover:text-bone hover:underline";
+// Links on the blob (switched off): hoverLink's darken-on-hover would vanish on black, so they
+// brightened instead, with the tabs in text-bone.
+// const ON_BLOB = "underline-offset-4 transition-colors duration-300 hover:text-bone hover:underline";
 
-/** Where a tab `d` steps from the apex sits on the arc, and how large and faint it is. */
-function place(d: number): React.CSSProperties {
+/**
+ * Tab `i`'s fixed row, centred on the column, and how large and faint it is `d` steps from the
+ * current page (fractional while the page changes, so it grows and shrinks smoothly).
+ */
+function place(i: number, d: number): React.CSSProperties {
   const far = Math.abs(d);
-  const x = RADIUS * (Math.cos(d * STEP) - 1);
-  const y = RADIUS * Math.sin(d * STEP);
+  const y = (i - (N - 1) / 2) * ROW;
   const scale = 1 + GROW * Math.max(0, 1 - far) - SHRINK * far;
   return {
-    transform: `translate(calc(${x} * var(--u)), calc(-50% + ${y} * var(--u))) scale(${scale})`,
+    transform: `translateY(calc(-50% + ${y} * var(--u))) scale(${scale})`,
     opacity: Math.max(MIN_OPACITY, 1 - FADE * far),
   };
 }
 
 /**
- * The arc's position as a float that eases toward the current tab. Driven by
- * requestAnimationFrame on the same cubic-bezier as the page slides' CSS, so the arc and the page
- * move exactly together.
+ * The current page as a float that eases toward each new one, for the tabs' sizes and the bar. Driven by
+ * requestAnimationFrame on the same cubic-bezier as the page slides' CSS, so they move with the page.
  */
 function useArcPosition(active: number) {
   const [pos, setPos] = useState(active);
