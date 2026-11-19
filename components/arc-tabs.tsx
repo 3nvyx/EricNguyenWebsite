@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { SlideLink, slideTo, type SlideDir } from "@/components/slide-link";
 import { PAGES, activePage } from "@/lib/pages";
+import { FluidBlob } from "@/components/fluid-blob";
 import { cn } from "@/lib/utils";
 
 /*
@@ -18,9 +19,9 @@ import { cn } from "@/lib/utils";
  * wheel and the page move as one. Phones keep the plain tab row (PageTabs).
  *
  * The tabs sit in a black blob that bulges out from the left edge of the screen, roughly half an
- * oval, its outline slowly drifting so it reads as something fluid. The tabs read light on it.
- * Over the blob or a tab the wheel turns the arc; anywhere else it scrolls the page. The blob's
- * keyframes (`blob-drift`) are in globals.css.
+ * oval, with a jelly-like edge that drifts on its own, gives where the pointer crosses it, and
+ * ripples when the page changes (components/fluid-blob.tsx). The tabs read light on it.
+ * Over the blob or a tab the wheel turns the arc; anywhere else it scrolls the page.
  */
 
 // Measurements are design pixels at 1440 wide (see --u in globals.css).
@@ -104,9 +105,9 @@ export function ArcTabs({ className }: { className?: string }) {
       aria-label="Pages"
       className={cn("fw-nav pointer-events-none relative h-[calc(200*var(--u))] w-[calc(290*var(--u))]", className)}
     >
-      <div
-        aria-hidden
-        className="blob pointer-events-auto absolute bg-ink"
+      <FluidBlob
+        pulse={active}
+        className="pointer-events-auto absolute"
         style={{
           left: `calc(${-EDGE - BLOB_X} * var(--u))`,
           // On short windows the blob gets shorter, so it stays clear of the top block.

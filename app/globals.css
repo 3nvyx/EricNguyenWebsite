@@ -121,22 +121,6 @@ body {
   }
 }
 
-/* The sidebar tabs' blob (components/arc-tabs.tsx): its outline drifts between a few lopsided
-   ovals, slowly, so it reads as something fluid rather than a shape. */
-@keyframes blob-drift {
-  0%   { border-radius: 46% 54% 52% 48% / 50% 44% 56% 50%; transform: scale(1) rotate(0deg); }
-  33%  { border-radius: 54% 46% 44% 56% / 44% 54% 46% 56%; transform: scale(1.03, 0.98) rotate(2deg); }
-  66%  { border-radius: 50% 50% 56% 44% / 56% 48% 52% 44%; transform: scale(0.98, 1.03) rotate(-2deg); }
-  100% { border-radius: 46% 54% 52% 48% / 50% 44% 56% 50%; transform: scale(1) rotate(0deg); }
-}
-.blob {
-  border-radius: 46% 54% 52% 48% / 50% 44% 56% 50%;
-  animation: blob-drift 14s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .blob { animation: none; }
-}
-
 /* Page slides (components/slide-link.tsx). SlideLink sets html[data-slide] for one view
    transition. Without data-slide, view transitions keep the browser's default cross-fade.
 
