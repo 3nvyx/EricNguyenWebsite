@@ -12,7 +12,7 @@ export const hoverLink =
 /** The right-hand column every page renders into, beside the sticky sidebar. */
 export const pageMain = cn(
   "px-5 pt-12 pb-24",
-  "md:pt-[calc(64*var(--u))] md:pr-[calc(45*var(--u))] md:pb-[calc(120*var(--u))] md:pl-0",
+  "md:pt-[calc(64*var(--u))] md:pr-0 md:pb-[calc(120*var(--u))] md:pl-0",
 );
 
 /** Shared easing for page motion. */
@@ -27,7 +27,8 @@ export const ease = [0.22, 1, 0.36, 1] as const;
  */
 export function morph(name: string, kind?: string) {
   return {
-    className: "vt-name",
+    // The kind is also a class, so CSS can switch a family of names off (see globals.css).
+    className: cn("vt-name", kind),
     style: { "--vt-name": name, ...(kind && { "--vt-class": kind }) } as React.CSSProperties,
   };
 }

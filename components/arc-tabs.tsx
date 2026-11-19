@@ -42,7 +42,8 @@ const BAR_W = 2;
 // const BLOB_Y = 190; // half its height, at most
 // const BLOB_Y_MIN = 110; // ...and at least, to hold the tabs
 // const TOP_BLOCK = 215; // the sidebar's top block, from the top: the blob stays below it
-// const EDGE = 45; // the sidebar's content starts this far in from the screen's edge
+// const EDGE = 45; // the sidebar's content starts this far in from the frame's edge (--edge); the
+// blob would now need the frame's offset from the screen edge too
 
 // Same duration and curve as the page slides in globals.css, so the tabs move with the page.
 const DURATION = 650;

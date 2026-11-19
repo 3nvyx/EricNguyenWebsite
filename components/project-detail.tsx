@@ -37,8 +37,10 @@ export function ProjectDetail({ project }: { project: Project }) {
   return (
     <div
       className={cn(
-        "px-5 pt-8 pb-24 md:px-[calc(45*var(--u))] md:pt-[calc(45*var(--u))] md:pb-[calc(120*var(--u))]",
-        "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,calc(855*var(--u)))_minmax(0,1fr)] lg:gap-x-[calc(45*var(--u))]",
+        "px-5 pt-8 pb-24 md:px-[var(--edge)] md:pt-[calc(45*var(--u))] md:pb-[calc(120*var(--u))]",
+        // In the site's centred frame, like every page: the article between two narrow rails.
+        "md:mx-auto md:max-w-[var(--frame)]",
+        "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,calc(640*var(--u)))_minmax(0,1fr)] lg:gap-x-[calc(45*var(--u))]",
       )}
     >
       {/* Left rail: the way back, kept in view. */}

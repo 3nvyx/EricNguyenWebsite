@@ -7,7 +7,8 @@ import { Sidebar } from "@/components/sidebar";
  */
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="md:grid md:grid-cols-[36.5vw_minmax(0,1fr)]">
+    // The centred frame (--frame in globals.css): sidebar column, then the page.
+    <div className="md:mx-auto md:grid md:max-w-[var(--frame)] md:grid-cols-[var(--side-col)_minmax(0,1fr)] md:px-[var(--edge)]">
       <Sidebar />
       {/* The page beside the sidebar. It's its own view-transition layer while a tab switch
           slides it up or down (globals.css), so the sidebar holds still. */}

@@ -46,7 +46,9 @@ export function Sidebar() {
       className={cn(
         sidebarMorph.className,
         "flex flex-col px-5 pt-8",
-        "md:sticky md:top-0 md:z-10 md:ml-[calc(45*var(--u))] md:h-dvh md:w-[calc(428*var(--u))] md:self-start md:justify-between md:px-0",
+        "md:sticky md:top-0 md:z-10 md:h-dvh md:w-[var(--side)] md:self-start md:justify-between md:px-0",
+        // A hairline down its right edge on desktop, the same weight as the section labels' rules.
+        "md:border-r-[0.5px] md:border-ink",
         "md:pt-[calc(64*var(--u))] md:pb-[calc(45*var(--u))]",
       )}
     >

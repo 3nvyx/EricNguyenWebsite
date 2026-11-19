@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
-import { useMountedInSlide } from "@/components/slide-link";
+import { useSlideOrigin } from "@/components/slide-link";
 import { isFeatured } from "@/lib/featured";
 import { cn, hoverLink, morph } from "@/lib/utils";
 
@@ -14,6 +14,13 @@ export const cardHover = cn(
   "-m-[calc(12*var(--u))] p-[calc(12*var(--u))] transition-colors duration-200",
   "hover:bg-faint/30 focus-within:bg-faint/30",
 );
+
+/**
+ * Makes a card as tall as its grid row, so every card in a row (and its hover background) is the
+ * same height. Its wrappers take h-full; the card adds back the 12px bleed cardHover gives it on
+ * each side.
+ */
+export const cardFill = "h-[calc(100%+24*var(--u))]";
 
 /**
  * Whether a card's gif should play: while it's hovered or something in it has focus, or, on
@@ -113,24 +120,27 @@ function useBlockEntrance(index: number, glides: boolean) {
  */
 export function ProjectCard({ project: p, index }: { project: Project; index: number }) {
   const { ref, playing, handlers } = useHoverPlay<HTMLAnchorElement>();
-  const glides = useMountedInSlide() && isFeatured(p.slug);
+  // Only a slide from home has a cover to glide from ("See more →" also comes from other pages).
+  const glides = useSlideOrigin() === "/" && isFeatured(p.slug);
   const { ref: blockRef, controls, initial } = useBlockEntrance(index, glides);
   // Only home's covers have a twin to glide from. Named, the others would be lifted out of their
   // card for the transition and held where their entrance starts.
   const cover = isFeatured(p.slug) ? morph(`project-${p.slug}`, "vt-card") : undefined;
 
   return (
-    <motion.div ref={blockRef} initial={initial} animate={controls}>
-      <Link ref={ref} href={`/projects/${p.slug}`} {...handlers} className={cn("group block", cardHover)}>
+    <motion.div ref={blockRef} initial={initial} animate={controls} className="h-full">
+      <Link ref={ref} href={`/projects/${p.slug}`} {...handlers} className={cn("group block", cardHover, cardFill)}>
+        {/* One line, so every cover in a row starts level: the title shortens, the date doesn't. */}
         <p className="fw-label flex justify-between gap-6">
-          <span className="uppercase">{p.title}</span>
-          <span className="text-mute">{p.dates}</span>
+          <span title={p.title} className="min-w-0 truncate uppercase">{p.title}</span>
+          <span className="shrink-0 whitespace-nowrap text-mute">{p.dates}</span>
         </p>
         {/* morph: coming from home, a featured cover blurs, glides here and sharpens. */}
         <div className={cn("aspect-video w-full overflow-hidden", cover?.className)} style={cover?.style}>
           <MediaSlot project={p} playing={playing} />
         </div>
-        <p className={cn("fw-title mt-[calc(14*var(--u))] self-start", hoverLink, "group-hover:underline")}>
+        {/* One line: a title longer than the card ends in an ellipsis (the full one on hover). */}
+        <p title={p.title} className={cn("fw-title mt-[calc(14*var(--u))] truncate", hoverLink, "group-hover:underline")}>
           {p.title}
         </p>
         <p className="fw-text text-mute">

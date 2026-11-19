@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/projects";
 import { FEATURED } from "@/lib/featured";
 import { MediaSlot } from "@/components/media-slot";
-import { cardHover, useHoverPlay } from "@/components/project-card";
+import { cardFill, cardHover, useHoverPlay } from "@/components/project-card";
 import { PageTitle, PageTitleLink } from "@/components/page-title";
 import { SlideLink, useMountedInSlide } from "@/components/slide-link";
 import { cn, ease, hoverLink as hover, morph, pageMain } from "@/lib/utils";
@@ -24,12 +24,16 @@ function FeaturedProject({ project: p, index: i }: { project: Project; index: nu
       initial={inSlide ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease, delay: 0.15 + i * 0.08 }}
+      className="h-full"
     >
-      <Link ref={ref} href={`/projects/${p.slug}`} {...handlers} className={cn("group block", cardHover)}>
+      <Link ref={ref} href={`/projects/${p.slug}`} {...handlers} className={cn("group block", cardHover, cardFill)}>
         <div className={cn("aspect-video w-full overflow-hidden", cover.className)} style={cover.style}>
           <MediaSlot project={p} playing={playing} />
         </div>
-        <p className={cn("fw-title mt-[calc(14*var(--u))]", hover, "group-hover:underline")}>{p.title}</p>
+        {/* One line: a title longer than the card ends in an ellipsis (the full one on hover). */}
+        <p title={p.title} className={cn("fw-title mt-[calc(14*var(--u))] truncate", hover, "group-hover:underline")}>
+          {p.title}
+        </p>
         <p className="fw-text text-mute">{p.line}</p>
       </Link>
     </motion.div>

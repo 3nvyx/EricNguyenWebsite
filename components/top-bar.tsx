@@ -15,7 +15,8 @@ import { PageTitleLink } from "@/components/page-title";
 export function TopBar() {
   const grid = usePathname() === "/projects";
   return (
-    <header className="flex flex-wrap items-center justify-between gap-4 px-5 pt-6 md:px-[calc(45*var(--u))] md:pt-[calc(64*var(--u))]">
+    // In the site's centred frame, lined up with the page below it.
+    <header className="flex flex-wrap items-center justify-between gap-4 px-5 pt-6 md:mx-auto md:max-w-[var(--frame)] md:px-[var(--edge)] md:pt-[calc(64*var(--u))]">
       {grid ? (
         // The arrow leads the line, so "← Projects" starts where the name does on other pages.
         <h1 className="fw-name">

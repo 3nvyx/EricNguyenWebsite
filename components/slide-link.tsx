@@ -48,6 +48,8 @@ export function slideTo(
   const root = document.documentElement;
   const id = ++slideId;
   root.dataset.slide = dir;
+  // Where the slide started, for pages that only do something coming from a particular page.
+  root.dataset.slideFrom = window.location.pathname;
 
   // Vertical slides move .page-slot as its own layer, lined up with the new page. Where the
   // slot's top sat on screen before and after lets the CSS put the old image back where it was
@@ -81,6 +83,7 @@ export function slideTo(
   transition.finished.finally(() => {
     if (id !== slideId) return;
     delete root.dataset.slide;
+    delete root.dataset.slideFrom;
   });
 }
 
@@ -127,6 +130,17 @@ export function SlideLink({
 export function useMountedInSlide() {
   const [inSlide] = useState(() => typeof document !== "undefined" && !!document.documentElement.dataset.slide);
   return inSlide;
+}
+
+/**
+ * The page the running slide started from, if this component mounted during one; otherwise null
+ * (always on the server and on first load).
+ */
+export function useSlideOrigin() {
+  const [from] = useState(() =>
+    typeof document !== "undefined" ? (document.documentElement.dataset.slideFrom ?? null) : null,
+  );
+  return from;
 }
 
 /**

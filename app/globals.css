@@ -70,6 +70,15 @@ body {
    and capped so text stays readable on small screens and doesn't balloon on large ones. */
 :root {
   --u: clamp(0.85px, calc(100vw / 1440), 1.25px);
+  /* Desktop layout: everything sits in one centred frame, compact, with open space either side.
+     --frame is its width (it shrinks to the window, less --edge each side, below that), --edge
+     the frame's own inner margin, --side the sidebar's width and --side-col its column (the
+     sidebar plus the gap before the page beside it). The sidebar pages, the projects grid's top
+     bar and page, and the footer all use these, so they line up. */
+  --frame: calc(1120 * var(--u)); /* the frame's width at most */
+  --edge: calc(45 * var(--u));
+  --side: calc(300 * var(--u));
+  --side-col: calc(340 * var(--u));
 }
 
 /* Phones get the single-column layout, so the scale stops tracking width and holds at a size
@@ -147,7 +156,11 @@ html[data-slide="back"]::view-transition-new(*) {
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* The old page only softens; it stays opaque under the arriving one, so nothing shows through. */
+/* "See more →" also reaches the grid from About and Play, where there's no cover to glide
+   from: the grid's covers stay in their cards then. (SlideLink sets data-slide-from.) */
+html[data-slide="forward"]:not([data-slide-from="/"]) .vt-card {
+  view-transition-name: none;
+}
 /* The covers: blur, then move (the group, delayed), then sharpen. */
 @keyframes card-travel {
   0% { filter: none; }
@@ -168,6 +181,7 @@ html[data-slide]::view-transition-new(*.vt-card) {
   object-fit: cover;
 }
 
+/* The old page only softens; it stays opaque under the arriving one, so nothing shows through. */
 @keyframes page-dissolve { to { filter: blur(14px) grayscale(1); } }
 @keyframes page-arrive { from { opacity: 0; } }
 html[data-slide="forward"]::view-transition-old(root),

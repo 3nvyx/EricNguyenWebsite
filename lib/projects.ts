@@ -25,7 +25,9 @@ export const PROJECTS: Project[] = [
     dates: "Nov 2026",
     tags: ["XR", "Meta Quest", "Voice AI", "Hackathon"],
     stack: "Unity / C# / Python / World Labs",
-    media: "/media/zap.gif",
+    // The name animation from the headset build (ZapIntro.mp4), then three moments from the
+    // headset tour: the Great Wall, the wormhole to the biology lab, the ribosome.
+    media: "/media/zap-intro.mp4",
   },
   {
     slug: "luyten",
