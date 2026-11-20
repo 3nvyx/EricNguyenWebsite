@@ -1,72 +1,37 @@
 import type { Metadata } from "next";
-import { ABOUT, ABOUT_INTRO } from "@/lib/about";
+import { ABOUT_BRIEF, FEATURED_ABOUT } from "@/lib/about";
 import { cn, hoverLink, pageMain } from "@/lib/utils";
-import { PageTitle } from "@/components/page-title";
+import { PageTitle, PageTitleLink } from "@/components/page-title";
+import { AboutSectionBlock } from "@/components/about-sections";
+import { NudgeArrow } from "@/components/nudge-arrow";
+import { SlideLink } from "@/components/slide-link";
 
 export const metadata: Metadata = { title: "About" };
 
-// Same rhythm as the project rows: label over a hairline, then a left column and a right column.
+/**
+ * A short preview: a few lines on who Eric is and the skills (the featured sections in
+ * lib/about.ts), no photo. Like home and the projects grid, the title and "See more about me"
+ * slide to the full page (/about/more): the photo, the whole intro and every section.
+ */
 export default function AboutPage() {
   return (
     <main className={pageMain}>
-      <PageTitle>About</PageTitle>
+      <PageTitle>
+        <PageTitleLink href="/about/more" dir="forward" vtName="about-title">
+          About
+        </PageTitleLink>
+      </PageTitle>
       <div className="flex flex-col gap-[calc(45*var(--u))]">
-        {/* The photo sits beside the intro as its own column, so no line wraps under it. Stacked on phones. */}
-        <section className="fw-text flex max-w-[calc(820*var(--u))] flex-col gap-[calc(20*var(--u))] md:flex-row md:gap-[calc(27*var(--u))]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/eric-portrait.jpg"
-            alt="Eric Nguyen"
-            width={800}
-            height={1201}
-            className="aspect-square w-[calc(160*var(--u))] min-w-28 shrink-0 object-cover object-[50%_28%] md:mt-[calc(8*var(--u))]"
-          />
-          <div className="space-y-[calc(16*var(--u))]">
-            {ABOUT_INTRO.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-          </div>
-        </section>
-        {ABOUT.map((section) => (
-          <section key={section.label}>
-            <h2 className="fw-label">{section.label}</h2>
-            <ul
-              className={cn(
-                "flex flex-col",
-                section.compact ? "gap-[calc(10*var(--u))]" : "gap-[calc(36*var(--u))]",
-              )}
-            >
-              {section.entries.map((e) => (
-                <li
-                  key={`${e.when}-${e.title}`}
-                  className="grid gap-1 md:grid-cols-[calc(279*var(--u))_minmax(0,1fr)] md:gap-[calc(27*var(--u))]"
-                >
-                  <p className="fw-text text-mute">{e.when}</p>
-                  {section.compact ? (
-                    <p className="fw-text">{e.title}</p>
-                  ) : (
-                    <div>
-                      <p className="fw-title">{e.title}</p>
-                      {e.where && <p className="fw-text text-mute">{e.where}</p>}
-                      {e.line && <p className="fw-text mt-[calc(10*var(--u))]">{e.line}</p>}
-                      {e.link && (
-                        <a
-                          href={e.link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={cn("fw-text mt-[calc(6*var(--u))] inline-block", hoverLink)}
-                        >
-                          {e.link.label}
-                          <span className="ml-0.5 align-top text-[0.75em]">↗</span>
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
+        <p className="fw-text max-w-[calc(640*var(--u))]">{ABOUT_BRIEF}</p>
+        {FEATURED_ABOUT.map((section) => (
+          <AboutSectionBlock key={section.label} section={section} />
         ))}
+        <p className="fw-label">
+          <SlideLink href="/about/more" dir="forward" className={cn("group inline-flex items-baseline", hoverLink)}>
+            SEE MORE ABOUT ME
+            <NudgeArrow />
+          </SlideLink>
+        </p>
       </div>
     </main>
   );

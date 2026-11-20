@@ -29,11 +29,17 @@ type Power = "split" | "wide" | "short";
 type Block = { x: number; y: number; hp: number; tough: boolean; power?: Power };
 type Ball = { x: number; y: number; vx: number; vy: number };
 type Drop = { x: number; y: number; power: Power };
-type Pop = { x: number; y: number; text: string; t: number };
+type Pop = { x: number; y: number; text: string; t: number; color: string };
 type Phase = "ready" | "playing" | "over";
 export type Result = { run: number; score: number; durationMs: number };
 
 const DROP_LABEL: Record<Power, string> = { split: "SPLIT", wide: "WIDE", short: "SHORT" };
+// Three colours, one job each: blue is the wall, green is good for you, red is bad for you.
+const BLOCK = "#6f9de0";
+const BLOCK_TOUGH = "#2b5aa6"; // darker blue: takes two hits
+const GOOD = "#1f9a6e";
+const BAD = "#e0453a";
+const DROP_COLOR: Record<Power, string> = { split: GOOD, wide: GOOD, short: BAD };
 
 const BEST_KEY = "breakout-best";
 
@@ -139,7 +145,6 @@ export function Breakout() {
     const fx = (sfx.current = createSfx());
     const css = getComputedStyle(document.documentElement);
     const ink = css.getPropertyValue("--ink").trim() || "#111";
-    const mute = css.getPropertyValue("--mute").trim() || "#777";
     const faint = css.getPropertyValue("--faint").trim() || "#bbb";
     const bone = css.getPropertyValue("--bone").trim() || "#f4f3f0";
     const font = getComputedStyle(document.body).fontFamily;
@@ -204,11 +209,11 @@ export function Breakout() {
       setResult({ run: runs.current, score: s.score, durationMs: Math.round(performance.now() - s.startedAt) });
     };
 
-    const addScore = (n: number, x: number, y: number, label?: string) => {
+    const addScore = (n: number, x: number, y: number, label?: string, color = ink) => {
       const s = state.current;
       s.score += n;
       setScore(s.score);
-      if (label) s.pops.push({ x, y, text: label, t: 0 });
+      if (label) s.pops.push({ x, y, text: label, t: 0, color });
     };
 
     const applyPower = (d: Drop) => {
@@ -229,17 +234,17 @@ export function Breakout() {
         }
         s.balls.push(...extra);
         fx.split();
-        addScore(25, cx, d.y, "SPLIT");
+        addScore(25, cx, d.y, "SPLIT", DROP_COLOR.split);
       } else if (d.power === "wide") {
         s.paddleTarget = PADDLE.wide;
         s.sizeUntil = s.elapsed + 12;
         fx.good();
-        addScore(25, cx, d.y, "WIDE");
+        addScore(25, cx, d.y, "WIDE", DROP_COLOR.wide);
       } else {
         s.paddleTarget = PADDLE.short;
         s.sizeUntil = s.elapsed + 10;
         fx.bad();
-        addScore(75, cx, d.y, "+75 SHORT");
+        addScore(75, cx, d.y, "+75 SHORT", DROP_COLOR.short);
       }
     };
 
@@ -381,7 +386,7 @@ export function Breakout() {
             const m = Math.min(5, 1 + Math.floor(s.combo / 3));
             setMult(m);
             throttled("block", () => fx.block(s.combo));
-            addScore(10 * m, k.x + BLOCK_W / 2, k.y, m > 1 ? `+${10 * m}` : undefined);
+            addScore(10 * m, k.x + BLOCK_W / 2, k.y, m > 1 ? `+${10 * m}` : undefined, BLOCK_TOUGH);
             if (k.power) s.drops.push({ x: k.x + (BLOCK_W - DROP_W) / 2, y: k.y, power: k.power });
             break;
           }
@@ -397,22 +402,26 @@ export function Breakout() {
       ctx.setTransform(scale, 0, 0, scale, 0, 0);
       ctx.clearRect(0, 0, W, H);
 
-      // Danger line: the game ends when the wall reaches it.
-      ctx.fillStyle = faint;
-      ctx.fillRect(0, PADDLE_Y - 1, W, 1);
+      // Danger line: the game ends when the wall reaches it. It warms to red as the wall closes in.
+      const lowest = s.blocks.reduce((m, k) => Math.max(m, k.y + BLOCK_H), 0);
+      const near = Math.max(0, Math.min(1, 1 - (PADDLE_Y - lowest) / (ROW_H * 4)));
+      ctx.fillStyle = near > 0 ? BAD : faint;
+      ctx.globalAlpha = near > 0 ? 0.35 + near * 0.65 : 1;
+      ctx.fillRect(0, PADDLE_Y - 1, W, near > 0 ? 2 : 1);
+      ctx.globalAlpha = 1;
 
       for (const k of s.blocks) {
         if (k.tough && k.hp === 1) {
           // A cracked tough block: just its outline left.
-          ctx.strokeStyle = ink;
+          ctx.strokeStyle = BLOCK_TOUGH;
           ctx.lineWidth = 2;
           ctx.strokeRect(k.x + 1, k.y + 1, BLOCK_W - 2, BLOCK_H - 2);
         } else {
-          ctx.fillStyle = k.tough ? ink : mute;
+          ctx.fillStyle = k.tough ? BLOCK_TOUGH : BLOCK;
           ctx.fillRect(k.x, k.y, BLOCK_W, BLOCK_H);
         }
         if (k.power) {
-          ctx.fillStyle = k.tough && k.hp === 1 ? ink : bone;
+          ctx.fillStyle = k.tough && k.hp === 1 ? BLOCK_TOUGH : bone;
           ctx.beginPath();
           ctx.arc(k.x + BLOCK_W / 2, k.y + BLOCK_H / 2, 3, 0, Math.PI * 2);
           ctx.fill();
@@ -425,26 +434,28 @@ export function Breakout() {
       for (const d of s.drops) {
         // Good drops are solid; SHORT is hollow so it reads as one to dodge.
         const bad = d.power === "short";
+        const color = DROP_COLOR[d.power];
         ctx.beginPath();
         ctx.roundRect(d.x, d.y, DROP_W, DROP_H, DROP_H / 2);
-        ctx.fillStyle = bad ? bone : ink;
+        ctx.fillStyle = bad ? bone : color;
         ctx.fill();
         if (bad) {
-          ctx.strokeStyle = ink;
+          ctx.strokeStyle = color;
           ctx.lineWidth = 1.5;
           ctx.stroke();
         }
-        ctx.fillStyle = bad ? ink : bone;
+        ctx.fillStyle = bad ? color : bone;
         ctx.fillText(DROP_LABEL[d.power], d.x + DROP_W / 2, d.y + DROP_H / 2 + 0.5);
       }
 
-      // The paddle blinks in the last two seconds of a size power-up.
+      // The paddle takes the colour of an active size power-up and blinks in its last two seconds.
       const ending = s.sizeUntil && s.sizeUntil - s.elapsed < 2;
       ctx.globalAlpha = ending && Math.floor(s.elapsed * 8) % 2 ? 0.35 : 1;
-      ctx.fillStyle = ink;
+      ctx.fillStyle = !s.sizeUntil ? ink : s.paddleTarget === PADDLE.wide ? GOOD : BAD;
       ctx.fillRect(s.paddleX, PADDLE_Y, s.paddleW, PADDLE_H);
       ctx.globalAlpha = 1;
 
+      ctx.fillStyle = ink;
       for (const b of s.balls) {
         ctx.beginPath();
         ctx.arc(b.x, b.y, BALL_R, 0, Math.PI * 2);
@@ -454,7 +465,7 @@ export function Breakout() {
       ctx.font = `600 12px ${font}`;
       for (const p of s.pops) {
         ctx.globalAlpha = 1 - p.t / 0.9;
-        ctx.fillStyle = ink;
+        ctx.fillStyle = p.color;
         ctx.fillText(p.text, p.x, p.y - p.t * 30);
       }
       ctx.globalAlpha = 1;
@@ -494,7 +505,7 @@ export function Breakout() {
       <div className="fw-small mb-[calc(10*var(--u))] flex items-center justify-between gap-4 text-mute">
         <span>
           SCORE <span className="text-ink tabular-nums">{score}</span>
-          {mult > 1 && <span className="ml-1.5 text-ink">×{mult}</span>}
+          {mult > 1 && <span className="ml-1.5 text-[#1f9a6e]">×{mult}</span>}
         </span>
         <span className="flex items-center gap-[calc(18*var(--u))]">
           <span>

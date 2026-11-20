@@ -4,7 +4,8 @@
 export type Page = { label: string; href: string; more?: { label: string; href: string } };
 
 export const PAGES: Page[] = [
-  { label: "About", href: "/about" },
+  // About's highlights; the whole story (skills and awards too) is one hover away.
+  { label: "About", href: "/about", more: { label: "See more →", href: "/about/more" } },
   // Home is the featured projects; the full grid is one hover away.
   { label: "Projects", href: "/", more: { label: "See more →", href: "/projects" } },
   // Blogs are parked for now; the tab goes to the game instead.
@@ -20,4 +21,17 @@ export function activePage(pathname: string) {
       p.href === "/" ? pathname === "/" || pathname.startsWith("/projects") : pathname.startsWith(p.href),
     ),
   );
+}
+
+/**
+ * The page whose "See more →" leads to `pathname` (the projects grid, the full About), if any.
+ * Those wide pages swap the name in the top bar for the page's title, back to it.
+ */
+export function moreOf(pathname: string) {
+  return PAGES.find((p) => p.more?.href === pathname);
+}
+
+/** The morph name for a page's title, so it glides between the page and its "See more" page. */
+export function titleMorph(page: Page) {
+  return `${page.label.toLowerCase()}-title`;
 }

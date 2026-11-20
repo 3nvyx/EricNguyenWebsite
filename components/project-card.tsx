@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
-import { useSlideOrigin } from "@/components/slide-link";
+import { SlideLink, useSlideDir, useSlideOrigin } from "@/components/slide-link";
 import { isFeatured } from "@/lib/featured";
-import { cn, hoverLink, morph } from "@/lib/utils";
+import { cn, hoverLink, morph, projectPiece } from "@/lib/utils";
 
 /** The soft background a project card takes while hovered or focused. */
 export const cardHover = cn(
@@ -122,32 +121,46 @@ export function ProjectCard({ project: p, index }: { project: Project; index: nu
   const { ref, playing, handlers } = useHoverPlay<HTMLAnchorElement>();
   // Only a slide from home has a cover to glide from ("See more →" also comes from other pages).
   const glides = useSlideOrigin() === "/" && isFeatured(p.slug);
-  const { ref: blockRef, controls, initial } = useBlockEntrance(index, glides);
+  // Coming back from a project page, the grid is simply there (that card's pieces fly home).
+  const fromProject = useSlideDir() === "close";
+  const settled = glides || fromProject;
+  const { ref: blockRef, controls, initial } = useBlockEntrance(index, settled);
   // Only home's covers have a twin to glide from. Named, the others would be lifted out of their
   // card for the transition and held where their entrance starts.
   const cover = isFeatured(p.slug) ? morph(`project-${p.slug}`, "vt-card") : undefined;
 
   return (
     <motion.div ref={blockRef} initial={initial} animate={controls} className="h-full">
-      <Link ref={ref} href={`/projects/${p.slug}`} {...handlers} className={cn("group block", cardHover, cardFill)}>
+      {/* Opening the project, each piece marked with projectPiece travels to its spot on the page. */}
+      <SlideLink
+        ref={ref}
+        href={`/projects/${p.slug}`}
+        dir="open"
+        morph={p.slug}
+        {...handlers}
+        className={cn("group block", cardHover, cardFill)}
+      >
         {/* One line, so every cover in a row starts level: the title shortens, the date doesn't. */}
         <p className="fw-label flex justify-between gap-6">
-          <span title={p.title} className="min-w-0 truncate uppercase">{p.title}</span>
-          <span className="shrink-0 whitespace-nowrap text-mute">{p.dates}</span>
+          <span {...projectPiece(p.slug, "name")} title={p.title} className="min-w-0 truncate uppercase">{p.title}</span>
+          <span {...projectPiece(p.slug, "dates")} className="shrink-0 whitespace-nowrap text-mute">{p.dates}</span>
         </p>
         {/* morph: coming from home, a featured cover blurs, glides here and sharpens. */}
-        <div className={cn("aspect-video w-full overflow-hidden", cover?.className)} style={cover?.style}>
+        <div {...projectPiece(p.slug, "cover")} className={cn("aspect-video w-full overflow-hidden", cover?.className)} style={cover?.style}>
           <MediaSlot project={p} playing={playing} />
         </div>
         {/* One line: a title longer than the card ends in an ellipsis (the full one on hover). */}
-        <p title={p.title} className={cn("fw-title mt-[calc(14*var(--u))] truncate", hoverLink, "group-hover:underline")}>
-          {p.title}
+        {/* The pieces of text hug their words (w-fit), so each one scales to its twin's size. */}
+        <p className="mt-[calc(14*var(--u))] flex">
+          <span {...projectPiece(p.slug, "title")} title={p.title} className={cn("fw-title min-w-0 truncate", hoverLink, "group-hover:underline")}>
+            {p.title}
+          </span>
         </p>
-        <p className="fw-text text-mute">
+        <p {...projectPiece(p.slug, "tags")} className="fw-text w-fit max-w-full text-mute">
           {p.tags.map((t) => `#${t}`).join("  ")}
         </p>
-        <p className="fw-text mt-[calc(10*var(--u))]">{p.line}</p>
-      </Link>
+        <p {...projectPiece(p.slug, "line")} className="fw-text mt-[calc(10*var(--u))] w-fit max-w-full">{p.line}</p>
+      </SlideLink>
     </motion.div>
   );
 }

@@ -20,7 +20,7 @@ export const PROJECTS: Project[] = [
   {
     slug: "zap",
     title: "ZAP!",
-    line: "An Immerse the Bay study tool for Meta Quest: say a topic, throw it into space, and step inside its world",
+    line: "A spatial knowledge space for Meta Quest: say a topic, throw it into place, and step inside its world",
     href: "https://zap-eosin.vercel.app",
     dates: "Nov 2026",
     tags: ["XR", "Meta Quest", "Voice AI", "Hackathon"],

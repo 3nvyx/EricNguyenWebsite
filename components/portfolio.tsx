@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import type { Project } from "@/lib/projects";
 import { FEATURED } from "@/lib/featured";
 import { MediaSlot } from "@/components/media-slot";
+import { NudgeArrow } from "@/components/nudge-arrow";
 import { cardFill, cardHover, useHoverPlay } from "@/components/project-card";
 import { PageTitle, PageTitleLink } from "@/components/page-title";
 import { SlideLink, useMountedInSlide } from "@/components/slide-link";
@@ -37,24 +38,6 @@ function FeaturedProject({ project: p, index: i }: { project: Project; index: nu
         <p className="fw-text text-mute">{p.line}</p>
       </Link>
     </motion.div>
-  );
-}
-
-/**
- * The arrow after "See all projects". Once the link scrolls into view it hops forward twice,
- * rests, and repeats, so the way onward is easy to spot. Still for reduced-motion users.
- */
-function NudgeArrow() {
-  const still = useReducedMotion();
-  return (
-    <motion.span
-      aria-hidden
-      className="ml-[calc(8*var(--u))] inline-block"
-      whileInView={still ? undefined : { x: [0, 6, 0, 4, 0] }}
-      transition={{ duration: 0.9, ease: "easeOut", repeat: Infinity, repeatDelay: 1.4 }}
-    >
-      →
-    </motion.span>
   );
 }
 

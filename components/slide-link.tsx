@@ -12,15 +12,40 @@ import { useLayoutEffect, useState, type ComponentProps } from "react";
  * page comes up from below / down from above, joined to the old one (the sidebar holds still;
  * see .page-slot in app/(site)/layout.tsx). Desktop only: on phones the sidebar sits above the
  * page, so these fall back to a plain navigation.
+ * `open` / `close`: a card on the projects grid and its project's page. The card's pieces (cover,
+ * label, title, tags, line) each travel to their spot on the other page as the page fades over.
+ * Pass `morph` (the project's slug) so slideTo can find them: see nameMorphs.
  */
-export type SlideDir = "forward" | "back" | "up" | "down";
+export type SlideDir = "forward" | "back" | "up" | "down" | "open" | "close";
 
 // The open view transition's "the new page is in the DOM" signal. SlideNavDone calls it.
 let finishNav: (() => void) | null = null;
 // Which slide is current, so an earlier transition finishing late can't undo a newer one.
 let slideId = 0;
+// Which slide last named each morph piece, so a slide only clears the names it still owns.
+const pieceOwner = new WeakMap<HTMLElement, number>();
 
 type Router = ReturnType<typeof useRouter>;
+
+/**
+ * Names the elements marked `data-morph-key={key}` for this transition, each with its
+ * `data-morph-name`, and returns them. Only the one card and its project page carry a key's marks,
+ * so the names stay unique; they're set inline just for the slide (cleared when it finishes).
+ * `onScreen` names only the pieces in view: leaving a page scrolled far down, its header's pieces
+ * would otherwise fly in from far off screen, so they stay with the page instead.
+ */
+function nameMorphs(key: string, id: number, onScreen = false) {
+  const els = [...document.querySelectorAll<HTMLElement>(`[data-morph-key="${CSS.escape(key)}"]`)].filter((el) => {
+    if (!onScreen) return true;
+    const r = el.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight;
+  });
+  for (const el of els) {
+    el.style.viewTransitionName = el.dataset.morphName ?? "none";
+    pieceOwner.set(el, id);
+  }
+  return els;
+}
 
 /** Whether a slide can run here; otherwise the caller navigates plainly. */
 function canSlide(dir: SlideDir) {
@@ -40,10 +65,12 @@ export function slideTo(
   router: Router,
   href: string,
   dir: SlideDir,
-  { replace, scroll }: { replace?: boolean; scroll?: boolean } = {},
+  { replace, scroll, morph }: { replace?: boolean; scroll?: boolean; morph?: string } = {},
 ) {
-  const go = () => (replace ? router.replace(href, { scroll }) : router.push(href, { scroll }));
-  if (!canSlide(dir)) return go();
+  if (!canSlide(dir)) return replace ? router.replace(href, { scroll }) : router.push(href, { scroll });
+  // Back to the grid, finish scrolls the card into view itself, so Next mustn't jump to the top.
+  const slideScroll = dir === "close" && morph ? false : scroll;
+  const go = () => (replace ? router.replace(href, { scroll: slideScroll }) : router.push(href, { scroll: slideScroll }));
 
   const root = document.documentElement;
   const id = ++slideId;
@@ -58,17 +85,37 @@ export function slideTo(
   const top = () => `${slot()?.getBoundingClientRect().top ?? 0}px`;
   root.style.setProperty("--slide-old-top", top());
   root.style.setProperty("--slide-new-top", "0px");
+  // The old page's pieces are named now; the new page's once it's in the DOM (in finish).
+  const named = morph ? nameMorphs(morph, id, true) : [];
+  const clearNames = () => {
+    for (const el of named) {
+      if (pieceOwner.get(el) !== id) continue;
+      el.style.viewTransitionName = "";
+      pieceOwner.delete(el);
+    }
+  };
+  // Set once the new page is captured or the wait gave up: a route committing later is too late.
+  let settled = false;
 
   const transition = document.startViewTransition(
     () =>
       new Promise<void>((resolve) => {
         const done = () => {
+          settled = true;
           clearTimeout(timeout);
           if (finishNav === finish) finishNav = null;
           resolve();
         };
         // Runs after Next has scrolled the new page into view.
         const finish = () => {
+          if (settled) return;
+          if (morph) {
+            const arrived = nameMorphs(morph, id);
+            named.push(...arrived);
+            // Back on the grid: bring the whole card being returned to into view, so its pieces
+            // land on screen (Next was told not to jump to the top; see slideScroll).
+            if (dir === "close") (arrived[0]?.closest("a") ?? arrived[0])?.scrollIntoView({ block: "center" });
+          }
           root.style.setProperty("--slide-new-top", top());
           done();
         };
@@ -81,6 +128,7 @@ export function slideTo(
   // ready rejects when a transition is skipped (e.g. a newer one starts); nothing to do then.
   transition.ready.catch(() => {});
   transition.finished.finally(() => {
+    clearNames();
     if (id !== slideId) return;
     delete root.dataset.slide;
     delete root.dataset.slideFrom;
@@ -99,8 +147,9 @@ export function SlideLink({
   onClick,
   replace,
   scroll,
+  morph,
   ...props
-}: Omit<ComponentProps<typeof Link>, "href"> & { href: string; dir: SlideDir }) {
+}: Omit<ComponentProps<typeof Link>, "href"> & { href: string; dir: SlideDir; morph?: string }) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -116,7 +165,7 @@ export function SlideLink({
         if (href === pathname || !canSlide(dir)) return;
         // Stopping the default here also stops Link's own navigation; slideTo navigates instead.
         e.preventDefault();
-        slideTo(router, href, dir, { replace: replace ?? undefined, scroll: scroll ?? undefined });
+        slideTo(router, href, dir, { replace: replace ?? undefined, scroll: scroll ?? undefined, morph });
       }}
     />
   );
@@ -141,6 +190,17 @@ export function useSlideOrigin() {
     typeof document !== "undefined" ? (document.documentElement.dataset.slideFrom ?? null) : null,
   );
   return from;
+}
+
+/**
+ * The direction of the slide this component mounted during, if any; otherwise null (always on
+ * the server and on first load).
+ */
+export function useSlideDir() {
+  const [dir] = useState(() =>
+    typeof document !== "undefined" ? ((document.documentElement.dataset.slide as SlideDir | undefined) ?? null) : null,
+  );
+  return dir;
 }
 
 /**

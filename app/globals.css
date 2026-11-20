@@ -196,6 +196,58 @@ html[data-slide="back"]::view-transition-new(root) {
 html[data-slide="forward"]::view-transition-old(sidebar) { animation-name: sidebar-away; }
 html[data-slide="back"]::view-transition-new(sidebar) { animation-name: sidebar-return; }
 
+/* A card on the grid and its project's page (`open` / `close`): the card's pieces (cover, label,
+   title, tags, line; marked with projectPiece in lib/utils.ts, named by slideTo) each travel to
+   their twin on the other page, all on one curve so they move as a block. The new page fades up
+   over the old one, which holds still. No blur and no grey here. */
+html[data-slide="open"]::view-transition-group(*),
+html[data-slide="close"]::view-transition-group(*) {
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+html[data-slide="open"]::view-transition-old(root),
+html[data-slide="close"]::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-slide="open"]::view-transition-new(root),
+html[data-slide="close"]::view-transition-new(root) {
+  animation: page-arrive 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  mix-blend-mode: normal;
+}
+/* The pieces cross-fade into their twins over the same 0.7s as they travel. */
+html[data-slide="open"]::view-transition-old(*),
+html[data-slide="open"]::view-transition-new(*),
+html[data-slide="close"]::view-transition-old(*),
+html[data-slide="close"]::view-transition-new(*) {
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+/* The text pieces wrap differently on each page, so they keep their own size and only move,
+   cross-fading into their twin. The title scales by its height, growing evenly into the heading. */
+html[data-slide]::view-transition-old(project-name),
+html[data-slide]::view-transition-new(project-name),
+html[data-slide]::view-transition-old(project-dates),
+html[data-slide]::view-transition-new(project-dates),
+html[data-slide]::view-transition-old(project-tags),
+html[data-slide]::view-transition-new(project-tags),
+html[data-slide]::view-transition-old(project-line),
+html[data-slide]::view-transition-new(project-line) {
+  width: auto;
+  height: auto;
+}
+html[data-slide]::view-transition-old(project-title),
+html[data-slide]::view-transition-new(project-title) {
+  width: auto;
+  height: 100%;
+}
+/* The grid's covers are 16:9 and a project's own may not be: fill and crop, never stretch. */
+html[data-slide]::view-transition-old(project-cover),
+html[data-slide]::view-transition-new(project-cover) {
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Tab switches beside the sidebar (`up` / `down`): only .page-slot moves, like scrolling one long
    page. The next page is joined to the edge of the screen and both travel together by one
    screen height on the same curve, so nothing fades and there is never a gap. Each page is

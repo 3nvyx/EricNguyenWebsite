@@ -8,6 +8,7 @@ import { PageTitleLink } from "@/components/page-title";
 import { SlideLink } from "@/components/slide-link";
 import { ICON } from "@/lib/icons";
 import { LINKS } from "@/lib/projects";
+import { moreOf, titleMorph } from "@/lib/pages";
 
 const [GITHUB, , , LINKEDIN] = LINKS;
 const SOCIAL = [
@@ -17,22 +18,24 @@ const SOCIAL = [
 
 /**
  * For pages without the sidebar: the name (home) on the left, the page tabs on the right, at the
- * same height as the sidebar pages' tops so the title glides straight across. On the
- * projects grid the left spot holds the page's title instead, back to home: coming from home,
- * the "Projects" title glides here as the sidebar leaves (see SlideLink). The grid's right side
- * has the name (home, with the slide back) and the GitHub and LinkedIn marks, like the top of
- * the sidebar, instead of the page tabs.
+ * same height as the sidebar pages' tops so the title glides straight across. On a "See more"
+ * page (the projects grid, the full About) the left spot holds the page's title instead, back to
+ * where it came from: the "Projects" or "About" title glides here as the sidebar leaves (see
+ * SlideLink). Their right side has the name (home, with the slide back) and the GitHub and
+ * LinkedIn marks, like the top of the sidebar, instead of the page tabs.
  */
 export function TopBar() {
-  const grid = usePathname() === "/projects";
+  // On a "See more" page (the projects grid, the full About), the page it came from.
+  const from = moreOf(usePathname());
+  const grid = !!from;
   return (
     // In the site's centred frame, lined up with the page below it.
     <header className="flex flex-wrap items-center justify-between gap-4 px-5 pt-6 md:mx-auto md:max-w-[var(--frame)] md:px-[var(--edge)] md:pt-[calc(64*var(--u))]">
-      {grid ? (
+      {from ? (
         // The arrow leads the line, so "← Projects" starts where the name does on other pages.
         <h1 className="fw-name">
-          <PageTitleLink href="/" dir="back" vtName="projects-title" inline>
-            Projects
+          <PageTitleLink href={from.href} dir="back" vtName={titleMorph(from)} inline>
+            {from.label}
           </PageTitleLink>
         </h1>
       ) : (

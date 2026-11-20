@@ -8,8 +8,11 @@ export type AboutEntry = {
   link?: { label: string; href: string };
 };
 
-/** compact: one-line rows (awards, skills) instead of the full title / where / line block. */
-export type AboutSection = { label: string; entries: AboutEntry[]; compact?: boolean };
+/**
+ * compact: one-line rows (awards, skills) instead of the full title / where / line block.
+ * featured: shown on /about itself (a short preview); every section is on the full page (/about/more).
+ */
+export type AboutSection = { label: string; entries: AboutEntry[]; compact?: boolean; featured?: boolean };
 
 // First-person intro shown above the sections: who Eric is, not the resume (that's below).
 export const ABOUT_INTRO: string[] = [
@@ -19,10 +22,15 @@ export const ABOUT_INTRO: string[] = [
   "I am a product engineer working in hardware and software. I work alongside the people doing the job and make the slow, manual parts disappear. I am currently seeking a summer 2027 internship.",
 ];
 
+// The short version for /about itself: who Eric is in a few lines, before the skills.
+export const ABOUT_BRIEF =
+  "I'm Eric, a product engineer working in hardware and software. I work alongside the people doing the job and make the slow, manual parts disappear. I'm currently seeking a summer 2027 internship.";
+
 export const ABOUT: AboutSection[] = [
   {
     label: "SKILLS",
     compact: true,
+    featured: true,
     entries: [
       { when: "Languages", title: "TypeScript, JavaScript, Python, C++, SQL, HTML / CSS" },
       { when: "Frontend", title: "React, Next.js, SvelteKit, React Router, Vite, Tailwind CSS, shadcn/ui" },
@@ -91,3 +99,5 @@ export const ABOUT: AboutSection[] = [
     ],
   },
 ];
+
+export const FEATURED_ABOUT = ABOUT.filter((s) => s.featured);

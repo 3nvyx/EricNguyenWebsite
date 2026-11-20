@@ -32,3 +32,12 @@ export function morph(name: string, kind?: string) {
     style: { "--vt-name": name, ...(kind && { "--vt-class": kind }) } as React.CSSProperties,
   };
 }
+
+/**
+ * Marks one piece of a project (its cover, label, title...) that travels between its card on the
+ * projects grid and its project page during an `open` / `close` slide. Spread it on the element on
+ * both pages; slideTo names the pieces of that one project for the slide (components/slide-link.tsx).
+ */
+export function projectPiece(slug: string, piece: "cover" | "name" | "dates" | "title" | "tags" | "line") {
+  return { "data-morph-key": slug, "data-morph-name": `project-${piece}` };
+}

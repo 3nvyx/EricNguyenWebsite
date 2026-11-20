@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SlideLink } from "@/components/slide-link";
-import { PAGES, activePage } from "@/lib/pages";
+import { PAGES, activePage, moreOf } from "@/lib/pages";
 import { cn, hoverLink } from "@/lib/utils";
 
 /**
@@ -15,10 +15,10 @@ export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
   const pathname = usePathname();
   const active = activePage(pathname);
   const stack = layout === "stack";
-  // On the projects grid, every top-bar tab leads back to a sidebar page: run the grid's morph
-  // in reverse, so the sidebar slides back in. "See more →" would lead to the grid itself, so
-  // it's left out there.
-  const fromGrid = !stack && pathname === "/projects";
+  // On a "See more" page (the projects grid, the full About), every top-bar tab leads back to a
+  // sidebar page: run the morph in reverse, so the sidebar slides back in. The "See more →"
+  // links are left out there.
+  const fromGrid = !stack && !!moreOf(pathname);
   return (
     <nav aria-label="Pages">
       <ul className={cn("fw-nav flex gap-6", layout === "row" && "md:gap-[calc(27*var(--u))]")}>
