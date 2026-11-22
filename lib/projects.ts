@@ -15,7 +15,7 @@ export type Project = {
   aspect?: string;
 };
 
-/** Newest first, by when each was started. The first three are the featured rows; the rest are listed under MORE. */
+/** Newest first, by when each was started. Which four are featured is set in lib/featured.ts. */
 export const PROJECTS: Project[] = [
   {
     slug: "zap",

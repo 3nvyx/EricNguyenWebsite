@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Unbounded, Instrument_Sans } from "next/font/google";
 import { Footer } from "@/components/footer";
+import { FooterFrame } from "@/components/footer-frame";
 import { SlideNavDone } from "@/components/slide-link";
 import "./globals.css";
 
@@ -61,7 +62,9 @@ export default function RootLayout({
     <html lang="en" className={`${unbounded.variable} ${instrumentSans.variable}`}>
       <body className="fw">
         {children}
-        <Footer />
+        <FooterFrame>
+          <Footer />
+        </FooterFrame>
         <SlideNavDone />
         <Analytics />
       </body>

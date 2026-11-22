@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SectionLink, useCurrentPage } from "@/components/sections";
 import { SlideLink } from "@/components/slide-link";
-import { PAGES, activePage, moreOf } from "@/lib/pages";
+import { PAGES, moreOf } from "@/lib/pages";
 import { cn, hoverLink } from "@/lib/utils";
 
 /**
@@ -13,10 +13,10 @@ import { cn, hoverLink } from "@/lib/utils";
  */
 export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
   const pathname = usePathname();
-  const active = activePage(pathname);
+  const active = useCurrentPage();
   const stack = layout === "stack";
   // On a "See more" page (the projects grid, the full About), every top-bar tab leads back to a
-  // sidebar page: run the morph in reverse, so the sidebar slides back in. The "See more →"
+  // section of home: run the morph in reverse, so the sidebar slides back in. The "See more →"
   // links are left out there.
   const fromGrid = !stack && !!moreOf(pathname);
   return (
@@ -32,9 +32,9 @@ export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
                   {it.label}
                 </SlideLink>
               ) : (
-                <Link href={it.href} aria-current={i === active ? "page" : undefined} className={className}>
+                <SectionLink index={i} aria-current={i === active ? "page" : undefined} className={className}>
                   {it.label}
-                </Link>
+                </SectionLink>
               )}
               {more && (
                 // Revealed on hover: to the right in the sidebar, underneath in the top bar. The

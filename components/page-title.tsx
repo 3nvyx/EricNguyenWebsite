@@ -1,9 +1,20 @@
 import { SlideLink } from "@/components/slide-link";
 import { cn, hoverLink, morph } from "@/lib/utils";
 
-/** The page's title at the top of its column, at the reference's brand-title size. */
-export function PageTitle({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <h1 className={cn("fw-name mb-[calc(36*var(--u))]", className)}>{children}</h1>;
+/**
+ * The page's title at the top of its column, at the reference's brand-title size. `as="h2"` for
+ * the sections after the first on home, which share one page.
+ */
+export function PageTitle({
+  as: Tag = "h1",
+  children,
+  className,
+}: {
+  as?: "h1" | "h2";
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <Tag className={cn("fw-name mb-[calc(36*var(--u))]", className)}>{children}</Tag>;
 }
 
 /**

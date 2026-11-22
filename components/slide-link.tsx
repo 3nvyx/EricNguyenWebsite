@@ -22,6 +22,10 @@ export type SlideDir = "forward" | "back" | "up" | "down" | "open" | "close";
 let finishNav: (() => void) | null = null;
 // Which slide is current, so an earlier transition finishing late can't undo a newer one.
 let slideId = 0;
+// Set by slideTo for an href with a #section: once that route is in the DOM, SlideNavDone scrolls
+// the section into view before the slide's "after" picture. Any other route arriving (the slide
+// never landed) just clears it.
+let landAt: { path: string; id: string } | null = null;
 // Which slide last named each morph piece, so a slide only clears the names it still owns.
 const pieceOwner = new WeakMap<HTMLElement, number>();
 
@@ -47,6 +51,19 @@ function nameMorphs(key: string, id: number, onScreen = false) {
   return els;
 }
 
+/**
+ * Takes the morph name (morph() in lib/utils.ts) off every marked piece that's off screen, for
+ * this slide, and returns them so it can be put back.
+ */
+function dropOffscreen() {
+  return [...document.querySelectorAll<HTMLElement>(".vt-name")].filter((el) => {
+    const r = el.getBoundingClientRect();
+    if (r.bottom > 0 && r.top < window.innerHeight) return false;
+    el.style.viewTransitionName = "none";
+    return true;
+  });
+}
+
 /** Whether a slide can run here; otherwise the caller navigates plainly. */
 function canSlide(dir: SlideDir) {
   if (!document.startViewTransition) return false;
@@ -59,15 +76,22 @@ function canSlide(dir: SlideDir) {
  * Navigates to `href` inside a slide when the browser can show one, and plainly otherwise. For
  * navigation that doesn't start from a link click (the sidebar's arc turned by the wheel).
  * Pages that mount during a slide can skip their own entrance fades with useMountedInSlide, so
- * they arrive fully drawn instead of fading in mid-slide.
+ * they arrive fully drawn instead of fading in mid-slide. An href with a #section (/#projects)
+ * lands on that section of the page.
  */
 export function slideTo(
   router: Router,
   href: string,
   dir: SlideDir,
-  { replace, scroll, morph }: { replace?: boolean; scroll?: boolean; morph?: string } = {},
+  { replace, scroll: scrollOpt, morph }: { replace?: boolean; scroll?: boolean; morph?: string } = {},
 ) {
-  if (!canSlide(dir)) return replace ? router.replace(href, { scroll }) : router.push(href, { scroll });
+  // Without a slide, Next scrolls to the #section itself.
+  if (!canSlide(dir)) return replace ? router.replace(href, { scroll: scrollOpt }) : router.push(href, { scroll: scrollOpt });
+  // Landing on a section, SlideNavDone does the scrolling, so Next mustn't jump to the top first.
+  const [rawPath, section] = href.split("#");
+  const path = rawPath || "/";
+  landAt = section ? { path, id: section } : null;
+  const scroll = section ? false : scrollOpt;
   // Back to the grid, finish scrolls the card into view itself, so Next mustn't jump to the top.
   const slideScroll = dir === "close" && morph ? false : scroll;
   const go = () => (replace ? router.replace(href, { scroll: slideScroll }) : router.push(href, { scroll: slideScroll }));
@@ -75,8 +99,12 @@ export function slideTo(
   const root = document.documentElement;
   const id = ++slideId;
   root.dataset.slide = dir;
-  // Where the slide started, for pages that only do something coming from a particular page.
+  // Where the slide started and where it's going, for morphs between one pair of pages only.
   root.dataset.slideFrom = window.location.pathname;
+  root.dataset.slideTo = path;
+  // Between home and a "See more" page, only what's on screen at each end morphs: home is one
+  // long page, and a piece far off screen would fly in from (or out to) there.
+  const offscreen = dir === "forward" || dir === "back" ? dropOffscreen() : [];
 
   // Vertical slides move .page-slot as its own layer, lined up with the new page. Where the
   // slot's top sat on screen before and after lets the CSS put the old image back where it was
@@ -116,6 +144,7 @@ export function slideTo(
             // land on screen (Next was told not to jump to the top; see slideScroll).
             if (dir === "close") (arrived[0]?.closest("a") ?? arrived[0])?.scrollIntoView({ block: "center" });
           }
+          if (dir === "forward" || dir === "back") offscreen.push(...dropOffscreen());
           root.style.setProperty("--slide-new-top", top());
           done();
         };
@@ -129,9 +158,13 @@ export function slideTo(
   transition.ready.catch(() => {});
   transition.finished.finally(() => {
     clearNames();
+    for (const el of offscreen) if (el.style.viewTransitionName === "none") el.style.viewTransitionName = "";
+    // A slide that never landed mustn't scroll a later page to its section.
+    if (landAt?.path === path) landAt = null;
     if (id !== slideId) return;
     delete root.dataset.slide;
     delete root.dataset.slideFrom;
+    delete root.dataset.slideTo;
   });
 }
 
@@ -205,11 +238,16 @@ export function useSlideDir() {
 
 /**
  * Mounted once in the root layout. When the pathname changes, the new route has committed to
- * the DOM, so the view transition can take its "after" snapshot.
+ * the DOM, so the view transition can take its "after" snapshot (after scrolling to the section
+ * slideTo was asked to land on).
  */
 export function SlideNavDone() {
   const pathname = usePathname();
   useLayoutEffect(() => {
+    if (landAt) {
+      if (landAt.path === pathname) document.getElementById(landAt.id)?.scrollIntoView({ behavior: "instant" });
+      landAt = null;
+    }
     finishNav?.();
     finishNav = null;
   }, [pathname]);

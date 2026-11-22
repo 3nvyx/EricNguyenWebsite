@@ -1,7 +1,7 @@
 import { Sidebar } from "@/components/sidebar";
 
 /**
- * Projects, About and Blogs: the sticky sidebar beside the page. It sticks while the page
+ * Home (About, Projects and Play as one long page), Blogs and Privacy: the sticky sidebar beside the page. It sticks while the page
  * scrolls, then leaves with the content when the footer arrives. Project pages live outside
  * this group and have no sidebar.
  */

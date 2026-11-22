@@ -13,12 +13,14 @@ npm run dev
 
 | Route | File | What's there |
 | --- | --- | --- |
-| `/` | `components/portfolio.tsx` | Sidebar intro, featured projects, the rest as a list |
-| `/projects` | `app/(wide)/projects/page.tsx` | Every project as a card grid |
+| `/` | `app/(site)/page.tsx` | One long page: About (photo, short intro, skills), the four featured projects, and Breakout with a shared leaderboard |
+| `/about/more` | `app/(wide)/about/more/page.tsx` | The full About: whole intro, experience, leadership, skills, awards |
+| `/projects/all` | `app/(wide)/projects/all/page.tsx` | Every project as a card grid |
 | `/projects/<slug>` | `components/project-detail.tsx` | Write-up with facts strip, figures, video and an on-this-page index |
-| `/about` | `app/(site)/about/page.tsx` | Bio and experience, from `lib/about.ts` |
-| `/play` | `components/breakout.tsx` | Breakout with a shared leaderboard |
 | `/blogs`, `/privacy` | `app/(site)/…` | Posts from `lib/posts.ts`; privacy note |
+
+The sidebar tabs follow home's sections and glide to them (`components/sections.tsx`).
+`/about`, `/projects` and `/play` redirect to `/`, `/#projects` and `/#play`.
 
 ![Home](docs/readme/home.png)
 

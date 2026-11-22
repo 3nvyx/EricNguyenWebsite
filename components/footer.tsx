@@ -18,10 +18,10 @@ const SOCIAL = [
 
 /**
  * Site footer, modelled on the Rakuten Fashion Week footer: a full-width ink bar with the name,
- * three stacked link columns, and social marks plus copyright. It's the same on every page and
- * lays itself out by the window's width: on wide screens three zones across (name left, links
- * centred, marks right); at tablet width the name and the marks share the top row with the
- * links beneath; on phones it stacks. Measurements are design pixels at 1440 (see globals.css).
+ * three stacked link columns, and social marks plus copyright. FooterFrame lines it up with the
+ * frame on pages that have one. It lays itself out by the window's
+ * width: on wide screens three zones across (name left, links centred, marks right); at tablet
+ * width the name and the marks share the top row with the links beneath; on phones it stacks. Measurements are design pixels at 1440 (see globals.css).
  */
 export function Footer() {
   return (
@@ -30,6 +30,8 @@ export function Footer() {
       <div
         className={cn(
           "grid gap-8 px-5 py-8",
+          // On the framed pages, in their centred frame (components/footer-frame.tsx).
+          "md:group-data-[framed]:mx-auto md:group-data-[framed]:max-w-[var(--frame)]",
           "md:grid-cols-[1fr_auto] md:gap-x-[calc(45*var(--u))] md:gap-y-[calc(27*var(--u))] md:px-[var(--edge)] md:py-[calc(26.25*var(--u))]",
           "lg:grid-cols-[1fr_auto_1fr] lg:gap-y-0",
         )}
@@ -46,10 +48,10 @@ export function Footer() {
           className="fw-small flex gap-[calc(27*var(--u))] md:col-span-2 md:row-start-2 lg:col-span-1 lg:col-start-2 lg:row-start-1"
         >
             <ul className="flex flex-col">
-              <li><Link href="/about" className={link}>ABOUT</Link></li>
-              <li><Link href="/projects" className={link}>PROJECTS</Link></li>
+              <li><Link href="/" className={link}>ABOUT</Link></li>
+              <li><Link href="/#projects" className={link}>PROJECTS</Link></li>
               {/* <li><Link href="/blogs" className={link}>BLOGS</Link></li> */}
-              <li><Link href="/play" className={link}>PLAY</Link></li>
+              <li><Link href="/#play" className={link}>PLAY</Link></li>
             </ul>
             <ul className="flex flex-col">
               <li><a href={RESUME.href} {...ext} className={link}>RESUME</a></li>

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { SlideLink, slideTo, type SlideDir } from "@/components/slide-link";
-import { PAGES, activePage } from "@/lib/pages";
+import { SlideLink } from "@/components/slide-link";
+import { SectionLink, useCurrentPage, useGoToPage } from "@/components/sections";
+import { PAGES } from "@/lib/pages";
 // The blob behind the tabs is switched off for now; see the commented-out FluidBlob below.
 // import { FluidBlob } from "@/components/fluid-blob";
 import { cn, hoverLink } from "@/lib/utils";
@@ -11,16 +11,15 @@ import { cn, hoverLink } from "@/lib/utils";
 /*
  * The desktop sidebar's page tabs (once set on an arc, hence the name). They hold still in a
  * close column, About on top and Play at the bottom; the current one is larger, and the others
- * smaller and fainter the further they are, and switching pages just grows one and shrinks the
- * other. A short bar to their left, a solid track with a marker one page tall, shows how many
- * pages there are and which one you're on; the marker slides as the page changes.
+ * smaller and fainter the further they are, and switching just grows one and shrinks the other.
+ * A short bar to their left, a solid track with a marker one page tall, shows how many pages
+ * there are and which one you're on; the marker slides as that changes.
  *
- * Clicking a tab, or turning the mouse wheel over the tabs (one notch, one page), changes page
- * and slides the page beside it (SlideLink's `up` / `down`); the tabs' sizes and the marker ease
- * on the same curve and timing, so they move with the page. Phones keep the plain tab row
- * (PageTabs).
+ * About, Projects and Play are sections of one long home page (components/sections.tsx): the
+ * tabs follow the scroll, and clicking a tab, or turning the mouse wheel over the tabs (one
+ * notch, one section), glides the page there. Phones keep the plain tab row (PageTabs).
  *
- * Over the tabs and the bar the wheel changes page; anywhere else it scrolls the page.
+ * Over the tabs and the bar the wheel changes section; anywhere else it scrolls the page.
  *
  * (Switched off for now: a black jelly blob behind the tabs, bulging in from the screen's left
  * edge, with the tabs in light on it; components/fluid-blob.tsx. To bring it back, uncomment it
@@ -52,13 +51,14 @@ const EASE = cubicBezier(0.32, 0.72, 0, 1);
 const N = PAGES.length;
 
 export function ArcTabs({ className }: { className?: string }) {
-  const router = useRouter();
-  const active = activePage(usePathname());
+  const active = useCurrentPage();
   const pos = useArcPosition(active);
   const navRef = useRef<HTMLElement>(null);
-
-  // A tab below the current one slides its page up from below.
-  const dirTo = (i: number): SlideDir => (i > active ? "up" : "down");
+  const goTo = useGoToPage();
+  const goRef = useRef(goTo);
+  useEffect(() => {
+    goRef.current = goTo;
+  }, [goTo]);
 
   // The wheel moves one page per notch. A trackpad sends a stream of small events for
   // one swipe, so after a step the wheel stays locked until the stream goes quiet and the turn
@@ -91,16 +91,15 @@ export function ArcTabs({ className }: { className?: string }) {
       settled = false;
       const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       lockedUntil = performance.now() + (still ? 0 : DURATION);
-      const step = next - targetRef.current;
       targetRef.current = next;
-      slideTo(router, PAGES[next].href, step > 0 ? "up" : "down");
+      goRef.current(next);
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       el.removeEventListener("wheel", onWheel);
       clearTimeout(quiet);
     };
-  }, [router]);
+  }, []);
 
   return (
     // The nav takes no pointer events itself: only the bar and the tabs do, so the wheel changes
@@ -147,14 +146,13 @@ export function ArcTabs({ className }: { className?: string }) {
       <ul className={LIST}>
         {PAGES.map((it, i) => (
           <li key={it.href} className={cn(ITEM, it.more && "group")} style={place(i, i - pos)}>
-            <SlideLink
-              href={it.href}
-              dir={dirTo(i)}
+            <SectionLink
+              index={i}
               aria-current={i === active ? "page" : undefined}
               className={cn(hoverLink, "duration-300", i === active ? "text-ink" : "fw-nav-off")}
             >
               {it.label}
-            </SlideLink>
+            </SectionLink>
             {it.more && (
               // Revealed on hover, to the right of the tab. The padding bridges the gap so the
               // pointer can travel from the tab to the link.

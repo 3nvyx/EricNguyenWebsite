@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Project } from "@/lib/projects";
-import { PROJECTS } from "@/lib/projects";
+import { GRID_ORDER } from "@/lib/featured";
 import { PROJECT_DETAILS, type Fact } from "@/lib/project-details";
 import { MediaSlot } from "@/components/media-slot";
 import { Prose } from "@/components/prose";
@@ -8,6 +8,7 @@ import { cn, hoverLink, projectPiece } from "@/lib/utils";
 import { SlideLink } from "@/components/slide-link";
 import { sectionId } from "@/lib/content";
 import { OnThisPage } from "@/components/on-this-page";
+import { PROJECTS_GRID } from "@/lib/pages";
 
 const arrow = <span className="ml-0.5 align-top text-[0.75em]">↗</span>;
 
@@ -27,9 +28,10 @@ function defaultFacts(p: Project): Fact[] {
 export function ProjectDetail({ project }: { project: Project }) {
   const detail = PROJECT_DETAILS[project.slug];
   const facts = detail?.facts ?? defaultFacts(project);
-  const i = PROJECTS.findIndex((p) => p.slug === project.slug);
-  const prev = PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length];
-  const next = PROJECTS[(i + 1) % PROJECTS.length];
+  // Prev/next walk the grid's order (featured first), so they match the cards on /projects/all.
+  const i = GRID_ORDER.findIndex((p) => p.slug === project.slug);
+  const prev = GRID_ORDER[(i - 1 + GRID_ORDER.length) % GRID_ORDER.length];
+  const next = GRID_ORDER[(i + 1) % GRID_ORDER.length];
 
   const sections = (detail?.body ?? [])
     .filter((b): b is { h: string } => typeof b === "object" && "h" in b)
@@ -123,7 +125,7 @@ export function ProjectDetail({ project }: { project: Project }) {
             <span className={cn("self-start", hoverLink, "group-hover:underline")}>{prev.title}</span>
           </Link>
           <SlideLink
-            href="/projects"
+            href={PROJECTS_GRID}
             dir="close"
             morph={project.slug}
             className={cn("self-center justify-self-center", hoverLink)}

@@ -6,7 +6,7 @@ import { PageTitleLink } from "@/components/page-title";
 import { SlideLink } from "@/components/slide-link";
 import { ICON } from "@/lib/icons";
 import { LINKS } from "@/lib/projects";
-import { moreOf, titleMorph } from "@/lib/pages";
+import { PROJECTS_GRID, moreOf, titleMorph } from "@/lib/pages";
 
 const [GITHUB, , , LINKEDIN] = LINKS;
 const SOCIAL = [
@@ -56,7 +56,7 @@ export function TopBar() {
   // On a "See more" page (the projects grid, the full About), the page it came from.
   const from = moreOf(pathname);
   // On a project's page, its slug.
-  const project = pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
+  const project = !from && pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
   return (
     // In the site's centred frame, lined up with the page below it.
     <header className="flex flex-wrap items-center justify-between gap-4 px-5 pt-6 md:mx-auto md:max-w-[var(--frame)] md:px-[var(--edge)] md:pt-[calc(64*var(--u))]">
@@ -74,7 +74,7 @@ export function TopBar() {
         <>
           {project && (
             <p className="fw-name">
-              <PageTitleLink href="/projects" dir="close" slideMorph={project} inline>
+              <PageTitleLink href={PROJECTS_GRID} dir="close" slideMorph={project} inline>
                 Projects
               </PageTitleLink>
             </p>

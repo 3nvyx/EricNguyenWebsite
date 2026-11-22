@@ -129,14 +129,16 @@ body {
 /* Page slides (components/slide-link.tsx). SlideLink sets html[data-slide] for one view
    transition. Without data-slide, view transitions keep the browser's default cross-fade.
 
-   Home to the projects grid (`forward`) and back (`back`): the sidebar slides off to the left (or
-   back in), the "Projects" title glides sideways between its spot on home and the top bar's
-   corner, and the new page fades up over the old one, which holds still (no blur or grey).
-   Both are marked with morph() in lib/utils.ts; the names are on only during these slides.
+   Home to a "See more" page (`forward`: the projects grid, the full About) and back (`back`) move
+   like one screen sliding sideways. Going on, the sidebar closes off to the left, home moves left
+   with it (by about the sidebar's width) as it fades, the new page comes in from the right, and
+   whatever is in both glides straight to its new place on the same curve: the "Projects" or
+   "About" title to the top bar's corner, and each featured project's whole card (lib/featured.ts)
+   to its card in the grid, where the grid's other cards fall into place around them
+   (components/project-card.tsx). Coming back, all of it runs in reverse.
 
-   Home's four covers ("vt-card") carry over too: each glides to its card in the grid (or back),
-   as fluidly as the title. The grid's other cards fade in and glide into order
-   (components/project-card.tsx). */
+   Pieces are marked with morph() in lib/utils.ts; their names are on only during these slides,
+   and only for pieces on screen whose twin is on the other page (slideTo's dropOffscreen). */
 html[data-slide="forward"] .vt-name,
 html[data-slide="back"] .vt-name {
   view-transition-name: var(--vt-name);
@@ -152,35 +154,28 @@ html[data-slide="back"]::view-transition-new(*) {
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* "See more →" also reaches the grid from About and Play, where there's no cover to glide
-   from: the grid's covers stay in their cards then. (SlideLink sets data-slide-from.) */
-html[data-slide="forward"]:not([data-slide-from="/"]) .vt-card {
-  view-transition-name: none;
-}
-/* Both ends are 16:9, but fill and crop anyway rather than stretch mid-flight. */
-html[data-slide]::view-transition-old(*.vt-card),
-html[data-slide]::view-transition-new(*.vt-card) {
-  height: 100%;
-  object-fit: cover;
-}
+/* How far the screen travels: about the sidebar's column on desktop, less on phones (the
+   sidebar sits above the page there). */
+:root { --slide-shift: 24vw; }
+@media (min-width: 48rem) { :root { --slide-shift: 36.5vw; } }
 
-/* The old page holds still, opaque under the arriving one, so nothing shows through. */
-@keyframes page-arrive { from { opacity: 0; } }
-html[data-slide="forward"]::view-transition-old(root),
-html[data-slide="back"]::view-transition-old(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-html[data-slide="forward"]::view-transition-new(root),
-html[data-slide="back"]::view-transition-new(root) {
-  animation-name: page-arrive;
-  mix-blend-mode: normal;
-}
+@keyframes screen-out-left { to { transform: translateX(calc(-1 * var(--slide-shift))); opacity: 0; } }
+@keyframes screen-in-right { from { transform: translateX(calc(0.5 * var(--slide-shift))); opacity: 0; } }
+@keyframes screen-out-right { to { transform: translateX(calc(0.5 * var(--slide-shift))); opacity: 0; } }
+@keyframes screen-in-left { from { transform: translateX(calc(-1 * var(--slide-shift))); opacity: 0; } }
+html[data-slide="forward"]::view-transition-old(root) { animation-name: screen-out-left; mix-blend-mode: normal; }
+html[data-slide="forward"]::view-transition-new(root) { animation-name: screen-in-right; mix-blend-mode: normal; }
+html[data-slide="back"]::view-transition-old(root) { animation-name: screen-out-right; mix-blend-mode: normal; }
+html[data-slide="back"]::view-transition-new(root) { animation-name: screen-in-left; mix-blend-mode: normal; }
 
-@keyframes sidebar-away { to { transform: translateX(-35%); opacity: 0; } }
-@keyframes sidebar-return { from { transform: translateX(-35%); opacity: 0; } }
+/* The sidebar closes all the way off the left edge (and opens back from it), solid as it goes. */
+@keyframes sidebar-away { to { transform: translateX(calc(-100% - var(--edge) - 1px)); } }
+@keyframes sidebar-return { from { transform: translateX(calc(-100% - var(--edge) - 1px)); } }
 html[data-slide="forward"]::view-transition-old(sidebar) { animation-name: sidebar-away; }
 html[data-slide="back"]::view-transition-new(sidebar) { animation-name: sidebar-return; }
+
+/* Used by the card-to-project slides below. */
+@keyframes page-arrive { from { opacity: 0; } }
 
 /* A card on the grid and its project's page (`open` / `close`): the card's pieces (cover, label,
    title, tags, line; marked with projectPiece in lib/utils.ts, named by slideTo) each travel to
