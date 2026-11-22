@@ -131,12 +131,12 @@ body {
 
    Home to the projects grid (`forward`) and back (`back`): the sidebar slides off to the left (or
    back in), the "Projects" title glides sideways between its spot on home and the top bar's
-   corner, and the old page goes soft and grey as the new one fades up over it. Both are marked
-   with morph() in lib/utils.ts; the names are on only during these slides.
+   corner, and the new page fades up over the old one, which holds still (no blur or grey).
+   Both are marked with morph() in lib/utils.ts; the names are on only during these slides.
 
-   Home's four covers ("vt-card") carry over too: each blurs where it is, glides to its card in
-   the grid (or back), and sharpens there, so they travel as fluidly as the title. The grid's
-   other cards come in as blurred blocks that glide into order (components/project-card.tsx). */
+   Home's four covers ("vt-card") carry over too: each glides to its card in the grid (or back),
+   as fluidly as the title. The grid's other cards fade in and glide into order
+   (components/project-card.tsx). */
 html[data-slide="forward"] .vt-name,
 html[data-slide="back"] .vt-name {
   view-transition-name: var(--vt-name);
@@ -157,19 +157,6 @@ html[data-slide="back"]::view-transition-new(*) {
 html[data-slide="forward"]:not([data-slide-from="/"]) .vt-card {
   view-transition-name: none;
 }
-/* The covers: blur, then move (the group, delayed), then sharpen. */
-@keyframes card-travel {
-  0% { filter: none; }
-  22%, 72% { filter: blur(10px) grayscale(1); }
-  100% { filter: none; }
-}
-html[data-slide]::view-transition-group(*.vt-card) {
-  animation-delay: 0.18s;
-  animation-duration: 0.6s;
-}
-html[data-slide]::view-transition-image-pair(*.vt-card) {
-  animation: card-travel 1s cubic-bezier(0.32, 0.72, 0, 1) both;
-}
 /* Both ends are 16:9, but fill and crop anyway rather than stretch mid-flight. */
 html[data-slide]::view-transition-old(*.vt-card),
 html[data-slide]::view-transition-new(*.vt-card) {
@@ -177,12 +164,11 @@ html[data-slide]::view-transition-new(*.vt-card) {
   object-fit: cover;
 }
 
-/* The old page only softens; it stays opaque under the arriving one, so nothing shows through. */
-@keyframes page-dissolve { to { filter: blur(14px) grayscale(1); } }
+/* The old page holds still, opaque under the arriving one, so nothing shows through. */
 @keyframes page-arrive { from { opacity: 0; } }
 html[data-slide="forward"]::view-transition-old(root),
 html[data-slide="back"]::view-transition-old(root) {
-  animation-name: page-dissolve;
+  animation: none;
   mix-blend-mode: normal;
 }
 html[data-slide="forward"]::view-transition-new(root),

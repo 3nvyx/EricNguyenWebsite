@@ -13,7 +13,7 @@ import { cn, ease, hoverLink as hover, morph, pageMain } from "@/lib/utils";
 
 /**
  * One home card: the cover, the title and one line. Like the projects page, its gif plays only
- * on hover. Going to the grid, the cover blurs, glides to its card there and sharpens (morph).
+ * on hover. Going to the grid, the cover glides to its card there (morph).
  */
 function FeaturedProject({ project: p, index: i }: { project: Project; index: number }) {
   const { ref, playing, handlers } = useHoverPlay<HTMLAnchorElement>();

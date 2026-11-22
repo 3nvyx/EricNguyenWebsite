@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Projects" };
 /**
  * Every project, full width without the sidebar, the featured ones (home's four) first.
  * Every cover is the same 16:9 frame here (project pages keep each one's own shape), and they
- * glide into order as grey blurred blocks, then sharpen as they load (components/project-card.tsx);
+ * fade in and glide into order (components/project-card.tsx);
  * each card opens the project's page, and its gif plays only while hovered. The page's title, back to
  * home, sits in the top bar where the name is on other pages (components/top-bar.tsx).
  */

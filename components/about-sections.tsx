@@ -1,8 +1,20 @@
 import { ABOUT_INTRO, type AboutSection } from "@/lib/about";
 import { cn, hoverLink } from "@/lib/utils";
 
-/** The photo beside the intro, as its own column so no line wraps under it. Stacked on phones. */
-export function AboutIntro({ className }: { className?: string }) {
+/**
+ * The photo beside the intro, as its own column so no line wraps under it. Stacked on phones.
+ * `paragraphs`: the whole intro by default; /about passes the short one. `lead`: the first
+ * paragraph is set larger, as the line the rest hangs off.
+ */
+export function AboutIntro({
+  paragraphs = ABOUT_INTRO,
+  lead = false,
+  className,
+}: {
+  paragraphs?: string[];
+  lead?: boolean;
+  className?: string;
+}) {
   return (
     <section
       className={cn(
@@ -19,8 +31,10 @@ export function AboutIntro({ className }: { className?: string }) {
         className="aspect-square w-[calc(160*var(--u))] min-w-28 shrink-0 object-cover object-[50%_28%] md:mt-[calc(8*var(--u))]"
       />
       <div className="space-y-[calc(16*var(--u))]">
-        {ABOUT_INTRO.map((p) => (
-          <p key={p}>{p}</p>
+        {paragraphs.map((p, i) => (
+          <p key={p} className={cn(lead && i === 0 && "fw-title")}>
+            {p}
+          </p>
         ))}
       </div>
     </section>
@@ -33,6 +47,7 @@ export function AboutIntro({ className }: { className?: string }) {
  * entries instead (one-line rows keep a narrower left column), for the full page's two columns.
  */
 export function AboutSectionBlock({ section, stacked = false }: { section: AboutSection; stacked?: boolean }) {
+  if (section.groups) return <AboutGroups section={section} stacked={stacked} />;
   return (
     <section>
       <h2 className="fw-label">{section.label}</h2>
@@ -71,6 +86,50 @@ export function AboutSectionBlock({ section, stacked = false }: { section: About
                 )}
               </div>
             )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * A section as a grid of small groups (the skills): each group's name in small grey type over
+ * its items, set apart by soft dots. Three across beside the sidebar, two in the full page's
+ * half-width column, one on phones.
+ */
+function AboutGroups({ section, stacked }: { section: AboutSection; stacked: boolean }) {
+  return (
+    <section>
+      <h2 className="fw-label">{section.label}</h2>
+      <ul
+        className={cn(
+          "grid gap-x-[calc(27*var(--u))] gap-y-[calc(27*var(--u))] sm:grid-cols-2",
+          !stacked && "lg:grid-cols-3",
+        )}
+      >
+        {section.entries.map((e) => (
+          <li key={e.when}>
+            <p className="fw-small text-mute mb-[calc(6*var(--u))]">{e.when}</p>
+            <p className="fw-text leading-[1.75]!">
+              {e.title.split(", ").map((item, i, items) => (
+                // Each item stays whole with the dot after it, so a line can end on a dot but
+                // never start with one; the space after is where lines break.
+                <span key={item}>
+                  <span className="whitespace-nowrap">
+                    {item}
+                    {i < items.length - 1 && (
+                      <>
+                        <span aria-hidden className="text-mute">
+                          {" ·"}
+                        </span>
+                        <span className="sr-only">,</span>
+                      </>
+                    )}
+                  </span>{" "}
+                </span>
+              ))}
+            </p>
           </li>
         ))}
       </ul>

@@ -8,7 +8,8 @@ export function PageTitle({ children, className }: { children: React.ReactNode; 
 
 /**
  * A title that links to a sibling page, with an arrow on the side it's heading: `forward` after
- * the word, `back` before it. It nudges that way on hover.
+ * the word, `back` before it. It nudges that way on hover. `close` is a back link from a project's
+ * page to the grid: pass `slideMorph` (the project's slug) so its pieces fly back into its card.
  *
  * `inline`: the arrow takes its own room, so the line starts with it (the projects grid's top
  * bar, where "← Projects" starts where the name does elsewhere). Otherwise it hangs outside the
@@ -19,16 +20,18 @@ export function PageTitleLink({
   href,
   dir,
   vtName,
+  slideMorph,
   inline = false,
   children,
 }: {
   href: string;
-  dir: "forward" | "back";
+  dir: "forward" | "back" | "close";
   vtName?: string;
+  slideMorph?: string;
   inline?: boolean;
   children: React.ReactNode;
 }) {
-  const back = dir === "back";
+  const back = dir !== "forward";
   const m = vtName ? morph(vtName) : undefined;
   const gap = "calc(10*var(--u))";
   const arrow = (
@@ -45,7 +48,7 @@ export function PageTitleLink({
     </span>
   );
   return (
-    <SlideLink href={href} dir={dir} className={cn("group relative inline-block", hoverLink)}>
+    <SlideLink href={href} dir={dir} morph={slideMorph} className={cn("group relative inline-block", hoverLink)}>
       {back && arrow}
       {/* inline-block, so it has a box to glide; the link's underline can't reach into it. */}
       <span className={cn("inline-block underline-offset-4 group-hover:underline", m?.className)} style={m?.style}>

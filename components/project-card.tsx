@@ -48,9 +48,8 @@ export function useHoverPlay<T extends HTMLElement>() {
   return { ref, playing: active || inView, handlers };
 }
 
-// Each card enters as a block in three beats: it fades in as a soft grey blur, a little out of
-// place (scattered off to the left, the way the page sweeps in); it glides into its slot in grid
-// order; and once its cover has loaded it sharpens into colour.
+// Each card enters as a block in two beats: it fades in a little out of place (scattered off to
+// the left, the way the page sweeps in), then glides into its slot in grid order. No blur or grey.
 const STAGGER = 0.045; // seconds between cards
 const MAX_STAGGERED = 12;
 const GLIDE = [0.32, 0.72, 0, 1] as const;
@@ -63,15 +62,13 @@ function scatter(i: number) {
     y: `${(((i * 37) % 5) - 2) * 7}%`,
     rotate: (((i * 53) % 7) - 3) * 1.1,
     scale: 0.94,
-    filter: "blur(14px) grayscale(1)",
   };
 }
 
-const SETTLED = { opacity: 1, x: "0%", y: "0%", rotate: 0, scale: 1, filter: "none" };
+const SETTLED = { opacity: 1, x: "0%", y: "0%", rotate: 0, scale: 1 };
 
-/** Runs the three beats; returns what to pass to the card's motion.div. */
+/** Runs the two beats; returns what to pass to the card's motion.div. */
 function useBlockEntrance(index: number, glides: boolean) {
-  const ref = useRef<HTMLDivElement>(null);
   const controls = useAnimationControls();
   const still = useReducedMotion();
 
@@ -84,25 +81,12 @@ function useBlockEntrance(index: number, glides: boolean) {
       controls.set(SETTLED);
       return;
     }
-    const el = ref.current;
-    const img = el?.querySelector("img");
-    // The 3D card and the SLAP! splash have no image to wait for.
-    const loaded = new Promise<void>((done) => {
-      if (!img || img.complete) return done();
-      img.addEventListener("load", () => done(), { once: true });
-      img.addEventListener("error", () => done(), { once: true });
-    });
     let live = true;
     const delay = Math.min(index, MAX_STAGGERED) * STAGGER;
     (async () => {
       await controls.start({ opacity: 1, transition: { duration: 0.25, delay } });
       if (!live) return;
       await controls.start({ x: "0%", y: "0%", rotate: 0, scale: 1, transition: { duration: 0.7, ease: GLIDE } });
-      await loaded;
-      if (!live) return;
-      await controls.start({ filter: "blur(0px) grayscale(0)", transition: { duration: 0.5, ease: GLIDE } });
-      // Drop the filter entirely, so the card doesn't keep a filter layer for good.
-      if (live) controls.set({ filter: "none" });
     })();
     return () => {
       live = false;
@@ -110,7 +94,7 @@ function useBlockEntrance(index: number, glides: boolean) {
     };
   }, [controls, index, still, glides]);
 
-  return { ref, controls, initial: glides ? false : scatter(index) };
+  return { controls, initial: glides ? false : scatter(index) };
 }
 
 /**
@@ -124,13 +108,13 @@ export function ProjectCard({ project: p, index }: { project: Project; index: nu
   // Coming back from a project page, the grid is simply there (that card's pieces fly home).
   const fromProject = useSlideDir() === "close";
   const settled = glides || fromProject;
-  const { ref: blockRef, controls, initial } = useBlockEntrance(index, settled);
+  const { controls, initial } = useBlockEntrance(index, settled);
   // Only home's covers have a twin to glide from. Named, the others would be lifted out of their
   // card for the transition and held where their entrance starts.
   const cover = isFeatured(p.slug) ? morph(`project-${p.slug}`, "vt-card") : undefined;
 
   return (
-    <motion.div ref={blockRef} initial={initial} animate={controls} className="h-full">
+    <motion.div initial={initial} animate={controls} className="h-full">
       {/* Opening the project, each piece marked with projectPiece travels to its spot on the page. */}
       <SlideLink
         ref={ref}
@@ -145,7 +129,7 @@ export function ProjectCard({ project: p, index }: { project: Project; index: nu
           <span {...projectPiece(p.slug, "name")} title={p.title} className="min-w-0 truncate uppercase">{p.title}</span>
           <span {...projectPiece(p.slug, "dates")} className="shrink-0 whitespace-nowrap text-mute">{p.dates}</span>
         </p>
-        {/* morph: coming from home, a featured cover blurs, glides here and sharpens. */}
+        {/* morph: coming from home, a featured cover glides here from its spot there. */}
         <div {...projectPiece(p.slug, "cover")} className={cn("aspect-video w-full overflow-hidden", cover?.className)} style={cover?.style}>
           <MediaSlot project={p} playing={playing} />
         </div>

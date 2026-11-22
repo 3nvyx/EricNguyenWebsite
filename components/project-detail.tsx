@@ -44,13 +44,9 @@ export function ProjectDetail({ project }: { project: Project }) {
         "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,calc(640*var(--u)))_minmax(0,1fr)] lg:gap-x-[calc(45*var(--u))]",
       )}
     >
-      {/* Left rail: the way back, kept in view. */}
-      <aside className="mb-8 lg:sticky lg:top-[calc(64*var(--u))] lg:mb-0 lg:self-start">
-        {/* Back to the grid, this project's pieces fly back into its card. */}
-        <SlideLink href="/projects" dir="close" morph={project.slug} className={cn("fw-nav", hoverLink)}>
-          ← PROJECTS
-        </SlideLink>
-      </aside>
+      {/* Left rail: empty, holding the article in the centre column. The way back to the grid is
+          "← Projects" at the top left (components/top-bar.tsx). */}
+      <div aria-hidden className="hidden lg:block" />
 
       <main>
         <h2 className="fw-label flex justify-between gap-6">

@@ -7,7 +7,7 @@ import { useLayoutEffect, useState, type ComponentProps } from "react";
 /**
  * `forward` / `back`: home to the projects grid and back. The sidebar slides off to the left (or
  * back in), the "Projects" title (marked with morph() in lib/utils.ts) glides to its spot on the
- * other page, and the old page goes soft and grey as the new one sweeps in over it.
+ * other page, and the new page fades in over the old one.
  * `up` / `down`: only the page beside the sidebar moves, as if scrolling one long page: the next
  * page comes up from below / down from above, joined to the old one (the sidebar holds still;
  * see .page-slot in app/(site)/layout.tsx). Desktop only: on phones the sidebar sits above the

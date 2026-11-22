@@ -11,8 +11,15 @@ export type AboutEntry = {
 /**
  * compact: one-line rows (awards, skills) instead of the full title / where / line block.
  * featured: shown on /about itself (a short preview); every section is on the full page (/about/more).
+ * groups: a grid of small groups (skills), each `when` as a label over its comma-separated `title`.
  */
-export type AboutSection = { label: string; entries: AboutEntry[]; compact?: boolean; featured?: boolean };
+export type AboutSection = {
+  label: string;
+  entries: AboutEntry[];
+  compact?: boolean;
+  featured?: boolean;
+  groups?: boolean;
+};
 
 // First-person intro shown above the sections: who Eric is, not the resume (that's below).
 export const ABOUT_INTRO: string[] = [
@@ -22,20 +29,23 @@ export const ABOUT_INTRO: string[] = [
   "I am a product engineer working in hardware and software. I work alongside the people doing the job and make the slow, manual parts disappear. I am currently seeking a summer 2027 internship.",
 ];
 
-// The short version for /about itself: who Eric is in a few lines, before the skills.
-export const ABOUT_BRIEF =
-  "I'm Eric, a product engineer working in hardware and software. I work alongside the people doing the job and make the slow, manual parts disappear. I'm currently seeking a summer 2027 internship.";
+// The short version for /about itself: a lead line (set larger), then a sentence or two.
+export const ABOUT_BRIEF: string[] = [
+  "I'm Eric, a product engineer working across hardware and software.",
+  "I work alongside the people doing the job and make the slow, manual parts disappear. Currently seeking a summer 2027 internship.",
+];
 
 export const ABOUT: AboutSection[] = [
   {
     label: "SKILLS",
     compact: true,
     featured: true,
+    groups: true,
     entries: [
       { when: "Languages", title: "TypeScript, JavaScript, Python, C++, SQL, HTML / CSS" },
       { when: "Frontend", title: "React, Next.js, SvelteKit, React Router, Vite, Tailwind CSS, shadcn/ui" },
       { when: "Backend and data", title: "Node.js, Hono, WebSockets, PostgreSQL, SpacetimeDB, Supabase, Neon" },
-      { when: "AI and agents", title: "Claude Agent SDK, Vercel AI SDK, OpenAI, Fetch.ai uAgents, LoRA fine-tuning" },
+      { when: "AI and agents", title: "Claude Agent SDK, Vercel AI SDK, OpenAI, Fetch.ai uAgents, LoRA fine\u2011tuning" },
       { when: "Hardware and tools", title: "ESP32-S3, Arduino, Git, Docker, Vercel, PostHog" },
       { when: "Design and fabrication", title: "Figma, Rhino, SolidWorks, Fusion 360, Bambu Studio (3D printing)" },
     ],
