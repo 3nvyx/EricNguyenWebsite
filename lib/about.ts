@@ -8,6 +8,8 @@ export type AboutEntry = {
   where?: string;
   line?: string;
   link?: { label: string; href: string };
+  /** Projects (by slug, lib/projects.ts) whose recap videos are previewed under the entry. */
+  recaps?: string[];
 };
 
 /**
@@ -104,7 +106,7 @@ export const ABOUT: AboutSection[] = [
         title: "Lead Organizer",
         where: "HackCC 2024, Spookathon 2025, OCC Hacks 2026",
         line: "Led a six-department team across colleges to run 30-hour hackathons for 100+ attendees; raised $21,000.",
-        link: { label: "Recap video", href: "https://www.youtube.com/watch?v=vT81BYkjc8k" },
+        recaps: ["hackcc", "spookathon"],
       },
       {
         when: "2024 – now",

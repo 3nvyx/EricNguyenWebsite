@@ -60,6 +60,9 @@ export function SectionSpy() {
     let frame = 0;
     const update = () => {
       frame = 0;
+      // Leaving home, the next page scrolls to its top before this is cleaned up: that scroll
+      // isn't home's, and writing home's address then would replace the new page's.
+      if (window.location.pathname !== "/") return;
       const i = sectionInView();
       setCurrent(i);
       const url = i === 0 ? "/" : `/#${PAGES[i].id}`;
@@ -70,7 +73,10 @@ export function SectionSpy() {
     };
     // Arriving at /#play, the browser has already scrolled there: mark it straight away. Back or
     // Forward may put the scroll somewhere else again, so look once more after those.
-    const recheck = () => requestAnimationFrame(() => setCurrent(sectionInView()));
+    const recheck = () =>
+      requestAnimationFrame(() => {
+        if (window.location.pathname === "/") setCurrent(sectionInView());
+      });
     setCurrent(sectionInView());
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
