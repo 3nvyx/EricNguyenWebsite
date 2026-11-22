@@ -11,7 +11,7 @@ import { isFramed } from "@/lib/pages";
 export function FooterFrame({ children }: { children: React.ReactNode }) {
   const framed = isFramed(usePathname());
   return (
-    <div className="group" data-framed={framed ? "" : undefined}>
+    <div className="group" data-swipe="page" data-framed={framed ? "" : undefined}>
       {children}
     </div>
   );

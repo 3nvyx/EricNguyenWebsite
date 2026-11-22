@@ -4,6 +4,7 @@ import { Unbounded, Instrument_Sans } from "next/font/google";
 import { Footer } from "@/components/footer";
 import { FooterFrame } from "@/components/footer-frame";
 import { SlideNavDone } from "@/components/slide-link";
+import { SwipeNav } from "@/components/swipe-nav";
 import "./globals.css";
 
 const unbounded = Unbounded({
@@ -65,6 +66,8 @@ export default function RootLayout({
         <FooterFrame>
           <Footer />
         </FooterFrame>
+        {/* Before SlideNavDone: a swipe's offsets come off before the slide's picture of the new page. */}
+        <SwipeNav />
         <SlideNavDone />
         <Analytics />
       </body>

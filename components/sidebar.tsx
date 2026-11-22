@@ -38,6 +38,8 @@ export function Sidebar() {
 
   return (
     <motion.aside
+      // A sideways swipe closes it a little way as the fingers move (components/swipe-nav.tsx).
+      data-swipe="sidebar"
       initial={inSlide ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.9, ease }}

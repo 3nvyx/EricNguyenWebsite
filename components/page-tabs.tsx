@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { SectionLink, useCurrentPage } from "@/components/sections";
+import { SectionLink, useCurrentKind, useCurrentPage } from "@/components/sections";
 import { SlideLink } from "@/components/slide-link";
 import { PAGES, moreOf } from "@/lib/pages";
 import { cn, hoverLink } from "@/lib/utils";
@@ -14,6 +14,7 @@ import { cn, hoverLink } from "@/lib/utils";
 export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
   const pathname = usePathname();
   const active = useCurrentPage();
+  const currentKind = useCurrentKind();
   const stack = layout === "stack";
   // On a "See more" page (the projects grid, the full About), every top-bar tab leads back to a
   // section of home: run the morph in reverse, so the sidebar slides back in. The "See more →"
@@ -32,7 +33,7 @@ export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
                   {it.label}
                 </SlideLink>
               ) : (
-                <SectionLink index={i} aria-current={i === active ? "page" : undefined} className={className}>
+                <SectionLink index={i} aria-current={i === active ? currentKind : undefined} className={className}>
                   {it.label}
                 </SectionLink>
               )}

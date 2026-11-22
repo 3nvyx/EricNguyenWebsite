@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 
 /**
- * The arrow after "See all projects" and "See more about me". Once the link scrolls into view it
+ * The arrow after "See all projects" and "My story". Once the link scrolls into view it
  * hops forward twice, rests, and repeats, so the way onward is easy to spot. Still for
  * reduced-motion users.
  */

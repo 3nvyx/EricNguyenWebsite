@@ -13,7 +13,7 @@ import { useLayoutEffect, useState, type ComponentProps } from "react";
  * see .page-slot in app/(site)/layout.tsx). Desktop only: on phones the sidebar sits above the
  * page, so these fall back to a plain navigation.
  * `open` / `close`: a card on the projects grid and its project's page. The card's pieces (cover,
- * label, title, tags, line) each travel to their spot on the other page as the page fades over.
+ * title, date, line) each travel to their spot on the other page as the page fades over.
  * Pass `morph` (the project's slug) so slideTo can find them: see nameMorphs.
  */
 export type SlideDir = "forward" | "back" | "up" | "down" | "open" | "close";
@@ -51,17 +51,37 @@ function nameMorphs(key: string, id: number, onScreen = false) {
   return els;
 }
 
+// Which slide took each piece's name off, so a slide only puts back the names it took.
+const dropOwner = new WeakMap<HTMLElement, number>();
+
 /**
- * Takes the morph name (morph() in lib/utils.ts) off every marked piece that's off screen, for
- * this slide, and returns them so it can be put back.
+ * Sorts the pieces marked with morph() (lib/utils.ts) for slide `id`: a piece keeps its name if
+ * `keep` agrees (and, with `onScreen`, it's on screen); every other one has it taken off for this
+ * slide, so it stays with its page instead of flying in from nowhere, or fading where it stood.
+ * A card's pieces (inside data-vt-block) are on screen together, whenever any of the card is, so
+ * the card never comes apart. Returns the names kept, and the pieces to give theirs back to once
+ * the slide is over.
  */
-function dropOffscreen() {
-  return [...document.querySelectorAll<HTMLElement>(".vt-name")].filter((el) => {
-    const r = el.getBoundingClientRect();
-    if (r.bottom > 0 && r.top < window.innerHeight) return false;
-    el.style.viewTransitionName = "none";
-    return true;
-  });
+function pickMorphs(id: number, onScreen: boolean, keep: (pair: string | undefined, name: string) => boolean) {
+  const kept = new Set<string>();
+  const dropped: HTMLElement[] = [];
+  for (const el of document.querySelectorAll<HTMLElement>(".vt-name")) {
+    const r = (el.closest("[data-vt-block]") ?? el).getBoundingClientRect();
+    const name = el.style.getPropertyValue("--vt-name");
+    if ((!onScreen || (r.bottom > 0 && r.top < window.innerHeight)) && keep(el.dataset.vtPair, name)) {
+      // An earlier slide may still have it off; this one wants it.
+      if (dropOwner.has(el)) {
+        el.style.viewTransitionName = "";
+        dropOwner.delete(el);
+      }
+      kept.add(name);
+    } else {
+      el.style.viewTransitionName = "none";
+      dropOwner.set(el, id);
+      dropped.push(el);
+    }
+  }
+  return { kept, dropped };
 }
 
 /** Whether a slide can run here; otherwise the caller navigates plainly. */
@@ -100,11 +120,16 @@ export function slideTo(
   const id = ++slideId;
   root.dataset.slide = dir;
   // Where the slide started and where it's going, for morphs between one pair of pages only.
-  root.dataset.slideFrom = window.location.pathname;
+  const from = window.location.pathname;
+  root.dataset.slideFrom = from;
   root.dataset.slideTo = path;
-  // Between home and a "See more" page, only what's on screen at each end morphs: home is one
-  // long page, and a piece far off screen would fly in from (or out to) there.
-  const offscreen = dir === "forward" || dir === "back" ? dropOffscreen() : [];
+  // Between home and a "See more" page, only what's on screen at each end morphs, and only into
+  // a twin that will be on screen too: home is one long page. Leaving, a piece's pair must be
+  // exactly where this slide lands (/#projects, not the top of home); arriving, its twin must
+  // have been named on the way out. Unpaired pieces (the sidebar) always slide.
+  const sideways = dir === "forward" || dir === "back";
+  const leaving = sideways ? pickMorphs(id, true, (pair) => !pair || pair === href) : null;
+  const dropped = leaving?.dropped ?? [];
 
   // Vertical slides move .page-slot as its own layer, lined up with the new page. Where the
   // slot's top sat on screen before and after lets the CSS put the old image back where it was
@@ -144,7 +169,12 @@ export function slideTo(
             // land on screen (Next was told not to jump to the top; see slideScroll).
             if (dir === "close") (arrived[0]?.closest("a") ?? arrived[0])?.scrollIntoView({ block: "center" });
           }
-          if (dir === "forward" || dir === "back") offscreen.push(...dropOffscreen());
+          if (leaving) {
+            // A paired piece goes wherever its twin is, even below the fold, rather than fading
+            // where it stood; an unpaired one (the sidebar) only if it's in view.
+            const arriving = pickMorphs(id, false, (pair, name) => !pair || ((pair.split("#")[0] || "/") === from && leaving.kept.has(name)));
+            dropped.push(...arriving.dropped);
+          }
           root.style.setProperty("--slide-new-top", top());
           done();
         };
@@ -158,7 +188,11 @@ export function slideTo(
   transition.ready.catch(() => {});
   transition.finished.finally(() => {
     clearNames();
-    for (const el of offscreen) if (el.style.viewTransitionName === "none") el.style.viewTransitionName = "";
+    for (const el of dropped) {
+      if (dropOwner.get(el) !== id) continue;
+      el.style.viewTransitionName = "";
+      dropOwner.delete(el);
+    }
     // A slide that never landed mustn't scroll a later page to its section.
     if (landAt?.path === path) landAt = null;
     if (id !== slideId) return;

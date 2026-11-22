@@ -21,6 +21,8 @@
 
 html {
   background: var(--bone);
+  /* Sideways swipes move between pages here (components/swipe-nav.tsx), not the browser's history. */
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -133,12 +135,13 @@ body {
    like one screen sliding sideways. Going on, the sidebar closes off to the left, home moves left
    with it (by about the sidebar's width) as it fades, the new page comes in from the right, and
    whatever is in both glides straight to its new place on the same curve: the "Projects" or
-   "About" title to the top bar's corner, and each featured project's whole card (lib/featured.ts)
-   to its card in the grid, where the grid's other cards fall into place around them
-   (components/project-card.tsx). Coming back, all of it runs in reverse.
+   "About" title to the top bar's corner, each featured project's card (lib/featured.ts), the
+   same block on both pages, to its place in the grid, where the other cards fall in around it
+   (components/project-card.tsx), and About's portrait, summary and skills to their places on the
+   full page (components/about-sections.tsx). Coming back, all of it runs in reverse.
 
    Pieces are marked with morph() in lib/utils.ts; their names are on only during these slides,
-   and only for pieces on screen whose twin is on the other page (slideTo's dropOffscreen). */
+   and only for pieces on screen whose twin is on the other page (slideTo's pickMorphs). */
 html[data-slide="forward"] .vt-name,
 html[data-slide="back"] .vt-name {
   view-transition-name: var(--vt-name);
@@ -168,6 +171,38 @@ html[data-slide="forward"]::view-transition-new(root) { animation-name: screen-i
 html[data-slide="back"]::view-transition-old(root) { animation-name: screen-out-right; mix-blend-mode: normal; }
 html[data-slide="back"]::view-transition-new(root) { animation-name: screen-in-left; mix-blend-mode: normal; }
 
+/* A featured card is the same block on home and in the grid (CardBody in
+   components/project-card.tsx), only narrower there. Its pieces each travel to their twin on one
+   curve, so they stay joined and the card moves as one block: the cover scales with the card
+   (16:9 at both ends), the hairline stretches to its width, and the words keep their own size
+   and only move, so nothing blurs, swells or fades out and back. */
+html[data-slide]::view-transition-old(*.vt-card-cover),
+html[data-slide]::view-transition-new(*.vt-card-cover) {
+  height: 100%;
+  object-fit: cover;
+}
+html[data-slide]::view-transition-old(*.vt-card-rule),
+html[data-slide]::view-transition-new(*.vt-card-rule) {
+  height: 100%;
+}
+html[data-slide]::view-transition-old(*.vt-card-text),
+html[data-slide]::view-transition-new(*.vt-card-text) {
+  width: auto;
+  height: auto;
+}
+
+/* About's three blocks (the portrait, the summary, the skills: AboutPreview in
+   components/about-sections.tsx) are the same layout on home and at the top of the full page,
+   only larger there. Each travels to its twin on the same curve and grows on the way: both ends
+   are the same picture at a different size, so the words scale with their block (the default)
+   and nothing is doubled. The portrait fills its box and crops, in case the two ends ever differ
+   by a hair in shape, rather than stretch. */
+html[data-slide]::view-transition-old(*.vt-photo),
+html[data-slide]::view-transition-new(*.vt-photo) {
+  height: 100%;
+  object-fit: cover;
+}
+
 /* The sidebar closes all the way off the left edge (and opens back from it), solid as it goes. */
 @keyframes sidebar-away { to { transform: translateX(calc(-100% - var(--edge) - 1px)); } }
 @keyframes sidebar-return { from { transform: translateX(calc(-100% - var(--edge) - 1px)); } }
@@ -177,8 +212,8 @@ html[data-slide="back"]::view-transition-new(sidebar) { animation-name: sidebar-
 /* Used by the card-to-project slides below. */
 @keyframes page-arrive { from { opacity: 0; } }
 
-/* A card on the grid and its project's page (`open` / `close`): the card's pieces (cover, label,
-   title, tags, line; marked with projectPiece in lib/utils.ts, named by slideTo) each travel to
+/* A card on the grid and its project's page (`open` / `close`): the card's pieces (cover, title,
+   date, line; marked with projectPiece in lib/utils.ts, named by slideTo) each travel to
    their twin on the other page, all on one curve so they move as a block. The new page fades up
    over the old one, which holds still. No blur and no grey here. */
 html[data-slide="open"]::view-transition-group(*),

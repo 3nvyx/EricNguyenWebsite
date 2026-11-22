@@ -43,7 +43,8 @@ export function PageTitleLink({
   children: React.ReactNode;
 }) {
   const back = dir !== "forward";
-  const m = vtName ? morph(vtName) : undefined;
+  // Its twin is where it links to (/#projects: home's Projects section).
+  const m = vtName ? morph(vtName, { pair: href }) : undefined;
   const gap = "calc(10*var(--u))";
   const arrow = (
     <span
@@ -62,7 +63,7 @@ export function PageTitleLink({
     <SlideLink href={href} dir={dir} morph={slideMorph} className={cn("group relative inline-block", hoverLink)}>
       {back && arrow}
       {/* inline-block, so it has a box to glide; the link's underline can't reach into it. */}
-      <span className={cn("inline-block underline-offset-4 group-hover:underline", m?.className)} style={m?.style}>
+      <span className={cn("inline-block underline-offset-4 group-hover:underline", m?.className)} style={m?.style} {...m?.attrs}>
         {children}
       </span>
       {!back && arrow}

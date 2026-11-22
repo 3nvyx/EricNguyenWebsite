@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SlideLink } from "@/components/slide-link";
-import { SectionLink, useCurrentPage, useGoToPage } from "@/components/sections";
+import { SectionLink, useCurrentKind, useCurrentPage, useGoToPage } from "@/components/sections";
 import { PAGES } from "@/lib/pages";
 // The blob behind the tabs is switched off for now; see the commented-out FluidBlob below.
 // import { FluidBlob } from "@/components/fluid-blob";
@@ -49,9 +49,13 @@ const DURATION = 650;
 const EASE = cubicBezier(0.32, 0.72, 0, 1);
 
 const N = PAGES.length;
+// How long a glide to a section is given before the wheel can step again (a smooth scroll across
+// the page takes longer than the tabs' own turn).
+const GLIDE_LOCK = 900;
 
 export function ArcTabs({ className }: { className?: string }) {
   const active = useCurrentPage();
+  const currentKind = useCurrentKind();
   const pos = useArcPosition(active);
   const navRef = useRef<HTMLElement>(null);
   const goTo = useGoToPage();
@@ -60,18 +64,32 @@ export function ArcTabs({ className }: { className?: string }) {
     goRef.current = goTo;
   }, [goTo]);
 
-  // The wheel moves one page per notch. A trackpad sends a stream of small events for
-  // one swipe, so after a step the wheel stays locked until the stream goes quiet and the turn
-  // has had time to land. Steps count from the page last asked for, not the one showing, so a
-  // slow page can't make a second notch ask for the same page again.
+  // The wheel moves one section per notch. A trackpad sends a stream of small events for one
+  // swipe, so after a step the wheel stays locked until the stream goes quiet and the glide has
+  // had time to land. Steps count from the section last asked for, not the one showing: a glide
+  // passes the sections in between, and the tabs following them mustn't move the target.
   const targetRef = useRef(active);
+  const activeRef = useRef(active);
+  const lockRef = useRef(0);
+  const unlockRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => {
-    targetRef.current = active;
+    activeRef.current = active;
+    if (performance.now() >= lockRef.current) targetRef.current = active;
   }, [active]);
+  useEffect(() => () => clearTimeout(unlockRef.current), []);
+  // A click glides too: aim there and hold the target until it lands. Then the target is
+  // whatever the tabs show, in case the glide was cut short by a scroll of the visitor's own.
+  const aim = (i: number) => {
+    targetRef.current = i;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lock = still ? 0 : GLIDE_LOCK;
+    lockRef.current = performance.now() + lock;
+    clearTimeout(unlockRef.current);
+    unlockRef.current = setTimeout(() => (targetRef.current = activeRef.current), lock);
+  };
   useEffect(() => {
     const el = navRef.current;
     if (!el) return;
-    let lockedUntil = 0;
     let quiet: ReturnType<typeof setTimeout> | undefined;
     let settled = true;
     const onWheel = (e: WheelEvent) => {
@@ -80,7 +98,7 @@ export function ArcTabs({ className }: { className?: string }) {
       // Firefox's mouse wheel counts in lines (deltaMode 1), about 3 a notch; others in pixels.
       const dy = e.deltaMode ? e.deltaY * 16 : e.deltaY;
       // The rest of a swipe that just changed page is swallowed, even once it reaches an end.
-      const turning = !settled || performance.now() < lockedUntil;
+      const turning = !settled || performance.now() < lockRef.current;
       const next = targetRef.current + (dy > 0 ? 1 : -1);
       // Past either end (with the swipe over), the wheel scrolls the page as usual.
       if (!turning && (next < 0 || next >= N)) return;
@@ -89,9 +107,7 @@ export function ArcTabs({ className }: { className?: string }) {
       quiet = setTimeout(() => (settled = true), 180);
       if (turning || next < 0 || next >= N || Math.abs(dy) < 4) return;
       settled = false;
-      const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      lockedUntil = performance.now() + (still ? 0 : DURATION);
-      targetRef.current = next;
+      aim(next);
       goRef.current(next);
     };
     el.addEventListener("wheel", onWheel, { passive: false });
@@ -148,7 +164,8 @@ export function ArcTabs({ className }: { className?: string }) {
           <li key={it.href} className={cn(ITEM, it.more && "group")} style={place(i, i - pos)}>
             <SectionLink
               index={i}
-              aria-current={i === active ? "page" : undefined}
+              onClick={() => aim(i)}
+              aria-current={i === active ? currentKind : undefined}
               className={cn(hoverLink, "duration-300", i === active ? "text-ink" : "fw-nav-off")}
             >
               {it.label}

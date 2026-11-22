@@ -330,6 +330,8 @@ export function Video360({ src, poster, label, className }: { src: string; poste
   return (
     <div
       ref={host}
+      // Dragging here looks around the video: not a swipe between pages (components/swipe-nav.tsx).
+      data-no-swipe=""
       tabIndex={0}
       aria-label={`${label}. 360° video: drag, use the control ball or the arrow keys to look around, space to play or pause.`}
       className={cn(

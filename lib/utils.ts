@@ -19,17 +19,20 @@ export const pageMain = cn(
 export const ease = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Marks an element that morphs between home and the projects grid during a `forward` / `back`
+ * Marks an element that morphs between home and a "See more" page during a `forward` / `back`
  * SlideLink transition: the element with the same name on the other page glides from one spot
- * to the other. Merge `className` with cn and pass `style`. globals.css turns the name on only
- * during those transitions, so it doesn't cut the element out of the vertical tab slides.
- * `kind` is a view-transition-class, for styling a family of morphs ("vt-card": the covers).
+ * to the other. Merge `className` with cn, pass `style` and spread `attrs`. globals.css turns the
+ * name on only during those transitions, so it doesn't cut the element out of other slides.
+ * `kind` is a view-transition-class, for styling a family of morphs ("vt-card-text": the words
+ * on a featured card). `pair` is where its twin is (a page, or a section of home: /#projects): going anywhere
+ * else, it stays with its page.
  */
-export function morph(name: string, kind?: string) {
+export function morph(name: string, { kind, pair }: { kind?: string; pair?: string } = {}) {
   return {
-    // The kind is also a class, so CSS can switch a family of names off (see globals.css).
+    // The kind is also a class, so CSS can pick out a family of names (see globals.css).
     className: cn("vt-name", kind),
     style: { "--vt-name": name, ...(kind && { "--vt-class": kind }) } as React.CSSProperties,
+    attrs: pair ? { "data-vt-pair": pair } : {},
   };
 }
 

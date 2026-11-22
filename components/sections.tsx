@@ -23,6 +23,14 @@ function setCurrent(i: number) {
   for (const fn of listeners) fn();
 }
 
+/**
+ * How a tab marks the current one for screen readers: on home it's a place on the page, elsewhere
+ * the page itself.
+ */
+export function useCurrentKind() {
+  return usePathname() === "/" ? "location" : "page";
+}
+
 /** Which page the tabs mark: on home the section in view, elsewhere the page the path is part of. */
 export function useCurrentPage() {
   const pathname = usePathname();
@@ -31,7 +39,7 @@ export function useCurrentPage() {
 }
 
 /** The section in view: the last one whose top has passed the upper third of the screen. */
-function sectionInView() {
+export function sectionInView() {
   const line = window.innerHeight / 3;
   let i = 0;
   PAGES.forEach((p, k) => {
@@ -53,7 +61,6 @@ export function SectionSpy() {
     const update = () => {
       frame = 0;
       const i = sectionInView();
-      if (i === current) return;
       setCurrent(i);
       const url = i === 0 ? "/" : `/#${PAGES[i].id}`;
       if (window.location.pathname + window.location.hash !== url) window.history.replaceState(null, "", url);
@@ -61,14 +68,22 @@ export function SectionSpy() {
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    // Arriving at /#play, the browser has already scrolled there: mark it straight away.
+    // Arriving at /#play, the browser has already scrolled there: mark it straight away. Back or
+    // Forward may put the scroll somewhere else again, so look once more after those.
+    const recheck = () => requestAnimationFrame(() => setCurrent(sectionInView()));
     setCurrent(sectionInView());
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.addEventListener("popstate", recheck);
+    window.addEventListener("pageshow", recheck);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.removeEventListener("popstate", recheck);
+      window.removeEventListener("pageshow", recheck);
+      // Off home the tabs follow the path; coming back, they start from the top, not a stale section.
+      setCurrent(0);
     };
   }, []);
   return null;

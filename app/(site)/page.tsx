@@ -1,13 +1,12 @@
-import { ABOUT_BRIEF, FEATURED_ABOUT } from "@/lib/about";
+import { ABOUT_LEAD, FEATURED_ABOUT } from "@/lib/about";
 import { PAGES } from "@/lib/pages";
-import { cn, hoverLink, pageMain } from "@/lib/utils";
+import { cn, pageMain } from "@/lib/utils";
 import { PageTitle, PageTitleLink } from "@/components/page-title";
-import { AboutIntro, AboutSectionBlock } from "@/components/about-sections";
+import { AboutPreview } from "@/components/about-sections";
 import { Breakout } from "@/components/breakout";
-import { NudgeArrow } from "@/components/nudge-arrow";
 import { Portfolio } from "@/components/portfolio";
 import { SectionSpy } from "@/components/sections";
-import { SlideLink } from "@/components/slide-link";
+import { SeeMoreButton } from "@/components/see-more-button";
 
 const [ABOUT, PROJECTS, PLAY] = PAGES;
 
@@ -19,30 +18,24 @@ const section = "scroll-mt-12 md:scroll-mt-[calc(64*var(--u))]";
  * The sidebar's tabs follow the scroll and glide to a section (components/sections.tsx); the
  * footer ends it.
  *
- * About is the short preview: the photo beside a few lines on who Eric is, then the skills (the
- * featured sections in lib/about.ts). Its title and "See more about me" slide to the full page
- * (/about/more), as Projects' slide to the grid (/projects/all).
+ * About is the short preview: the portrait beside the one line on who Eric is, with the skills
+ * (the featured sections in lib/about.ts) under that line, and "My story" centred below, all
+ * short enough to show at once. Its title and "My story" slide to the full page (/about/more),
+ * where the portrait, the summary and the skills each glide to their new places; Projects' slide
+ * to the grid (/projects/all) the same way.
  */
 export default function Home() {
   return (
-    <main className={cn(pageMain, "flex flex-col gap-[calc(150*var(--u))]")}>
+    <main className={cn(pageMain, "flex flex-col gap-[calc(60*var(--u))]")}>
       <section id={ABOUT.id} aria-label={ABOUT.label} className={section}>
         <PageTitle>
           <PageTitleLink href="/about/more" dir="forward" vtName="about-title">
             About
           </PageTitleLink>
         </PageTitle>
-        <div className="flex flex-col gap-[calc(45*var(--u))]">
-          <AboutIntro paragraphs={ABOUT_BRIEF} lead />
-          {FEATURED_ABOUT.map((s) => (
-            <AboutSectionBlock key={s.label} section={s} />
-          ))}
-          <p className="fw-label">
-            <SlideLink href="/about/more" dir="forward" className={cn("group inline-flex items-baseline", hoverLink)}>
-              SEE MORE ABOUT ME
-              <NudgeArrow />
-            </SlideLink>
-          </p>
+        <div className="flex flex-col gap-[calc(27*var(--u))]">
+          <AboutPreview lead={ABOUT_LEAD} sections={FEATURED_ABOUT} />
+          <SeeMoreButton href="/about/more">My story</SeeMoreButton>
         </div>
       </section>
 
@@ -52,9 +45,7 @@ export default function Home() {
 
       <section id={PLAY.id} aria-label={PLAY.label} className={section}>
         <PageTitle as="h2">Play</PageTitle>
-        <div className="max-w-[calc(720*var(--u))]">
-          <Breakout />
-        </div>
+        <Breakout />
       </section>
 
       <SectionSpy />

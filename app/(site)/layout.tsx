@@ -12,7 +12,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
       {/* The page beside the sidebar. It's its own view-transition layer while a tab switch
           slides it up or down (globals.css), so the sidebar holds still. */}
-      <div className="page-slot min-w-0">{children}</div>
+      <div data-swipe="page" className="page-slot min-w-0">
+        {children}
+      </div>
     </div>
   );
 }

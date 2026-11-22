@@ -5,8 +5,8 @@ import { motion, useAnimationControls, useReducedMotion } from "motion/react";
 import type { Project } from "@/lib/projects";
 import { MediaSlot } from "@/components/media-slot";
 import { SlideLink, useSlideDir, useSlideOrigin } from "@/components/slide-link";
-import { isFeatured } from "@/lib/featured";
-import { cn, hoverLink, morph, projectPiece } from "@/lib/utils";
+import { cardText, isFeatured } from "@/lib/featured";
+import { cn, morph, projectPiece } from "@/lib/utils";
 
 /** The soft background a project card takes while hovered or focused. */
 export const cardHover = cn(
@@ -48,8 +48,9 @@ export function useHoverPlay<T extends HTMLElement>() {
   return { ref, playing: active || inView, handlers };
 }
 
-// Each card enters as a block in two beats: it fades in a little out of place (scattered off to
-// the left, the way the page sweeps in), then glides into its slot in grid order. No blur or grey.
+// Each card enters as a block in two beats: it fades in a little out of place (off to the right
+// and a little high, the way the page sweeps in from the right on the way here), then falls into
+// its slot in grid order. No blur or grey.
 const STAGGER = 0.045; // seconds between cards
 const MAX_STAGGERED = 12;
 const GLIDE = [0.32, 0.72, 0, 1] as const;
@@ -58,8 +59,8 @@ const GLIDE = [0.32, 0.72, 0, 1] as const;
 function scatter(i: number) {
   return {
     opacity: 0,
-    x: `${-(18 + (i % 3) * 10)}%`,
-    y: `${(((i * 37) % 5) - 2) * 7}%`,
+    x: `${14 + (i % 3) * 8}%`,
+    y: `${-(6 + ((i * 37) % 4) * 4)}%`,
     rotate: (((i * 53) % 7) - 3) * 1.1,
     scale: 0.94,
   };
@@ -75,8 +76,8 @@ function useBlockEntrance(index: number, glides: boolean) {
   useEffect(() => {
     // The server always renders the scattered start, so reduced motion settles it here rather
     // than skipping `initial` (which would leave the server's hidden styles in place).
-    // A featured card arriving from home: its cover glides here in the page transition, so it
-    // starts in place. (Only on a client navigation, so this can't differ from server HTML.)
+    // A featured card arriving from home: it glides here in the page transition, so it starts
+    // in place. (Only on a client navigation, so this can't differ from server HTML.)
     if (still || glides) {
       controls.set(SETTLED);
       return;
@@ -98,20 +99,89 @@ function useBlockEntrance(index: number, glides: boolean) {
 }
 
 /**
+ * What's in a project's card, the same block on home's Projects section and in the grid: the
+ * cover, the name with when it was started over a hairline, and its one line (always there, so
+ * nothing moves on hover). The gif plays while `playing`.
+ *
+ * `pair`: where this card's twin is (a featured card: home's is in the grid, the grid's on home).
+ * Its pieces then travel to their twins' places during the slide between the two (morph), all on
+ * one curve, so the card moves as one block: the cover scales, the words keep their size.
+ * `pieces`: also mark them for the slide to the project's own page (the grid's cards).
+ *
+ * The words are set to the grid card's measure on both pages (from lg up, where the grid is three
+ * across and home's cards are wider): the name, the date's column and the line each get the width
+ * they have in the grid, so they wrap the same and are the same picture at both ends of the
+ * slide. Nothing has to cross-fade into a different wrapping.
+ */
+// The grid card's width at lg and up: a third of the frame (1120) less its margins (2 × 45) and
+// gaps (2 × 27), rounded down; the date's column; and what's left for the name beside it.
+const TEXT_W = "lg:max-w-[calc(325*var(--u))]";
+const DATE_W = "lg:w-[calc(70*var(--u))]";
+const NAME_W = "lg:max-w-[calc(239*var(--u))]"; // 325 - the 16 gap - 70
+export function CardBody({ project: p, playing, pair, pieces = false }: { project: Project; playing: boolean; pair?: string; pieces?: boolean }) {
+  const { title, built } = cardText(p);
+  const part = (name: string, kind: string) => (pair ? morph(`card-${p.slug}-${name}`, { kind, pair }) : undefined);
+  const piece = (name: Parameters<typeof projectPiece>[1]) => (pieces ? projectPiece(p.slug, name) : {});
+  const cover = part("cover", "vt-card-cover");
+  const name = part("title", "vt-card-text");
+  const date = part("date", "vt-card-text");
+  const rule = part("rule", "vt-card-rule");
+  const line = part("line", "vt-card-text");
+
+  return (
+    <>
+      <div {...piece("cover")} {...cover?.attrs} style={cover?.style} className={cn("aspect-video w-full overflow-hidden", cover?.className)}>
+        <div className="h-full w-full transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.03]">
+          <MediaSlot project={p} playing={playing} />
+        </div>
+      </div>
+      {/* The name, then when it was started at the far right. The name wraps rather than cut off. */}
+      <p className="mt-[calc(12*var(--u))] flex items-baseline justify-between gap-[calc(16*var(--u))]">
+        <span
+          {...piece("title")}
+          {...name?.attrs}
+          style={name?.style}
+          title={p.title}
+          className={cn("fw-title min-w-0 underline-offset-4 group-hover:underline", NAME_W, name?.className)}
+        >
+          {title}
+        </span>
+        <span
+          {...piece("dates")}
+          {...date?.attrs}
+          style={date?.style}
+          className={cn("fw-small shrink-0 whitespace-nowrap text-right uppercase tracking-[0.06em]", DATE_W, date?.className)}
+        >
+          {built}
+        </span>
+      </p>
+      {/* The hairline, its own piece so it can stretch to the card's width as the card travels. */}
+      <span aria-hidden {...rule?.attrs} style={rule?.style} className={cn("mt-[calc(6*var(--u))] block h-px bg-ink", rule?.className)} />
+      {/* Hugs its words (w-fit), within the grid card's measure, so it's the same picture on both pages. */}
+      <p
+        {...piece("line")}
+        {...line?.attrs}
+        style={line?.style}
+        className={cn("fw-text mt-[calc(6*var(--u))] w-fit max-w-full text-ink/70", TEXT_W, line?.className)}
+      >
+        {p.line}
+      </p>
+    </>
+  );
+}
+
+/**
  * A card on the projects page. Its gif holds on a still and plays only while hovered. `index` is
- * its place in the grid, for the order the cards glide in.
+ * its place in the grid, for the order the cards fall in.
  */
 export function ProjectCard({ project: p, index }: { project: Project; index: number }) {
   const { ref, playing, handlers } = useHoverPlay<HTMLAnchorElement>();
-  // Only a slide from home has a cover to glide from ("See more →" also comes from other pages).
+  // Only a slide from home has a card to glide from ("See more →" also comes from other pages).
   const glides = useSlideOrigin() === "/" && isFeatured(p.slug);
   // Coming back from a project page, the grid is simply there (that card's pieces fly home).
   const fromProject = useSlideDir() === "close";
   const settled = glides || fromProject;
   const { controls, initial } = useBlockEntrance(index, settled);
-  // Only home's covers have a twin to glide from. Named, the others would be lifted out of their
-  // card for the transition and held where their entrance starts.
-  const cover = isFeatured(p.slug) ? morph(`project-${p.slug}`, "vt-card") : undefined;
 
   return (
     <motion.div initial={initial} animate={controls} className="h-full">
@@ -122,28 +192,13 @@ export function ProjectCard({ project: p, index }: { project: Project; index: nu
         dir="open"
         morph={p.slug}
         {...handlers}
-        className={cn("group block", cardHover, cardFill)}
+        // data-vt-block: its pieces go, or stay, together (slideTo's pickMorphs).
+        data-vt-block=""
+        className={cn("group block", cardHover, cardFill, "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink")}
       >
-        {/* One line, so every cover in a row starts level: the title shortens, the date doesn't. */}
-        <p className="fw-label flex justify-between gap-6">
-          <span {...projectPiece(p.slug, "name")} title={p.title} className="min-w-0 truncate uppercase">{p.title}</span>
-          <span {...projectPiece(p.slug, "dates")} className="shrink-0 whitespace-nowrap text-mute">{p.dates}</span>
-        </p>
-        {/* morph: coming from home, a featured cover glides here from its spot there. */}
-        <div {...projectPiece(p.slug, "cover")} className={cn("aspect-video w-full overflow-hidden", cover?.className)} style={cover?.style}>
-          <MediaSlot project={p} playing={playing} />
-        </div>
-        {/* One line: a title longer than the card ends in an ellipsis (the full one on hover). */}
-        {/* The pieces of text hug their words (w-fit), so each one scales to its twin's size. */}
-        <p className="mt-[calc(14*var(--u))] flex">
-          <span {...projectPiece(p.slug, "title")} title={p.title} className={cn("fw-title min-w-0 truncate", hoverLink, "group-hover:underline")}>
-            {p.title}
-          </span>
-        </p>
-        <p {...projectPiece(p.slug, "tags")} className="fw-text w-fit max-w-full text-mute">
-          {p.tags.map((t) => `#${t}`).join("  ")}
-        </p>
-        <p {...projectPiece(p.slug, "line")} className="fw-text mt-[calc(10*var(--u))] w-fit max-w-full">{p.line}</p>
+        {/* Only home's featured cards have a twin: named, the others' pieces would be lifted out
+            and held where their entrance starts. */}
+        <CardBody project={p} playing={playing} pair={isFeatured(p.slug) ? "/#projects" : undefined} pieces />
       </SlideLink>
     </motion.div>
   );

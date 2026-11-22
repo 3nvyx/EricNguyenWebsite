@@ -408,7 +408,20 @@ export function Breakout() {
       onMove(e);
       launch();
     };
+    // The game sits on the long home page: off screen, it pauses and ignores the keys (the arrow
+    // keys are the page's again), so a run can't play on, or end, out of sight.
+    let visible = true;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (!visible) keys.current.left = keys.current.right = false;
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(canvas);
+
     const onKey = (down: boolean) => (e: KeyboardEvent) => {
+      if (!visible) return;
       // Leave typing alone (the name field for the leaderboard).
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.key === "ArrowLeft" || e.key === "a") keys.current.left = down;
@@ -785,6 +798,11 @@ export function Breakout() {
       // Clamp dt so a backgrounded tab doesn't teleport the ball on return.
       const dt = Math.min(0.033, (now - last) / 1000);
       last = now;
+      // Paused while scrolled away (see `visible`).
+      if (!visible) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       if (phaseRef.current !== "over") step(dt);
       draw();
       syncEffects();
@@ -794,6 +812,7 @@ export function Breakout() {
 
     return () => {
       cancelAnimationFrame(raf);
+      io.disconnect();
       ro.disconnect();
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerdown", onDown);
