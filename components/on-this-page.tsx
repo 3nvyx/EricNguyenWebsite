@@ -5,7 +5,8 @@ import { cn, hoverLink } from "@/lib/utils";
 
 /**
  * "On this page": the write-up's sections, styled like the page tabs. The section being read
- * is in ink; the rest are gray.
+ * is in ink; the rest are gray. Clicking one glides the page to that section (it jumps instead
+ * for reduced motion) and puts the section in the address, without adding a history entry.
  */
 export function OnThisPage({ sections }: { sections: { id: string; label: string }[] }) {
   const [active, setActive] = useState(sections[0]?.id);
@@ -32,7 +33,20 @@ export function OnThisPage({ sections }: { sections: { id: string; label: string
       <ul className="fw-text mt-[calc(10*var(--u))]">
         {sections.map((s) => (
           <li key={s.id}>
-            <a href={`#${s.id}`} className={cn(hoverLink, s.id === active ? "text-ink" : "fw-nav-off")}>
+            <a
+              href={`#${s.id}`}
+              onClick={(e) => {
+                // A new tab or window keeps the plain link.
+                if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                const el = document.getElementById(s.id);
+                if (!el) return;
+                e.preventDefault();
+                const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                el.scrollIntoView({ behavior: still ? "instant" : "smooth", block: "start" });
+                window.history.replaceState(null, "", `#${s.id}`);
+              }}
+              className={cn(hoverLink, s.id === active ? "text-ink" : "fw-nav-off")}
+            >
               {s.label}
             </a>
           </li>

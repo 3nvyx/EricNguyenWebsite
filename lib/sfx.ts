@@ -94,6 +94,13 @@ export function createSfx() {
         { freq: 1175, dur: 0.06, type: "square", gain: 0.3, delay: 0.05 },
         { freq: 1568, dur: 0.1, type: "square", gain: 0.3, delay: 0.1 },
       ),
+    boom: () =>
+      play(
+        { freq: 140, to: 40, dur: 0.3, type: "sawtooth", gain: 0.5 },
+        { freq: 90, to: 30, dur: 0.35, type: "square", gain: 0.3 },
+      ),
+    laser: () => play({ freq: 1400, to: 700, dur: 0.05, type: "square", gain: 0.12 }),
+    shield: () => play({ freq: 300, to: 600, dur: 0.12, type: "triangle", gain: 0.5 }),
     lose: () => play({ freq: 300, to: 80, dur: 0.4, type: "triangle", gain: 0.6 }),
     over: () =>
       play(

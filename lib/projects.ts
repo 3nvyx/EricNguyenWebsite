@@ -15,8 +15,20 @@ export type Project = {
   aspect?: string;
 };
 
-/** Newest first, by when each was started. The first three are the featured rows; the rest are listed under MORE. */
+/** Newest first, by when each was started. Which four are featured is set in lib/featured.ts. */
 export const PROJECTS: Project[] = [
+  {
+    slug: "zap",
+    title: "ZAP!",
+    line: "A spatial knowledge space for Meta Quest: say a topic, throw it into place, and step inside its world",
+    href: "https://zap-eosin.vercel.app",
+    dates: "Nov 2026",
+    tags: ["XR", "Meta Quest", "Voice AI", "Hackathon"],
+    stack: "Unity / C# / Python / World Labs",
+    // The name animation from the headset build (ZapIntro.mp4), then three moments from the
+    // headset tour: the Great Wall, the wormhole to the biology lab, the ribosome.
+    media: "/media/zap-intro.mp4",
+  },
   {
     slug: "luyten",
     title: "Cal Hacks Winner: Luyten – Autonomous Finance",

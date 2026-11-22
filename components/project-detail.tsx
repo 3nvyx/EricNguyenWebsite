@@ -1,12 +1,14 @@
 import Link from "next/link";
 import type { Project } from "@/lib/projects";
-import { PROJECTS } from "@/lib/projects";
+import { GRID_ORDER } from "@/lib/featured";
 import { PROJECT_DETAILS, type Fact } from "@/lib/project-details";
 import { MediaSlot } from "@/components/media-slot";
 import { Prose } from "@/components/prose";
-import { cn, hoverLink } from "@/lib/utils";
+import { cn, hoverLink, projectPiece } from "@/lib/utils";
+import { SlideLink } from "@/components/slide-link";
 import { sectionId } from "@/lib/content";
 import { OnThisPage } from "@/components/on-this-page";
+import { PROJECTS_GRID } from "@/lib/pages";
 
 const arrow = <span className="ml-0.5 align-top text-[0.75em]">↗</span>;
 
@@ -26,9 +28,10 @@ function defaultFacts(p: Project): Fact[] {
 export function ProjectDetail({ project }: { project: Project }) {
   const detail = PROJECT_DETAILS[project.slug];
   const facts = detail?.facts ?? defaultFacts(project);
-  const i = PROJECTS.findIndex((p) => p.slug === project.slug);
-  const prev = PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length];
-  const next = PROJECTS[(i + 1) % PROJECTS.length];
+  // Prev/next walk the grid's order (featured first), so they match the cards on /projects/all.
+  const i = GRID_ORDER.findIndex((p) => p.slug === project.slug);
+  const prev = GRID_ORDER[(i - 1 + GRID_ORDER.length) % GRID_ORDER.length];
+  const next = GRID_ORDER[(i + 1) % GRID_ORDER.length];
 
   const sections = (detail?.body ?? [])
     .filter((b): b is { h: string } => typeof b === "object" && "h" in b)
@@ -37,30 +40,33 @@ export function ProjectDetail({ project }: { project: Project }) {
   return (
     <div
       className={cn(
-        "px-5 pt-8 pb-24 md:px-[calc(45*var(--u))] md:pt-[calc(45*var(--u))] md:pb-[calc(120*var(--u))]",
-        "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,calc(855*var(--u)))_minmax(0,1fr)] lg:gap-x-[calc(45*var(--u))]",
+        "px-5 pt-8 pb-24 md:px-[var(--edge)] md:pt-[calc(45*var(--u))] md:pb-[calc(120*var(--u))]",
+        // In the site's centred frame, like every page: the article between two narrow rails.
+        "md:mx-auto md:max-w-[var(--frame)]",
+        "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,calc(640*var(--u)))_minmax(0,1fr)] lg:gap-x-[calc(45*var(--u))]",
       )}
     >
-      {/* Left rail: the way back, kept in view. */}
-      <aside className="mb-8 lg:sticky lg:top-[calc(64*var(--u))] lg:mb-0 lg:self-start">
-        <Link href="/projects" className={cn("fw-nav", hoverLink)}>
-          ← PROJECTS
-        </Link>
-      </aside>
+      {/* Left rail: empty, holding the article in the centre column. The way back to the grid is
+          "← Projects" at the top left (components/top-bar.tsx). */}
+      <div aria-hidden className="hidden lg:block" />
 
       <main>
         <h2 className="fw-label flex justify-between gap-6">
-          <span className="uppercase">{project.title}</span>
-          <span className="text-mute">{project.dates}</span>
+          <span {...projectPiece(project.slug, "name")} className="uppercase">{project.title}</span>
+          <span {...projectPiece(project.slug, "dates")} className="text-mute">{project.dates}</span>
         </h2>
 
-        <div className="w-full overflow-hidden" style={{ aspectRatio: project.aspect ?? "16 / 9" }}>
+        {/* Each piece marked with projectPiece arrives from its card on the grid (an `open` slide). */}
+        <div {...projectPiece(project.slug, "cover")} className="w-full overflow-hidden" style={{ aspectRatio: project.aspect ?? "16 / 9" }}>
           <MediaSlot project={project} controls />
         </div>
 
-        <h1 className="fw-name mt-[calc(36*var(--u))]">{project.title}</h1>
-        <p className="fw-text text-mute">{project.line}</p>
-        <p className="fw-text mt-[calc(4*var(--u))] flex flex-wrap gap-x-[calc(12*var(--u))] text-mute">
+        <h1 className="fw-name mt-[calc(36*var(--u))]">
+          {/* inline-block: one box even when the title wraps, as a view-transition piece must be. */}
+          <span {...projectPiece(project.slug, "title")} className="inline-block">{project.title}</span>
+        </h1>
+        <p {...projectPiece(project.slug, "line")} className="fw-text w-fit text-mute">{project.line}</p>
+        <p {...projectPiece(project.slug, "tags")} className="fw-text mt-[calc(4*var(--u))] flex w-fit flex-wrap gap-x-[calc(12*var(--u))] text-mute">
           {project.tags.map((t) => (
             <span key={t}>#{t}</span>
           ))}
@@ -118,9 +124,14 @@ export function ProjectDetail({ project }: { project: Project }) {
             <span className="fw-small uppercase text-mute">← Previous</span>
             <span className={cn("self-start", hoverLink, "group-hover:underline")}>{prev.title}</span>
           </Link>
-          <Link href="/projects" className={cn("self-center justify-self-center", hoverLink)}>
+          <SlideLink
+            href={PROJECTS_GRID}
+            dir="close"
+            morph={project.slug}
+            className={cn("self-center justify-self-center", hoverLink)}
+          >
             All projects
-          </Link>
+          </SlideLink>
           <Link href={`/projects/${next.slug}`} className="group flex flex-col items-end text-right">
             <span className="fw-small uppercase text-mute">Next →</span>
             <span className={cn(hoverLink, "group-hover:underline")}>{next.title}</span>

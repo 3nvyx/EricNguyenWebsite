@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "motion/react";
+import { useMountedInSlide } from "@/components/slide-link";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,11 +13,12 @@ import { cn } from "@/lib/utils";
 export function ChromeName({ className }: { className?: string }) {
   const ref = useRef<HTMLParagraphElement>(null);
   const { band, fade } = usePointerLight(ref);
+  const inSlide = useMountedInSlide();
 
   return (
     <motion.p
       ref={ref}
-      initial={{ opacity: 0 }}
+      initial={inSlide ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       className={cn("chrome-name font-display font-medium tracking-tight", className)}

@@ -125,6 +125,67 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     ],
   },
 
+  zap: {
+    facts: [
+      { label: "Type", values: ["Hackathon project", "Immerse the Bay 2026, Stanford XR", "Living Worlds track"] },
+      { label: "Team", values: ["Me", "@KevinNDoan", "@nadia827ny"] },
+      { label: "Duration", values: ["Nov 14 – 15, 2026"] },
+      { label: "Headset", values: ["Meta Quest 3 / 3S", "Unity 6, C#", "OpenXR", "XR Interaction Toolkit"] },
+      { label: "Relay", values: ["Python, FastAPI", "Faster Whisper", "GPT-6 Luna", "World Labs"] },
+      { label: "Design & pitch", values: ["Figma", "Next.js", "Three.js"] },
+    ],
+    // Follows the team's Devpost pitch (devpost.com/software/zap-gwayeo), section by section.
+    statement: "VR is good at space, interactivity and immersion. So why do its note apps put a flat desktop inside a headset?",
+    body: [
+      { h: "Inspiration" },
+      "Laptops and phones have plenty of tools for capturing and organizing ideas. VR has almost none, and the reasons are clear: headsets are niche, typing is slow, and wearing one for hours is uncomfortable. The few apps that do exist try to put a flat desktop inside a headset, which ignores what VR is actually good at: space, interactivity and immersion.",
+      "Kevin, Nadia and I wanted something closer to Notion or Obsidian, but built for a headset, where your ideas surround you instead of sitting in a sidebar. We built it at Immerse the Bay, Stanford XR's hackathon, for the Living Worlds track, and called it ZAP!.",
+      { figure: { src: "/media/zap/map.jpg", caption: "Where this year's hackers came from, on the screens at Immerse the Bay", aspect: "4 / 3" } },
+      { h: "What it does" },
+      "ZAP! is a spatial knowledge space for Meta Quest. You step into an immersive world and turn ideas into nodes you can place, move and connect around you.",
+      "A session starts with your voice. Hold a button on the controller and say a topic, and a glowing orb appears in your hand. An AI writes its note, using the ideas it descends from as context. You place the orb by throwing it, link it to related orbs by pointing from one to the other, and pull or stretch the whole map with two hands.",
+      { video: { src: "/media/zap/headset-tour.mp4", poster: "/media/zap/headset-tour-poster.jpg", caption: "A tour recorded from the headset: the constellation, the Great Wall, its watchtower and the biology lab", aspect: "720 / 756" } },
+      { figure: { src: "/media/zap/constellation.jpg", caption: "The home world: every world as an orb, and the connections between them", aspect: "1 / 1" } },
+      "Every orb is also a doorway. Throw one forward and you travel into a 3D world of that topic that you can walk around in.",
+      { figures: [
+        { src: "/media/zap/great-wall.jpg", caption: "Outside on the Great Wall, with a question and its answer on a glass pane", aspect: "1 / 1" },
+        { src: "/media/zap/watchtower.jpg", caption: "Travelling into the connected watchtower", aspect: "1 / 1" },
+      ] },
+      "Inside, you can grab and resize floating learning objects, ask questions out loud, and read the answers on glass panes that stay where you put them. You can even reshape the scene by voice: \"create RNA and delete the DNA.\"",
+      { figures: [
+        { src: "/media/zap/biology-lab.jpg", caption: "DNA and RNA models in the biology lab, with reading panes beside them", aspect: "1 / 1" },
+        { src: "/media/zap/ribosome.jpg", caption: "A ribosome, created by asking for one out loud", aspect: "1 / 1" },
+      ] },
+      { h: "How we built it" },
+      "We built ZAP! in Unity with C# and deployed it to the Meta Quest through Meta's developer platform.",
+      { list: [
+        "Worlds. World Labs' world models generate the immersive environments. For the demo we generated three ahead of time, the Great Wall, the inside of one of its watchtowers and a DNA biology lab, and exported them as textured 3D meshes that the headset loads at run time.",
+        "Interface and objects. Nadia designed the interface in Figma, and it comes into Unity through one shared theme. The learning objects inside each world aren't hand-modeled: an AI describes them using a small set of simple shapes, and Unity builds them on the spot.",
+        "Nodes. Each node stores its topic, its note, its position and its links in a small file on the headset. Everything you see is created from code when the app starts.",
+        "Input. Controllers plus voice. A small Python service on a laptop transcribes speech locally with Faster Whisper and calls GPT-6 Luna to write notes, answer questions and edit objects.",
+      ] },
+      { figures: [
+        { src: "/media/zap/building.jpg", caption: "Building between headset tests", aspect: "3 / 4" },
+        { src: "/media/zap/testing.jpg", caption: "Testing the constellation at our table", aspect: "3 / 4" },
+      ] },
+      { h: "Challenges we ran into" },
+      { list: [
+        "Scope. Our biggest debate was how broad to go. A general \"think anything\" tool risked feeling empty, and a tool for one narrow use case risked feeling like a toy. We settled on a general tool shown through three concrete worlds, so the demo has depth without locking the product to one subject.",
+        "World generation limits. Each World Labs world cost about 5,000 credits, so we could afford exactly three. We each had to make multiple accounts to create enough world assets.",
+        "Video is not a place. We first tried wrapping live generated video around the user. It drifted and never held together as one scene, so we moved to worlds with real geometry you can walk on.",
+      ] },
+      { h: "What we're proud of" },
+      "We shipped a working end-to-end concept on a real headset, a strong foundation for a lot of use cases. Creating and connecting nodes in 3D already feels natural: the orb is in your hand the moment you press the button, and you never touch a keyboard. We also put real effort into the interface so it feels native to VR rather than a 2D app floating in space, and the codebase is a solid base to keep building on.",
+      { figure: { src: "/media/zap/team-table.jpg", caption: "Nadia, Kevin and me at table 42, with the pitch site on one laptop and the headset's view on the other", aspect: "4 / 3" } },
+      { figures: [
+        { src: "/media/zap/team.jpg", caption: "Kevin, Nadia and me with Tevfik Demirbaş, one of the event's mentors", aspect: "3 / 4" },
+        { src: "/media/zap/hackers.jpg", caption: "182 hackers in 51 teams, and 267 attendees in all", aspect: "3 / 4" },
+      ] },
+      { h: "What we learned" },
+      "Most of us were new to Unity, C#, 3D modeling and Quest development, so the learning curve was steep. The biggest lesson was that typing kills immersion, so input has to be spatial and voice-first. The second was that world models make it possible to generate immersive experiences tailored to each user at run time, and that's the leverage the whole app runs on.",
+    ],
+  },
+
   luyten: {
     facts: [
       { label: "Type", values: ["Hackathon winner", "Cal Hacks, SpacetimeDB track"] },
