@@ -7,6 +7,9 @@ export type Page = { label: string; id: string; href: string; more?: { label: st
 /** Every project as a card grid (the featured ones are on home). */
 export const PROJECTS_GRID = "/projects/all";
 
+/** The game on its own page, on a wider board (the smaller one is on home). */
+export const PLAY_FULL = "/play/full";
+
 export const PAGES: Page[] = [
   // About's preview; the whole story (experience, leadership, awards) is one hover away.
   { label: "About", id: "about", href: "/", more: { label: "See more →", href: "/about/more" } },
@@ -14,15 +17,16 @@ export const PAGES: Page[] = [
   { label: "Projects", id: "projects", href: "/#projects", more: { label: "See more →", href: PROJECTS_GRID } },
   // Blogs are parked for now; the tab goes to the game instead.
   // { label: "BLOGS", href: "/blogs" },
-  { label: "Play", id: "play", href: "/#play" },
+  // The game; the full-size board is one hover away.
+  { label: "Play", id: "play", href: "/#play", more: { label: "Full size →", href: PLAY_FULL } },
 ];
 
 /**
  * Which page a path belongs to, off home (on home, the section in view: components/sections.tsx):
- * /about/more counts as About, everything under /projects as Projects.
+ * /about/more counts as About, everything under /projects as Projects, /play/full as Play.
  */
 export function activePage(pathname: string) {
-  return pathname.startsWith("/projects") ? 1 : 0;
+  return pathname.startsWith("/projects") ? 1 : pathname.startsWith("/play") ? 2 : 0;
 }
 
 /**

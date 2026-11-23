@@ -72,8 +72,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { h: "Overview" },
       "Chef Nourish is the internal system a private chef kitchen runs on. It holds client profiles and dietary restrictions, builds the weekly menus, and produces everything the kitchen and drivers need: cut sheets, labels, menu sheets, packing stations and delivery spreadsheets.",
       { figure: { src: "/media/chef-nourish/menu.jpg", caption: "Writing a week's menu, with the cut sheet filling in beside it", aspect: "4 / 3" } },
-      { h: "Context" },
-      "[How the kitchen worked before: what was done by hand, and what went wrong.]",
       { h: "Safety first, then AI" },
       "Restrictions are checked deterministically against an ingredient catalogue: if a dish conflicts with a client's diet, the check says so, every time. AI helps with the creative part, suggesting dishes and substitutions, and a person reviews before anything reaches the kitchen.",
       { h: "What it covers" },
@@ -88,10 +86,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
         { src: "/media/chef-nourish/substitutions.jpg", caption: "Reviewing a substitution for one client", aspect: "4 / 3" },
         { src: "/media/chef-nourish/labels.jpg", caption: "Generated labels", aspect: "4 / 3" },
       ] },
-      { h: "My part" },
-      "[What you owned on the team of three: features, decisions, and the hand-off to the client.]",
-      { h: "Reflections" },
-      "[What you learned building for a real kitchen.]",
     ],
   },
 
@@ -107,8 +101,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { h: "Overview" },
       "A credit-card-sized business card, 3D printed in white and black. The front has my name, contact details and a drawing of me; the back has a QR code and an NFC mark. Tap a phone on the mark and it opens my site, because there's an NFC tag sealed in the middle of the card. The model above is the exact geometry I print: drag it around, or pull the layers apart to see the tag.",
       { figure: { src: "/media/nfc-card/preview.png", caption: "Front and back as generated, with the tag pocket outlined in blue", aspect: "1772 / 579" } },
-      { h: "Context" },
-      "[Why you made it: the event or moment that made you want a card, and why a printed NFC one.]",
       { h: "Printing a tag inside" },
       "The card is built in layers, 0.1 mm each. Two layers of black art on the front face, a pocket just deep enough for the tag, a two-layer white lid, and two layers of black art on the back. The print pauses right after the pocket is finished, I drop the tag in, and the printer seals it over. The black art is inlaid flush, so both faces are perfectly flat.",
       { list: [
@@ -120,8 +112,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { h: "A card generator" },
       "Getting the first card right took prototypes, so I turned it into a script. Fill in a short config with a name, title, email, website, link for the QR code and an optional drawing, and it lays out the card, turns the fonts and SVG art into outlines, builds the two-colour model with manifold3d and writes a print-ready 3MF for Bambu Studio, with and without a lanyard slot.",
       "Before writing anything it checks the parts are watertight, flags lines too thin to print, warns if the name crowds the drawing, and scans the QR code back from the model to make sure it still opens the right link. Card thickness and the pause layer follow from the tag: an ultra-thin inlay gives a 0.7 mm card, a sticker 0.8 mm, a hard disc 1.8 mm.",
-      { h: "Reflections" },
-      "[What the prototypes taught you, how people react when they tap it, and what's next.]",
     ],
   },
 
@@ -257,7 +247,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
   nijello: {
     facts: [
       { label: "Type", values: ["Side project at Cal Hacks 13.0", "SpacetimeDB's ScrabbleBot arena"] },
-      { label: "Team", values: ["Me", "[teammates]"] },
+      { label: "Team", values: ["Me"] },
       { label: "Duration", values: ["Oct 24 – 25, 2026"] },
       { label: "Hardware", values: ["ASUS Ascent GX10", "NVIDIA GB10, 20 Arm cores", "128 GB unified memory"] },
       { label: "Result", values: ["Reached #1 on the ladder", "#7 of 146 now", "40th of 68 in Tournament 1"] },
@@ -344,8 +334,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { h: "Design decisions" },
       "Unverified and confirmed transcripts are separate types, so no calculation can ever read data a person hasn't signed off. A broken society rule fails loudly instead of quietly turning into \"doesn't qualify\". And an unreadable old record means \"ask the registrar\", never \"not a member\", so no student loses a membership they earned.",
       "Every Access column name lives in one file and is checked against the live database at import. 557 tests cover the parser, the confirmation gate, all seventeen rules, the GPA maths and the write planner.",
-      { h: "Reflections" },
-      "[What changed for the honors center, and what you'd do next.]",
     ],
   },
 
@@ -375,8 +363,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       "Applications ran for about six weeks, from Aug 24 to Oct 5. 216 people applied, 211 were accepted and 141 confirmed they were coming. The deadline drove the rush: 38% of applications arrived in the final week, and the last one landed two minutes before the form closed.",
       "Between Aug 24 and Oct 16 the site had 12,267 page views from about 1,500 visitors, 43% of them on phones.",
       { figure: { src: "/media/occhacks/applications-open.png", caption: "The homepage while applications were open, with the countdown to the deadline", aspect: "16 / 10" } },
-      { h: "Reflections" },
-      "[What running the site during the event taught you, and what you'd change for next year.]",
     ],
   },
 
@@ -384,24 +370,19 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     facts: [
       { label: "Type", values: ["Project management", "Lead organizer"] },
       { label: "Team", values: ["Me (lead)", "6 departments across colleges"] },
-      { label: "Duration", values: ["30 hours", "[Month] 2024"] },
+      { label: "Duration", values: ["30 hours"] },
       { label: "Recognition", values: ["OCC Event of the Year 2025"] },
     ],
-    statement: "[One line on why HackCC needed to exist: what community college students were missing.]",
     body: [
       { h: "Overview" },
       "HackCC 2024 was a 30-hour hackathon for community college students, run by a team drawn from several colleges. I led it as lead organizer, directing six departments that handled sponsorship, the venue, catering, mentors and overnight accommodations for 100+ attendees.",
       { youtube: { id: "vT81BYkjc8k", caption: "HackCC 2024, the recap" } },
-      { h: "Running it" },
-      "[How the six departments split the work, and the hardest call you made as lead.]",
       { h: "How it went" },
-      "Across HackCC and Spookathon we raised over $21,000 in sponsorship, and HackCC won OCC's Event of the Year at Honors Night 2025. [Attendance, projects and winners for HackCC itself.]",
+      "Across HackCC and Spookathon we raised over $21,000 in sponsorship, and HackCC won OCC's Event of the Year at Honors Night 2025.",
       { figures: [
         { src: "/media/hackcc/tracks.jpg", caption: "The four tracks, on the event site" },
         { src: "/media/hackcc/sponsors.jpg", caption: "The sponsors who made it happen" },
       ] },
-      { h: "Reflections" },
-      "[What you carried into Spookathon and OCC Hacks.]",
     ],
   },
 
@@ -409,23 +390,19 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
     facts: [
       { label: "Type", values: ["Project management", "Lead organizer"] },
       { label: "Team", values: ["Me (lead)", "6 departments across colleges"] },
-      { label: "Duration", values: ["30 hours", "[Month] 2025"] },
+      { label: "Duration", values: ["30 hours"] },
     ],
-    statement: "[One line on what Spookathon set out to do differently from HackCC.]",
     body: [
       { h: "Overview" },
       "Spookathon 2025 was a 30-hour hackathon that followed HackCC, run by the same cross-college team. I led it as lead organizer: sponsorship, the venue, catering, mentors and overnight accommodations for 100+ attendees.",
       { youtube: { id: "I9FVxneDnL4", caption: "Spookathon 2025, the recap" } },
       { h: "Running it" },
-      "[What changed from HackCC: the theme, the format, the team.]",
       { figures: [
         { src: "/media/spookathon/about.jpg", caption: "The Halloween theme ran through the whole site" },
         { src: "/media/spookathon/tracks.jpg", caption: "Six tracks, including a Math Honor Society challenge" },
       ] },
       { h: "How it went" },
-      "Across HackCC and Spookathon we raised over $21,000 in sponsorship. [Attendance, projects and winners for Spookathon itself.]",
-      { h: "Reflections" },
-      "[What you'd tell the next lead organizer.]",
+      "Across HackCC and Spookathon we raised over $21,000 in sponsorship.",
     ],
   },
 
@@ -453,17 +430,12 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
         { src: "/media/q-industries/customers.png", caption: "Customers and partners by industry", aspect: "4 / 3" },
         { src: "/media/q-industries/contact.png", caption: "The contact form", aspect: "4 / 3" },
       ] },
-      { h: "My part" },
-      "[What you led on the build, and how knowing the company from the inside shaped it.]",
-      { h: "Reflections" },
-      "[What you learned building for a client you used to work for.]",
     ],
   },
 
   "pickle-banh-mi": {
     facts: [
       { label: "Type", values: ["Client work", "at Plethora"] },
-      { label: "Team", values: ["[Team]"] },
       { label: "Status", values: ["Designed in Figma", "not built"] },
       { label: "Tools", values: ["Figma"] },
     ],
@@ -476,9 +448,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       "Every section leads to an order. The hero sells the food and the press bar backs it up. Then a single card offers both ways to buy: delivery through DoorDash or Grubhub, or pickup through online ordering. The menu shows nine dishes with another order button at the top, and the footer repeats the main links: menu, catering, Yelp, locations and contact.",
       { figure: { src: "/media/pickle-banh-mi/order.jpg", caption: "Delivery or pickup, from one card", aspect: "1512 / 862" } },
       { figure: { src: "/media/pickle-banh-mi/menu.jpg", caption: "The menu, a grid of the shop's dishes", aspect: "1512 / 975" } },
-      "[The decisions behind it: the type, the red and pink, the photography.]",
-      { h: "Reflections" },
-      "[What you'd carry into the build if it picks back up.]",
     ],
   },
 
@@ -504,8 +473,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       ] },
       { h: "How it works" },
       "The agent runs separately and reports back through a Discord bridge. Its events stream to the browser over Pusher, so the dashboard updates the moment something happens.",
-      { h: "My part" },
-      "[What you built on the team of three.]",
     ],
   },
 
@@ -536,7 +503,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
         "AMATYC Student Math League, Fall and Spring combined: up 15.8%",
       ] },
       { h: "Why it matters" },
-      "Fine-tuning a small model on concise reasoning made it more accurate without heavier hardware. That points to cheaper, clearer reasoning models for tutoring, proof assistance and debugging. [What you'd test next with more data or full precision.]",
+      "Fine-tuning a small model on concise reasoning made it more accurate without heavier hardware. That points to cheaper, clearer reasoning models for tutoring, proof assistance and debugging.",
     ],
   },
 
@@ -545,7 +512,7 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
       { label: "Type", values: ["Product design", "and fabrication"] },
       { label: "Team", values: ["Me"] },
       { label: "Duration", values: ["Jan 2026"] },
-      { label: "Tools", values: ["[Design program]", "Bambu P1S", "CNC router"] },
+      { label: "Tools", values: ["Bambu P1S", "CNC router"] },
       { label: "Materials", values: ["Translucent smoke PLA", "Galaxy black PLA", "Recycled redwood oak"] },
     ],
     statement: "A minimal, geometric form that lets the light do all the talking.",
@@ -570,8 +537,6 @@ export const PROJECT_DETAILS: Record<string, ProjectDetail> = {
         { src: "/media/glow-box/reaching.jpg", caption: "Lighting the bookshelf", aspect: "3 / 4" },
         { src: "/media/glow-box/reading.jpg", caption: "Though the phone still wins", aspect: "9 / 8" },
       ] },
-      { h: "Reflections" },
-      "[What you learned from the new program and tools, and what you'd change in version two.]",
     ],
   },
 };

@@ -3,15 +3,35 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createSfx, onMutedChange, readMuted, type Sfx } from "@/lib/sfx";
 import { Leaderboard } from "@/components/leaderboard";
+import { PLAY_FULL } from "@/lib/pages";
+import { cn, morph } from "@/lib/utils";
 
 // Logical playfield in game units; the canvas scales it to the column width.
-const W = 640;
 const H = 480;
-const COLS = 10;
 const GAP = 4;
-const BLOCK_W = (W - GAP * (COLS + 1)) / COLS;
+const BLOCK_W = (640 - GAP * 11) / 10;
 const BLOCK_H = 18;
+
+/**
+ * Board sizes, by column count: home's 10 make a 4:3 board (640 wide). The full-size page
+ * (/play/full) adds columns rather than scaling up, so the board gets wider but still fits a
+ * laptop screen. Blocks, ball and paddle stay the same size on both.
+ */
+type Board = { cols: number; w: number };
+const board = (cols: number): Board => ({ cols, w: GAP * (cols + 1) + BLOCK_W * cols });
+const BOARD = { normal: board(10), wide: board(14) };
+/** Room the full-size page needs around the board: its top bar, padding and the score row. */
+const FIT_CHROME = "calc(200 * var(--u))";
+
 const ROW_H = BLOCK_H + GAP;
+
+// Phones get home's board even on the full-size page: 14 columns across a phone makes blocks
+// too small to aim at. That's narrow screens, and phones on their side (short touch screens).
+const PHONE = "(max-width: 767px), (max-height: 500px) and (pointer: coarse)";
+// Read once when the page loads and never again, so turning a tablet or resizing the window
+// can't swap the board (and throw away a run) mid-game.
+const noSubscribe = () => () => {};
+const readPhone = () => window.matchMedia(PHONE).matches;
 const START_ROWS = 5;
 
 const PADDLE_H = 10;
@@ -123,9 +143,9 @@ function pickKind(elapsed: number): Kind {
 }
 
 /** A row with a few holes. Only plain and armoured blocks carry power-ups. */
-function makeRow(y: number, elapsed: number): Block[] {
+function makeRow(y: number, elapsed: number, cols: number): Block[] {
   const row: Block[] = [];
-  for (let c = 0; c < COLS; c++) {
+  for (let c = 0; c < cols; c++) {
     if (Math.random() > 0.8) continue;
     const kind = pickKind(elapsed);
     const carries = kind === "normal" || kind === "tough" || kind === "steel";
@@ -137,12 +157,12 @@ function makeRow(y: number, elapsed: number): Block[] {
       power: carries && Math.random() < 0.14 ? pickPower() : undefined,
     });
   }
-  return row.length ? row : makeRow(y, elapsed);
+  return row.length ? row : makeRow(y, elapsed, cols);
 }
 
-function freshState() {
+function freshState({ cols, w }: Board) {
   const blocks: Block[] = [];
-  for (let r = 0; r < START_ROWS; r++) blocks.push(...makeRow(GAP + r * ROW_H, 0));
+  for (let r = 0; r < START_ROWS; r++) blocks.push(...makeRow(GAP + r * ROW_H, 0, cols));
   return {
     blocks,
     balls: [] as Ball[],
@@ -152,7 +172,7 @@ function freshState() {
     pops: [] as Pop[],
     // The y of the newest (top) row; when it creeps down off the edge, another row spawns above it.
     topY: GAP,
-    paddleX: (W - PADDLE.base) / 2,
+    paddleX: (w - PADDLE.base) / 2,
     paddleW: PADDLE.base,
     paddleTarget: PADDLE.base,
     // Play times when each timed effect wears off; 0 (or anything already past) means off.
@@ -189,8 +209,27 @@ function steepen(b: Ball, speed: number) {
  * (armoured, explosive, row-clearing, bonus), some carry a power-up to catch (green) or dodge
  * (red, worth bonus points if you're brave). Breaking blocks without touching the paddle builds
  * a score multiplier.
+ *
+ * `wide`: the full-size page's board, with more columns, sized so all of it fits on screen
+ * (home's board on phones).
  */
-export function Breakout() {
+export function Breakout({ wide = false }: { wide?: boolean }) {
+  const phone = useSyncExternalStore(noSubscribe, readPhone, () => false);
+  const size = wide && !phone ? BOARD.wide : BOARD.normal;
+  // The server renders the wide board; on a phone the first client render swaps to home's, as a
+  // fresh game (before anyone can have started one).
+  return <Game key={size.cols} size={size} full={wide} />;
+}
+
+const BOARD_MORPH = {
+  home: morph("play-board", { kind: "vt-board", pair: PLAY_FULL }),
+  full: morph("play-board", { kind: "vt-board", pair: "/#play" }),
+};
+
+/** `full`: on the full-size page (whichever board it got), so its board pairs with home's. */
+function Game({ size, full }: { size: Board; full: boolean }) {
+  const wide = size === BOARD.wide;
+  const boardMorph = full ? BOARD_MORPH.full : BOARD_MORPH.home;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<Phase>("ready");
   const [score, setScore] = useState(0);
@@ -201,11 +240,12 @@ export function Breakout() {
   const muted = useSyncExternalStore(onMutedChange, readMuted, () => false);
   const sfx = useRef<Sfx | null>(null);
   const phaseRef = useRef<Phase>("ready");
-  const state = useRef(freshState());
+  const state = useRef(freshState(size));
   const keys = useRef({ left: false, right: false });
   const runs = useRef(0);
 
   useEffect(() => {
+    const { w: W, cols } = size;
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
     const fx = (sfx.current = createSfx());
@@ -251,7 +291,7 @@ export function Breakout() {
     const launch = () => {
       fx.unlock();
       if (phaseRef.current === "over") {
-        state.current = freshState();
+        state.current = freshState(size);
         setScore(0);
         setMult(1);
         setResult(null);
@@ -473,7 +513,7 @@ export function Breakout() {
       s.topY += creep * dt;
       while (s.topY > GAP) {
         s.topY -= ROW_H;
-        s.blocks.push(...makeRow(s.topY, s.elapsed));
+        s.blocks.push(...makeRow(s.topY, s.elapsed, cols));
       }
       if (s.blocks.some((k) => k.y + BLOCK_H >= PADDLE_Y - 1)) return end();
 
@@ -819,7 +859,7 @@ export function Breakout() {
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
     };
-  }, []);
+  }, [size]);
 
   const overlay =
     phase === "ready"
@@ -829,58 +869,66 @@ export function Breakout() {
         : null;
 
   return (
-    <div>
-      <div className="fw-small mb-[calc(10*var(--u))] flex items-center justify-between gap-4 text-mute">
-        <span className="flex flex-wrap items-center gap-x-[calc(14*var(--u))]">
-          <span>
-            SCORE <span className="text-ink tabular-nums">{score}</span>
-            {mult > 1 && <span className="ml-1.5 text-[#1f9a6e]">×{mult}</span>}
-          </span>
-          {effects.map((e) => (
-            <span key={e.label} className={`tabular-nums ${e.bad ? "text-[#e0453a]" : "text-[#1f9a6e]"}`}>
-              {e.label}
-              {e.left > 0 && ` ${e.left}`}
+    // The full-size board is capped by the screen's height, so the score row, the whole board and
+    // the paddle are all in view at once (FIT_CHROME is the top bar and page padding). The game
+    // is centred in the page when that leaves room either side.
+    <div className={cn(wide && "mx-auto")} style={wide ? { maxWidth: `calc((100svh - ${FIT_CHROME}) * ${size.w / H})` } : undefined}>
+      {/* The score row and board are one block on home and on the full page: it glides between
+          them on the page slide (vt-board in globals.css), paired with the page its twin is on. */}
+      <div className={boardMorph.className} style={boardMorph.style} {...boardMorph.attrs}>
+        <div className="fw-small mb-[calc(10*var(--u))] flex items-center justify-between gap-4 text-mute">
+          <span className="flex flex-wrap items-center gap-x-[calc(14*var(--u))]">
+            <span>
+              SCORE <span className="text-ink tabular-nums">{score}</span>
+              {mult > 1 && <span className="ml-1.5 text-[#1f9a6e]">×{mult}</span>}
             </span>
-          ))}
-        </span>
-        <span className="flex items-center gap-[calc(18*var(--u))]">
-          <span>
-            BEST <span className="text-ink tabular-nums">{Math.max(best, score)}</span>
+            {effects.map((e) => (
+              <span key={e.label} className={`tabular-nums ${e.bad ? "text-[#e0453a]" : "text-[#1f9a6e]"}`}>
+                {e.label}
+                {e.left > 0 && ` ${e.left}`}
+              </span>
+            ))}
           </span>
-          <button
-            type="button"
-            onClick={() => {
-              sfx.current?.unlock();
-              sfx.current?.setMuted(!muted);
-            }}
-            className="cursor-pointer underline-offset-4 hover:text-ink hover:underline"
-          >
-            {muted ? "SOUND OFF" : "SOUND ON"}
-          </button>
-        </span>
-      </div>
-      <div className="relative border border-faint">
-        <canvas
-          ref={canvasRef}
-          tabIndex={0}
-          aria-label="Breakout game. Move the paddle with the mouse or arrow keys; click or press Space to start."
-          className="block aspect-[4/3] w-full cursor-none touch-none outline-none"
-        />
-        {overlay && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            {/* Backed so it stays readable when the wall has come down behind it. */}
-            <div className="flex flex-col items-center gap-[calc(6*var(--u))] bg-bone/90 px-[calc(24*var(--u))] py-[calc(14*var(--u))] text-center">
-              <p className="fw-title">{overlay.title}</p>
-              <p className="fw-small text-mute">
-                {overlay.lead}
-                {/* "Tap" on touch screens. */}
-                <span className="[@media(pointer:coarse)]:hidden">{overlay.verb}</span>
-                <span className="hidden [@media(pointer:coarse)]:inline">{overlay.verb === "Click" ? "Tap" : "tap"}</span>{" "}
-                {overlay.line}
-              </p>
+          <span className="flex items-center gap-[calc(18*var(--u))]">
+            <span>
+              BEST <span className="text-ink tabular-nums">{Math.max(best, score)}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                sfx.current?.unlock();
+                sfx.current?.setMuted(!muted);
+              }}
+              className="cursor-pointer underline-offset-4 hover:text-ink hover:underline"
+            >
+              {muted ? "SOUND OFF" : "SOUND ON"}
+            </button>
+          </span>
+        </div>
+        <div className="relative border border-faint">
+          <canvas
+            ref={canvasRef}
+            tabIndex={0}
+            aria-label="Breakout game. Move the paddle with the mouse or arrow keys; click or press Space to start."
+            className="block w-full cursor-none touch-none outline-none"
+            style={{ aspectRatio: `${size.w} / ${H}` }}
+          />
+          {overlay && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              {/* Backed so it stays readable when the wall has come down behind it. */}
+              <div className="flex flex-col items-center gap-[calc(6*var(--u))] bg-bone/90 px-[calc(24*var(--u))] py-[calc(14*var(--u))] text-center">
+                <p className="fw-title">{overlay.title}</p>
+                <p className="fw-small text-mute">
+                  {overlay.lead}
+                  {/* "Tap" on touch screens. */}
+                  <span className="[@media(pointer:coarse)]:hidden">{overlay.verb}</span>
+                  <span className="hidden [@media(pointer:coarse)]:inline">{overlay.verb === "Click" ? "Tap" : "tap"}</span>{" "}
+                  {overlay.line}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <div className="fw-small mt-[calc(10*var(--u))] flex flex-col gap-[calc(6*var(--u))] text-mute">
         <p>

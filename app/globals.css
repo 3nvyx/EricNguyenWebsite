@@ -203,6 +203,25 @@ html[data-slide]::view-transition-new(*.vt-photo) {
   object-fit: cover;
 }
 
+/* The game's score row and board (components/breakout.tsx) are one block on home and on the full
+   page, wider there with more columns, so the two walls of blocks differ. The block glides and
+   stretches on the slide's curve like any other piece; inside it the old one is gone before the
+   new one shows, so two walls, score rows or "Click to start" cards never overlap. Each fills the
+   block from the top and crops rather than stretch, since the two boards are different shapes.
+   The old one is all but gone (the curve is fast at the start) by the time the new one begins,
+   so there's no blink between them either. */
+@keyframes board-out { 40%, 100% { opacity: 0; } }
+@keyframes board-in { 0%, 30% { opacity: 0; } }
+html[data-slide]::view-transition-old(*.vt-board),
+html[data-slide]::view-transition-new(*.vt-board) {
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  mix-blend-mode: normal;
+}
+html[data-slide]::view-transition-old(*.vt-board) { animation-name: board-out; }
+html[data-slide]::view-transition-new(*.vt-board) { animation-name: board-in; }
+
 /* The sidebar closes all the way off the left edge (and opens back from it), solid as it goes. */
 @keyframes sidebar-away { to { transform: translateX(calc(-100% - var(--edge) - 1px)); } }
 @keyframes sidebar-return { from { transform: translateX(calc(-100% - var(--edge) - 1px)); } }

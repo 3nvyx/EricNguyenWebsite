@@ -72,6 +72,9 @@ const SETTLED = { opacity: 1, x: "0%", y: "0%", rotate: 0, scale: 1 };
 function useBlockEntrance(index: number, glides: boolean) {
   const controls = useAnimationControls();
   const still = useReducedMotion();
+  // Its place when it arrived. The grid's filter moves the cards that stay to new places; they
+  // glide there (components/project-grid.tsx) and don't enter again.
+  const order = useRef(index);
 
   useEffect(() => {
     // The server always renders the scattered start, so reduced motion settles it here rather
@@ -83,7 +86,7 @@ function useBlockEntrance(index: number, glides: boolean) {
       return;
     }
     let live = true;
-    const delay = Math.min(index, MAX_STAGGERED) * STAGGER;
+    const delay = Math.min(order.current, MAX_STAGGERED) * STAGGER;
     (async () => {
       await controls.start({ opacity: 1, transition: { duration: 0.25, delay } });
       if (!live) return;
@@ -93,15 +96,16 @@ function useBlockEntrance(index: number, glides: boolean) {
       live = false;
       controls.stop();
     };
-  }, [controls, index, still, glides]);
+  }, [controls, still, glides]);
 
   return { controls, initial: glides ? false : scatter(index) };
 }
 
 /**
  * What's in a project's card, the same block on home's Projects section and in the grid: the
- * cover, the name with when it was started over a hairline, and its one line (always there, so
- * nothing moves on hover). The gif plays while `playing`.
+ * cover (with a star in its corner if the project is featured), the name with when it was
+ * started over a hairline, and its one line (always there, so nothing moves on hover). The gif
+ * plays while `playing`.
  *
  * `pair`: where this card's twin is (a featured card: home's is in the grid, the grid's on home).
  * Its pieces then travel to their twins' places during the slide between the two (morph), all on
@@ -130,10 +134,28 @@ export function CardBody({ project: p, playing, pair, pieces = false }: { projec
 
   return (
     <>
-      <div {...piece("cover")} {...cover?.attrs} style={cover?.style} className={cn("aspect-video w-full overflow-hidden", cover?.className)}>
+      <div
+        {...piece("cover")}
+        {...cover?.attrs}
+        style={cover?.style}
+        className={cn("relative aspect-video w-full overflow-hidden", cover?.className)}
+      >
         <div className="h-full w-full transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.03]">
           <MediaSlot project={p} playing={playing} />
         </div>
+        {/* A featured project wears a star in its cover's corner, on home and in the grid alike
+            (it's part of the cover, so the card is still the same block on both). */}
+        {isFeatured(p.slug) && (
+          <span
+            title="Featured project"
+            className="absolute top-[calc(8*var(--u))] left-[calc(8*var(--u))] flex size-[calc(26*var(--u))] items-center justify-center rounded-full bg-bone text-ink shadow-[0_1px_4px_rgb(17_17_17/0.25)]"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="size-[calc(15*var(--u))]">
+              <path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" />
+            </svg>
+            <span className="sr-only">Featured project</span>
+          </span>
+        )}
       </div>
       {/* The name, then when it was started at the far right. The name wraps rather than cut off. */}
       <p className="mt-[calc(12*var(--u))] flex items-baseline justify-between gap-[calc(16*var(--u))]">

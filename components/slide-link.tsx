@@ -270,6 +270,18 @@ export function useSlideDir() {
   return dir;
 }
 
+// The page showing, until the next one has committed.
+let lastPath: string | null = null;
+
+/**
+ * The path of the page being left, for a page to read as it first renders: null on a page load.
+ * (SlideNavDone moves it on once the new page is in.) It doesn't depend on a slide running, so
+ * it's the same with reduced motion.
+ */
+export function cameFrom() {
+  return lastPath;
+}
+
 /**
  * Mounted once in the root layout. When the pathname changes, the new route has committed to
  * the DOM, so the view transition can take its "after" snapshot (after scrolling to the section
@@ -284,6 +296,7 @@ export function SlideNavDone() {
     }
     finishNav?.();
     finishNav = null;
+    lastPath = pathname;
   }, [pathname]);
   return null;
 }

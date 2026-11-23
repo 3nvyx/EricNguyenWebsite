@@ -1,5 +1,5 @@
 import { ABOUT_LEAD, FEATURED_ABOUT } from "@/lib/about";
-import { PAGES } from "@/lib/pages";
+import { PAGES, PLAY_FULL } from "@/lib/pages";
 import { cn, pageMain } from "@/lib/utils";
 import { PageTitle, PageTitleLink } from "@/components/page-title";
 import { AboutPreview } from "@/components/about-sections";
@@ -45,8 +45,15 @@ export default function Home() {
       </section>
 
       <section id={PLAY.id} aria-label={PLAY.label} className={section}>
-        <PageTitle as="h2">Play</PageTitle>
-        <Breakout />
+        <PageTitle as="h2">
+          <PageTitleLink href={PLAY_FULL} dir="forward" vtName="play-title">
+            Play
+          </PageTitleLink>
+        </PageTitle>
+        <div className="flex flex-col gap-[calc(45*var(--u))]">
+          <Breakout />
+          <SeeMoreButton href={PLAY_FULL}>Play full size</SeeMoreButton>
+        </div>
       </section>
 
       <SectionSpy />
