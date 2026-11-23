@@ -11,7 +11,8 @@ import { SeeMoreButton } from "@/components/see-more-button";
 const [ABOUT, PROJECTS, PLAY] = PAGES;
 
 // A section's top stops this far below the screen's top when a tab glides to it (the page's own top padding).
-const section = "scroll-mt-12 md:scroll-mt-[calc(64*var(--u))]";
+// On phones that's below the pinned tabs (app/(site)/layout.tsx).
+const section = "scroll-mt-16 md:scroll-mt-[calc(64*var(--u))]";
 
 /**
  * Home: one long page, About, Projects and Play one after another (their ids in lib/pages.ts).

@@ -8,8 +8,9 @@ import { cn, hoverLink } from "@/lib/utils";
 
 /**
  * Page nav as a plain tab list, like the Rakuten Fashion Week brand pages: the current page in
- * ink, the rest in a soft gray. "stack" is the sidebar's tabs on phones, as a row (desktop uses
- * the arc in arc-tabs.tsx); "row" is the top bar on pages without the sidebar.
+ * ink, the rest in a soft gray. "stack" is the phones' row, pinned to the top of the sidebar
+ * pages (app/(site)/layout.tsx; desktop uses the arc in arc-tabs.tsx); "row" is the top bar on
+ * pages without the sidebar.
  */
 export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
   const pathname = usePathname();
@@ -24,8 +25,11 @@ export function PageTabs({ layout = "stack" }: { layout?: "stack" | "row" }) {
     <nav aria-label="Pages">
       <ul className={cn("fw-nav flex gap-6", layout === "row" && "md:gap-[calc(27*var(--u))]")}>
         {PAGES.map((it, i) => {
-          const more = !fromGrid && it.more;
-          const className = cn(hoverLink, i === active ? "text-ink" : "fw-nav-off");
+          // The phone row has no hover to reveal "See more →" with (and it would sit over the
+          // next tab): the sections' own buttons lead on from there.
+          const more = !fromGrid && !stack && it.more;
+          // Phones: padded to a finger's height.
+          const className = cn(hoverLink, stack && "inline-block py-1.5", i === active ? "text-ink" : "fw-nav-off");
           return (
             <li key={it.href} className={cn("self-start", more && "group relative")}>
               {fromGrid ? (

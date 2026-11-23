@@ -823,9 +823,9 @@ export function Breakout() {
 
   const overlay =
     phase === "ready"
-      ? { title: "Breakout", line: "Click to start" }
+      ? { title: "Breakout", line: "to start", verb: "Click" }
       : phase === "over"
-        ? { title: "Game over", line: `${score} points · click to play again` }
+        ? { title: "Game over", line: "to play again", lead: `${score} points · `, verb: "click" }
         : null;
 
   return (
@@ -871,7 +871,13 @@ export function Breakout() {
             {/* Backed so it stays readable when the wall has come down behind it. */}
             <div className="flex flex-col items-center gap-[calc(6*var(--u))] bg-bone/90 px-[calc(24*var(--u))] py-[calc(14*var(--u))] text-center">
               <p className="fw-title">{overlay.title}</p>
-              <p className="fw-small text-mute">{overlay.line}</p>
+              <p className="fw-small text-mute">
+                {overlay.lead}
+                {/* "Tap" on touch screens. */}
+                <span className="[@media(pointer:coarse)]:hidden">{overlay.verb}</span>
+                <span className="hidden [@media(pointer:coarse)]:inline">{overlay.verb === "Click" ? "Tap" : "tap"}</span>{" "}
+                {overlay.line}
+              </p>
             </div>
           </div>
         )}

@@ -331,6 +331,20 @@ html[data-slide="down"]::view-transition-new(page) { animation-name: scroll-in-d
   }
 }
 
+/* On touch screens, a small link or button gets a finger-sized hit area without anything moving:
+   an invisible pad around it. For ones with room around them (icons, a row of links); links
+   stacked in a list get real padding instead, so their pads can't cover each other. */
+@utility tap {
+  @media (pointer: coarse) {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -10px -8px;
+    }
+  }
+}
+
 /* In the base layer so selection: utilities can override it (the footer flips it on its ink bar). */
 @layer base {
   ::selection {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import type { Project } from "@/lib/projects";
 import { SlapSplash } from "@/components/slap-splash";
-import { MediaImage } from "@/components/media-image";
+import { LoopingVideo, MediaImage, posterOf, videoOf } from "@/components/media-image";
 import { cn } from "@/lib/utils";
 
 // three.js only loads on pages that show the card.
@@ -13,8 +13,7 @@ const NfcCard3D = dynamic(() => import("@/components/nfc-card-3d").then((m) => m
   loading: () => <div className="h-full w-full bg-faint/75" />,
 });
 
-/** A gif's or video's still, saved beside it as `<name>.poster.jpg`. */
-export const posterOf = (media: string) => media.replace(/\.(gif|mp4)$/, ".poster.jpg");
+export { posterOf };
 
 /**
  * A project's cover. SLAP! shows the device's own switch-on animation, the NFC card is a 3D model
@@ -47,36 +46,28 @@ export function MediaSlot({
 
   if (video && playing === undefined) {
     return (
-      <video
-        src={project.media}
-        poster={posterOf(project.media)}
-        autoPlay
-        loop
-        muted
-        playsInline
-        aria-label={project.line}
-        className="h-full w-full object-cover"
-      />
+      <LoopingVideo src={project.media} poster={posterOf(project.media)} label={project.line} className="h-full w-full object-cover" />
     );
   }
 
   if (video) {
     return (
       <div className="relative h-full w-full">
-        <MediaImage src={posterOf(project.media)} alt={project.line} label={label} />
+        <MediaImage src={posterOf(project.media)} alt={project.line} label={label} eager />
         {playing && <PlayingVideo src={project.media} />}
       </div>
     );
   }
 
   if (playing === undefined || !project.media.endsWith(".gif")) {
-    return <MediaImage src={project.media} alt={project.line} label={label} />;
+    return <MediaImage src={project.media} alt={project.line} label={label} eager />;
   }
 
   return (
     <div className="relative h-full w-full">
-      <MediaImage src={posterOf(project.media)} alt={project.line} label={label} />
-      {playing && <PlayingGif src={project.media} />}
+      <MediaImage src={posterOf(project.media)} alt={project.line} label={label} eager />
+      {/* The gif's video twin: a tenth of the download, which matters on a phone. */}
+      {playing && <PlayingVideo src={videoOf(project.media)} fallback={project.media} />}
     </div>
   );
 }
@@ -98,18 +89,21 @@ function PlayingGif({ src }: { src: string }) {
   );
 }
 
-/** Like PlayingGif, for a video: from the start on each play, looping, faded in when it can play. */
-function PlayingVideo({ src }: { src: string }) {
+/**
+ * Like PlayingGif, for a video: from the start on each play, looping, faded in when it can play.
+ * `fallback`: the gif to play instead if the video can't be loaded.
+ */
+function PlayingVideo({ src, fallback }: { src: string; fallback?: string }) {
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  // No video for it, or the phone won't autoplay one: the gif plays by itself. Without a
+  // fallback, the still underneath simply stays.
+  if (failed) return fallback ? <PlayingGif src={fallback} /> : null;
   return (
-    <video
+    <LoopingVideo
       src={src}
-      autoPlay
-      loop
-      muted
-      playsInline
-      aria-hidden
       onPlaying={() => setReady(true)}
+      onFail={() => setFailed(true)}
       className={cn(
         "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
         ready ? "opacity-100" : "opacity-0",

@@ -6,7 +6,6 @@ import { CoffeeChat } from "@/components/coffee-chat";
 import { useCopyEmail } from "@/components/copy-email";
 import { ICON } from "@/lib/icons";
 import { ChromeName } from "@/components/chrome-name";
-import { PageTabs } from "@/components/page-tabs";
 import { useMountedInSlide } from "@/components/slide-link";
 import { ArcTabs } from "@/components/arc-tabs";
 import { cn, ease, hoverLink, morph } from "@/lib/utils";
@@ -47,7 +46,7 @@ export function Sidebar() {
       style={sidebarMorph.style}
       className={cn(
         sidebarMorph.className,
-        "flex flex-col px-5 pt-8",
+        "flex flex-col px-5 pt-8 pb-5",
         "md:sticky md:top-0 md:z-10 md:ml-[var(--edge)] md:h-dvh md:w-[calc(428*var(--u))] md:self-start md:justify-between md:px-0",
         // A hairline down its right edge on desktop, the same weight as the section labels' rules.
         "md:border-r-[0.5px] md:border-ink",
@@ -68,7 +67,7 @@ export function Sidebar() {
                   rel="noopener noreferrer"
                   aria-label={s.label}
                   title={s.label}
-                  className="flex text-[#3a3a38] transition-colors duration-200 hover:text-ink"
+                  className="tap flex text-[#3a3a38] transition-colors duration-200 hover:text-ink"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="size-[calc(22*var(--u))]">
                     <path d={s.path} />
@@ -83,7 +82,7 @@ export function Sidebar() {
             href={RESUME.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-[#3a3a38] px-[calc(8*var(--u))] py-[calc(3*var(--u))] text-bone transition-colors duration-200 hover:bg-[#262625]"
+            className="tap bg-[#3a3a38] px-[calc(8*var(--u))] py-[calc(3*var(--u))] text-bone transition-colors duration-200 hover:bg-[#262625]"
           >
             Resume<span className="ml-0.5 align-top text-[0.75em]">↗</span>
           </a>
@@ -93,7 +92,7 @@ export function Sidebar() {
             onMouseLeave={resetCopied}
             onBlur={resetCopied}
             aria-label={`Copy email address ${EMAIL}`}
-            className={cn("group flex cursor-pointer items-center gap-[calc(6*var(--u))]", hoverLink)}
+            className={cn("tap group flex cursor-pointer items-center gap-[calc(6*var(--u))]", hoverLink)}
           >
             {/* Material Symbols icons (Apache 2.0), flat like the GitHub and LinkedIn marks:
                 mail at rest, copy on hover, a check right after copying. */}
@@ -123,17 +122,15 @@ export function Sidebar() {
         </div>
         <div className="fw-small mt-[calc(18*var(--u))] max-w-[calc(320*var(--u))] space-y-[calc(10*var(--u))] text-mute">
           <p>
-            <CoffeeChat className="text-ink" />
+            <CoffeeChat className="tap text-ink" />
           </p>
         </div>
       </div>
 
-      {/* Middle left: the tabs on an arc on desktop, a plain row on phones. */}
-      <div className="mt-[calc(36*var(--u))] md:absolute md:top-1/2 md:right-0 md:left-0 md:mt-0 md:-translate-y-1/2">
-        <div className="md:hidden">
-          <PageTabs />
-        </div>
-        <ArcTabs className="hidden md:block" />
+      {/* Middle left: the tabs on desktop. Phones have them pinned to the top of the page instead
+          (app/(site)/layout.tsx). */}
+      <div className="hidden md:absolute md:top-1/2 md:right-0 md:left-0 md:block md:-translate-y-1/2">
+        <ArcTabs />
       </div>
     </motion.aside>
   );

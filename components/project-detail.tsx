@@ -118,7 +118,8 @@ export function ProjectDetail({ project }: { project: Project }) {
 
         <nav
           aria-label="More projects"
-          className="fw-text mt-[calc(72*var(--u))] grid grid-cols-3 items-start gap-6 border-t border-ink/45 pt-[calc(27*var(--u))]"
+          // Phones: previous and next side by side, "All projects" centred under them.
+          className="fw-text mt-[calc(72*var(--u))] grid grid-cols-2 items-start gap-6 border-t border-ink/45 pt-[calc(27*var(--u))] md:grid-cols-3"
         >
           <Link href={`/projects/${prev.slug}`} className="group flex flex-col">
             <span className="fw-small uppercase text-mute">← Previous</span>
@@ -128,11 +129,11 @@ export function ProjectDetail({ project }: { project: Project }) {
             href={PROJECTS_GRID}
             dir="close"
             morph={project.slug}
-            className={cn("self-center justify-self-center", hoverLink)}
+            className={cn("self-center justify-self-center max-md:col-span-2 max-md:row-start-2 max-md:py-2", hoverLink)}
           >
             All projects
           </SlideLink>
-          <Link href={`/projects/${next.slug}`} className="group flex flex-col items-end text-right">
+          <Link href={`/projects/${next.slug}`} className="group flex flex-col items-end text-right max-md:col-start-2 max-md:row-start-1">
             <span className="fw-small uppercase text-mute">Next →</span>
             <span className={cn(hoverLink, "group-hover:underline")}>{next.title}</span>
           </Link>

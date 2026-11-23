@@ -30,7 +30,7 @@ function NameAndSocials() {
               rel="noopener noreferrer"
               aria-label={s.label}
               title={s.label}
-              className="flex text-[#3a3a38] transition-colors duration-200 hover:text-ink"
+              className="tap flex text-[#3a3a38] transition-colors duration-200 hover:text-ink"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="size-[calc(22*var(--u))]">
                 <path d={s.path} />

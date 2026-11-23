@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 
 const [GITHUB, RESUME, , LINKEDIN] = LINKS;
 
-const link = "underline-offset-4 hover:underline";
+// Phones: padded, so each link in these stacked lists is a comfortable tap.
+const link = "underline-offset-4 hover:underline max-md:inline-block max-md:py-[calc(7*var(--u))]";
 const ext = { target: "_blank", rel: "noopener noreferrer" } as const;
 
 const SOCIAL = [
@@ -55,7 +56,7 @@ export function Footer() {
             </ul>
             <ul className="flex flex-col">
               <li><a href={RESUME.href} {...ext} className={link}>RESUME</a></li>
-              <li><CoffeeChat className="hover:text-bone">COFFEE CHAT</CoffeeChat></li>
+              <li><CoffeeChat className="hover:text-bone max-md:py-[calc(7*var(--u))]">COFFEE CHAT</CoffeeChat></li>
             </ul>
             <ul className="flex flex-col">
               <li><a href={GITHUB.href} {...ext} className={link}>GITHUB</a></li>
@@ -67,13 +68,13 @@ export function Footer() {
             <ul className="flex items-center gap-[calc(11.25*var(--u))] md:justify-end">
               <li className="flex">
                 <CopyEmailIcon
-                  className="flex cursor-pointer opacity-90 transition-opacity hover:opacity-100"
+                  className="tap flex cursor-pointer opacity-90 transition-opacity hover:opacity-100"
                   iconClassName="size-[calc(20*var(--u))]"
                 />
               </li>
               {SOCIAL.map((s) => (
                 <li key={s.label} className="flex">
-                  <a href={s.href} {...ext} aria-label={s.label} className="opacity-90 transition-opacity hover:opacity-100">
+                  <a href={s.href} {...ext} aria-label={s.label} className="tap opacity-90 transition-opacity hover:opacity-100">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="size-[calc(20*var(--u))]">
                       <path d={s.path} />
                     </svg>
