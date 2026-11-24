@@ -77,6 +77,10 @@ body {
      its width (it shrinks to the window below that) and --edge its inner margin. */
   --frame: calc(1120 * var(--u)); /* its width, at most */
   --edge: calc(45 * var(--u));
+  /* The sidebar (components/sidebar.tsx): just wide enough for its widest row (the name and icons),
+     and its column in the home layout, which adds the edge before it and a gap after it. */
+  --sidebar: calc(300 * var(--u));
+  --sidebar-col: calc(var(--edge) + var(--sidebar) + 60 * var(--u));
 }
 
 /* Phones get the single-column layout, so the scale stops tracking width and holds at a size
@@ -160,7 +164,7 @@ html[data-slide="back"]::view-transition-new(*) {
 /* How far the screen travels: about the sidebar's column on desktop, less on phones (the
    sidebar sits above the page there). */
 :root { --slide-shift: 24vw; }
-@media (min-width: 48rem) { :root { --slide-shift: 36.5vw; } }
+@media (min-width: 48rem) { :root { --slide-shift: var(--sidebar-col); } }
 
 @keyframes screen-out-left { to { transform: translateX(calc(-1 * var(--slide-shift))); opacity: 0; } }
 @keyframes screen-in-right { from { transform: translateX(calc(0.5 * var(--slide-shift))); opacity: 0; } }

@@ -9,7 +9,7 @@ import { Sidebar } from "@/components/sidebar";
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     // Full width: the sidebar's column, then the page out to the right edge.
-    <div className="md:grid md:grid-cols-[36.5vw_minmax(0,1fr)]">
+    <div className="md:grid md:grid-cols-[var(--sidebar-col)_minmax(0,1fr)]">
       <Sidebar />
       {/* Phones: the page tabs, pinned to the top once the header above has scrolled away, so the
           sections of the long home page are always one tap off. (Desktop has them in the sidebar.) */}

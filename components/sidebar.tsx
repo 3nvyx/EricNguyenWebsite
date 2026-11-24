@@ -47,7 +47,7 @@ export function Sidebar() {
       className={cn(
         sidebarMorph.className,
         "flex flex-col px-5 pt-8 pb-5",
-        "md:sticky md:top-0 md:z-10 md:ml-[var(--edge)] md:h-dvh md:w-[calc(428*var(--u))] md:self-start md:justify-between md:px-0",
+        "md:sticky md:top-0 md:z-10 md:ml-[var(--edge)] md:h-dvh md:w-[var(--sidebar)] md:self-start md:justify-between md:px-0",
         // A hairline down its right edge on desktop, the same weight as the section labels' rules.
         "md:border-r-[0.5px] md:border-ink",
         "md:pt-[calc(64*var(--u))] md:pb-[calc(45*var(--u))]",
@@ -120,7 +120,7 @@ export function Sidebar() {
             <span aria-live="polite">{copied ? "Copied to clipboard" : EMAIL}</span>
           </button>
         </div>
-        <div className="fw-small mt-[calc(18*var(--u))] max-w-[calc(320*var(--u))] space-y-[calc(10*var(--u))] text-mute">
+        <div className="fw-small mt-[calc(18*var(--u))] space-y-[calc(10*var(--u))] text-mute">
           <p>
             <CoffeeChat className="tap text-ink" />
           </p>
