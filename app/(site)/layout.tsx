@@ -2,7 +2,7 @@ import { PageTabs } from "@/components/page-tabs";
 import { Sidebar } from "@/components/sidebar";
 
 /**
- * Home (About, Projects and Play as one long page), Blogs and Privacy: the sticky sidebar beside the page. It sticks while the page
+ * Home (About and Projects as one long page), Blogs and Privacy: the sticky sidebar beside the page. It sticks while the page
  * scrolls, then leaves with the content when the footer arrives. Project pages live outside
  * this group and have no sidebar.
  */

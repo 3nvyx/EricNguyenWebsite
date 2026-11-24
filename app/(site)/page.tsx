@@ -1,21 +1,20 @@
 import { ABOUT_LEAD, FEATURED_ABOUT } from "@/lib/about";
-import { PAGES, PLAY_FULL } from "@/lib/pages";
+import { PAGES } from "@/lib/pages";
 import { cn, pageMain } from "@/lib/utils";
 import { PageTitle, PageTitleLink } from "@/components/page-title";
 import { AboutPreview } from "@/components/about-sections";
-import { Breakout } from "@/components/breakout";
 import { Portfolio } from "@/components/portfolio";
 import { SectionSpy } from "@/components/sections";
 import { SeeMoreButton } from "@/components/see-more-button";
 
-const [ABOUT, PROJECTS, PLAY] = PAGES;
+const [ABOUT, PROJECTS] = PAGES;
 
 // A section's top stops this far below the screen's top when a tab glides to it (the page's own top padding).
 // On phones that's below the pinned tabs (app/(site)/layout.tsx).
 const section = "scroll-mt-16 md:scroll-mt-[calc(64*var(--u))]";
 
 /**
- * Home: one long page, About, Projects and Play one after another (their ids in lib/pages.ts).
+ * Home: one long page, About then Projects (their ids in lib/pages.ts).
  * The sidebar's tabs follow the scroll and glide to a section (components/sections.tsx); the
  * footer ends it.
  *
@@ -42,18 +41,6 @@ export default function Home() {
 
       <section id={PROJECTS.id} aria-label={PROJECTS.label} className={section}>
         <Portfolio />
-      </section>
-
-      <section id={PLAY.id} aria-label={PLAY.label} className={section}>
-        <PageTitle as="h2">
-          <PageTitleLink href={PLAY_FULL} dir="forward" vtName="play-title">
-            Play
-          </PageTitleLink>
-        </PageTitle>
-        <div className="flex flex-col gap-[calc(45*var(--u))]">
-          <Breakout />
-          <SeeMoreButton href={PLAY_FULL}>Play full size</SeeMoreButton>
-        </div>
       </section>
 
       <SectionSpy />

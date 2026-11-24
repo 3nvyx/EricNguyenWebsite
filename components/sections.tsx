@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { PAGES, activePage } from "@/lib/pages";
 
 /*
- * Home is one long page: About, Projects and Play as sections, one after another (each with the
+ * Home is one long page: About and Projects as sections, one after another (each with the
  * id from lib/pages.ts). The page tabs follow the scroll (SectionSpy) and clicking one glides
  * there (goToPage). Off home, a tab goes to its section on home (/#projects).
  */
@@ -52,7 +52,7 @@ export function sectionInView() {
 }
 
 /**
- * Mounted on home: keeps the tabs on the section in view, and the address on it too (/#play),
+ * Mounted on home: keeps the tabs on the section in view, and the address on it too (/#projects),
  * so a reload or a shared link comes back to the same place.
  */
 export function SectionSpy() {
@@ -71,7 +71,7 @@ export function SectionSpy() {
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    // Arriving at /#play, the browser has already scrolled there: mark it straight away. Back or
+    // Arriving at /#projects, the browser has already scrolled there: mark it straight away. Back or
     // Forward may put the scroll somewhere else again, so look once more after those.
     const recheck = () =>
       requestAnimationFrame(() => {

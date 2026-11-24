@@ -10,12 +10,12 @@ import { cn, hoverLink } from "@/lib/utils";
 
 /*
  * The desktop sidebar's page tabs (once set on an arc, hence the name). They hold still in a
- * close column, About on top and Play at the bottom; the current one is larger, and the others
+ * close column, About on top and Projects below; the current one is larger, and the others
  * smaller and fainter the further they are, and switching just grows one and shrinks the other.
  * A short bar to their left, a solid track with a marker one page tall, shows how many pages
  * there are and which one you're on; the marker slides as that changes.
  *
- * About, Projects and Play are sections of one long home page (components/sections.tsx): the
+ * About and Projects are sections of one long home page (components/sections.tsx): the
  * tabs follow the scroll, and clicking a tab, or turning the mouse wheel over the tabs (one
  * notch, one section), glides the page there. Phones keep the plain tab row (PageTabs).
  *

@@ -105,7 +105,7 @@ function reset() {
 }
 
 /**
- * Whether a swipe starting on `target` belongs to it rather than to the page: the game, form
+ * Whether a swipe starting on `target` belongs to it rather than to the page: a canvas, form
  * controls (a video's seek bar), anything marked data-no-swipe (the 360° video), and anything
  * that scrolls sideways itself (any way, for a touch, whose direction isn't known yet; for a
  * wheel, only if it can still scroll the way `dx` goes).

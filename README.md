@@ -13,14 +13,14 @@ npm run dev
 
 | Route | File | What's there |
 | --- | --- | --- |
-| `/` | `app/(site)/page.tsx` | One long page: About (photo, short intro, skills), the four featured projects, and Breakout with a shared leaderboard |
+| `/` | `app/(site)/page.tsx` | One long page: About (photo, short intro, skills), and the four featured projects |
 | `/about/more` | `app/(wide)/about/more/page.tsx` | The full About: whole intro, experience, leadership, skills, awards |
 | `/projects/all` | `app/(wide)/projects/all/page.tsx` | Every project as a card grid |
 | `/projects/<slug>` | `components/project-detail.tsx` | Write-up with facts strip, figures, video and an on-this-page index |
 | `/blogs`, `/privacy` | `app/(site)/…` | Posts from `lib/posts.ts`; privacy note |
 
 The sidebar tabs follow home's sections and glide to them (`components/sections.tsx`).
-`/about`, `/projects` and `/play` redirect to `/`, `/#projects` and `/#play`.
+`/about` and `/projects` redirect to `/` and `/#projects`; `/play` (the old game) goes to `/`.
 
 ![Home](docs/readme/home.png)
 
@@ -51,15 +51,6 @@ Projects and links live in `lib/projects.ts`; write-ups for `/projects/<slug>` l
 
 Project pages can also embed a 360° video (`components/video-360.tsx`), used for SLAP!'s
 soldering footage.
-
-## Breakout
-
-`/play` is a one-life Breakout: tough blocks, power-ups (SPLIT, WIDE, SHORT) and a combo
-multiplier for chaining blocks without touching the paddle. Scores go to a Neon Postgres table
-through `app/api/leaderboard`. Set `DATABASE_URL` (see `.env.example`); without it the game still
-plays and the board hides.
-
-![Breakout rally](docs/readme/breakout.gif)
 
 ## Coffee chat booking
 

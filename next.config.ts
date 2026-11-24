@@ -1,12 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Home is one long page of About, Projects and Play; their old pages go to their sections.
+  // Home is one long page of About and Projects; their old pages go to their sections. Play is gone,
+  // so old links to it land on home.
   async redirects() {
     return [
       { source: "/about", destination: "/", permanent: false },
       { source: "/projects", destination: "/#projects", permanent: false },
-      { source: "/play", destination: "/#play", permanent: false },
+      { source: "/play/:path*", destination: "/", permanent: false },
     ];
   },
 };
