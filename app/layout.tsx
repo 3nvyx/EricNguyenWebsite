@@ -23,7 +23,7 @@ const instrumentSans = Instrument_Sans({
 const SITE_URL = "https://ericnguyenn.me";
 const SITE_TITLE = "Eric Nguyen — Product Engineer";
 const SITE_DESCRIPTION =
-  "I make things people actually pick up and use. I sit with someone doing a job the slow way, find the part that hurts, and make it disappear, in code, in hardware, or both.";
+  "Product engineer working across software and hardware. Web apps, client work, hardware builds and hackathon projects.";
 // Same portrait as the About page.
 const SITE_IMAGE = { url: "/eric-portrait.jpg", width: 800, height: 1201, alt: "Eric Nguyen" };
 
